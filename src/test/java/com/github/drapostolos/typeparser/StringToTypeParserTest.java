@@ -44,9 +44,9 @@ public class StringToTypeParserTest {
     @Test
     public void shouldThrowIllegalArgumentExceptionWhenStaticFactoryMethodFails() throws Exception {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Can not parse \"aaa\" to type 'com.github.drapostolos.TestClass3' "
+        thrown.expectMessage("Can not parse \"aaa\" to type 'com.github.drapostolos.typeparser.TestClass3' "
                 + "due to:  Exception thrown in static factory method "
-                + "'com.github.drapostolos.TestClass3.valueOf('aaa')'. "
+                + "'com.github.drapostolos.typeparser.TestClass3.valueOf('aaa')'. "
                 + "See underlying exception for additional information.");
         StringToTypeParser.parse("aaa", TestClass3.class); 
     }

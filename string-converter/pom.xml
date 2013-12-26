@@ -3,10 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.github.drapostolos</groupId>
-	<artifactId>string-converter</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>string-converter</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -198,5 +196,7 @@
 		<developerConnection>scm:git:https://github.com/drapostolos/string-converter.git</developerConnection>
 		<url>https://github.com/drapostolos/string-converter.git</url>
 	</scm>
-	<description>This is a lightweigth library that does nothing but parse a string to a given type.</description>
+	<description>This is a lightweigth library that does nothing but parse a string to a given type. Supports most of the java classes, such as Integer, File, Enum, Float etc. Also possible to register your own parsers.</description>
+	<artifactId>type-parser</artifactId>
+	<name>type-parser</name>
 </project>

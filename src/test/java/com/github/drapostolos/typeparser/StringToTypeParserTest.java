@@ -1,10 +1,12 @@
-package com.github.drapostolos;
+package com.github.drapostolos.typeparser;
 
 
 import org.fest.assertions.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import com.github.drapostolos.typeparser.StringToTypeParser;
 
 
 public class StringToTypeParserTest {
@@ -42,9 +44,9 @@ public class StringToTypeParserTest {
     @Test
     public void shouldThrowIllegalArgumentExceptionWhenStaticFactoryMethodFails() throws Exception {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Can not parse \"aaa\" to type 'com.github.drapostolos.MyTestStunt3' "
+        thrown.expectMessage("Can not parse \"aaa\" to type 'com.github.drapostolos.TestClass3' "
                 + "due to:  Exception thrown in static factory method "
-                + "'com.github.drapostolos.MyTestStunt3.valueOf('aaa')'. "
+                + "'com.github.drapostolos.TestClass3.valueOf('aaa')'. "
                 + "See underlying exception for additional information.");
         StringToTypeParser.parse("aaa", TestClass3.class); 
     }

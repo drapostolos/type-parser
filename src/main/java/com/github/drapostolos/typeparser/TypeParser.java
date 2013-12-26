@@ -1,4 +1,4 @@
-package com.github.drapostolos;
+package com.github.drapostolos.typeparser;
 
 public interface TypeParser<T> {
     static final String X = "";

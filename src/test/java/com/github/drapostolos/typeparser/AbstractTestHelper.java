@@ -1,4 +1,4 @@
-package com.github.drapostolos;
+package com.github.drapostolos.typeparser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,6 +7,8 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.fest.assertions.api.Assertions;
+
+import com.github.drapostolos.typeparser.StringToTypeParser;
 
 abstract class AbstractTestHelper {
     static final String NUMBER_FORMAT_ERROR_MSG = "Number format exception For input string: \"%s\".";

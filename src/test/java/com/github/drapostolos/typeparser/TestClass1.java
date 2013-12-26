@@ -1,14 +1,25 @@
-package com.github.drapostolos;
+package com.github.drapostolos.typeparser;
 
-public class TestClass2 {
+import com.github.drapostolos.typeparser.TypeParser;
+
+public class TestClass1  implements TypeParser<TestClass1>{
     String value;
     
-    public static TestClass2 of(String value){
-        return new TestClass2(value);
+    public static TestClass1 valueOf(String value){
+        return new TestClass1(value);
     }
 
-    public TestClass2(String value) {
+    @Override
+    public TestClass1 parse(String value) {
+        return new TestClass1(value);
+    }
+
+    public TestClass1(String value) {
         this.value = value;
+    }
+
+    public TestClass1() {
+        this.value = "default";
     }
     
     @Override
@@ -27,7 +38,7 @@ public class TestClass2 {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        TestClass2 other = (TestClass2) obj;
+        TestClass1 other = (TestClass1) obj;
         if (value == null) {
             if (other.value != null)
                 return false;
@@ -35,6 +46,4 @@ public class TestClass2 {
             return false;
         return true;
     }
-
-    
 }

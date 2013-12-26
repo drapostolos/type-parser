@@ -1,4 +1,4 @@
-package com.github.drapostolos;
+package com.github.drapostolos.typeparser;
 
 import java.util.HashMap;
 import java.util.Map;

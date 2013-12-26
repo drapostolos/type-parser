@@ -1,7 +1,10 @@
-package com.github.drapostolos;
+package com.github.drapostolos.typeparser;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.Test;
+
+import com.github.drapostolos.typeparser.TypeParser;
+import com.github.drapostolos.typeparser.Util;
 
 public class UtilTest implements TypeParser<Integer>{
 

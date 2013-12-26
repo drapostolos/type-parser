@@ -1,4 +1,4 @@
-package com.github.drapostolos;
+package com.github.drapostolos.typeparser;
 
 public class TestClass3 {
     Integer value;

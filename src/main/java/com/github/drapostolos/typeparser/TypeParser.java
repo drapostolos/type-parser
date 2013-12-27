@@ -16,5 +16,4 @@ public interface TypeParser<T> {
      * @return an instance of type T.
      */
     T parse(String value);
-
 }

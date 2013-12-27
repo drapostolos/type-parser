@@ -1,19 +1,80 @@
 package com.github.drapostolos.typeparser;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The purpose of this class is to parse a string (read from a file for example)
+ * and convert it to a specific java object/Type (like the java primitive types
+ * and there wrapper classes).
+ * <p>
+ * There is a convenient static method (for simple usage), used as follow:</br>
+ * </br>
+ * {@code Integer i = StringToTypeParser.parse("125", Integer.class);}</br>
+ * {@code boolean i = StringToTypeParser.parse("true", boolean.class);}</br>
+ * {@code File f = StringToTypeParser.parse("/path/to", File.class);}</br>
+ * </br>
+ *  which supports only the following java types (and primitives): 
+ *  <ul>
+ *  <li> {@link Byte} (byte)</li>
+ *  <li> {@link Short} (short)</li>
+ *  <li> {@link Integer} (int)</li>
+ *  <li> {@link Long} (long)</li>
+ *  <li> {@link Float} (float)</li>
+ *  <li> {@link Double} (double)</li>
+ *  <li> {@link Boolean} (boolean)</li>
+ *  <li> {@link Character} (char)</li>
+ *  <li> {@link String} </li>
+ *  <li> {@link File} </li>
+ *  <li> Any types with a static factory method named: {@code valueOf(String)} (Example: {@link Enum})</li>
+ *  <li> Any types with a static factory method named: {@code of(String)} (Example: {@link EnumSet}) </li>
+ *  </ul>
+ * <p>
+ * Parsing and converting to additional types can be done by either:
+ *  <ul>
+ *  <li> Register your own implementations of the {@link TypeParser} interface</li>
+ *  <li> Add one of these static factory methods in your class:  {@code valueOf(String)} or  {@code of(String)}</li>
+ *  </ul>
+ * <p>
+ * Here's an example how to register your own {@link TypeParser}'s:
+ * </br></br>
+ * {@code StringToTypeParser parser = StringToTypeParser.newBuilder() }</br>
+ * {@code .registerTypeParser(new XTypeParser())}</br>
+ * {@code .registerTypeParser(new YTypeParser())}</br>
+ * {@code .build();}</br>
+ * </br>
+ * {@code X x = parser.parseType("some-string", X.class);}</br>
+ *
+ */
 public final class StringToTypeParser {
     private static final StringToTypeParser defaultTypeParser = newBuilder().build();
     private final Map<Class<?>, TypeParser<?>> typeParsers;
 
+    /**
+     * Use this method to get a new {@link StringToTypeParserBuilder} instance
+     * to register your own {@link TypeParser} implementations, or remove any of the 
+     * default {@link TypeParser}'s.
+     * 
+     * @return new instance of {@link StringToTypeParserBuilder}
+     */
     public static StringToTypeParserBuilder newBuilder() {
         return new StringToTypeParserBuilder();
     }
     
+    /**
+     * Convenient static method that only parses the types supported by default.
+     * @param value - string value to parse
+     * @param type - the expected type to convert {@code value} to.
+     * @return an instance of {@code type} corresponding to the given {@code value}.
+     * @throws NullPointerException if any of the arguments are null.
+     * @throws IllegalArgumentException if {@code value} is not parsable, or
+     * if {@code type} is not recognized.
+     */
     public static <T> T parse(String value, Class<T> type){
         return defaultTypeParser.parseType(value, type);
     }
@@ -22,6 +83,18 @@ public final class StringToTypeParser {
         this.typeParsers = typeParsers;
     }
 
+    /**
+     * Parses the given {@code value} to the given {@code type}. Where {@code type}
+     * is either one of the default supported java types or a registered {@link TypeParser}
+     * (for custom made types).
+     * 
+     * @param value - string value to parse
+     * @param type - the expected type to convert {@code value} to.
+     * @return an instance of {@code type} corresponding to the given {@code value}.
+     * @throws NullPointerException if any of the arguments are null.
+     * @throws IllegalArgumentException if {@code value} is not parsable, or
+     * if {@code type} is not recognized.
+     */
     public <T> T parseType(String value, Class<T> type) {
         if (value == null) {
             throw new NullPointerException(Util.nullArgumentErrorMsg("value"));
@@ -29,20 +102,19 @@ public final class StringToTypeParser {
         if (type == null) {
             throw new NullPointerException(Util.nullArgumentErrorMsg("type"));
         }
-
+        
+        // convert "null" string to null type.
         if (value.trim().equalsIgnoreCase("null")) {
             if (type.isPrimitive()) {
                 String message = "'%s' primitive can not be set to null.";
                 throw new IllegalArgumentException(String.format(message,
                         type.getName()));
             }
-            return null;
+            return null; 
         }
 
         Object result = null;
-        if (type == String.class) {
-            result = value;
-        } else if (typeParsers.containsKey(type)) {
+        if (typeParsers.containsKey(type)) {
             result = callTypeParser(value, type);
         } else if ((result = callFactoryMethodIfExisting("valueOf", value, type)) != null) {
             //

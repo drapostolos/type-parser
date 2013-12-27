@@ -33,7 +33,7 @@ public class StringToTypeParserTest {
     public void canRegisterAddionalTypeParsers() throws Exception {
         // given
         StringToTypeParser parser = StringToTypeParser.newBuilder()
-        .registerTypeParser(new TestClass1())
+        .registerTypeParser(TestClass1.class, new TestClass1())
         .build();
         
         // then
@@ -75,7 +75,12 @@ public class StringToTypeParserTest {
 
     @Test(expected = NullPointerException.class)
     public void shouldThrowExceptionWhenRegisteringNullTypeParser() throws Exception {
-        StringToTypeParser.newBuilder().registerTypeParser(null);
+        StringToTypeParser.newBuilder().registerTypeParser(int.class, null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldThrowExceptionWhenRegisteringNullType() throws Exception {
+        StringToTypeParser.newBuilder().registerTypeParser(null, new TestClass1());
     }
 
     @Test(expected = NullPointerException.class)

@@ -1,104 +1,121 @@
 package com.github.drapostolos.typeparser;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
+/*
+ * When adding new default type parsers: add them at the bottom (+ add TypeParser*Test.java class with unit tests).
+ */
 class DefaultTypeParsers {
+    private DefaultTypeParsers() { new AssertionError("Not meant for instantiation"); }
+    private static final String BOOLEAN_ERROR_MESSAGE = "\"%s\" is not parsable to a Boolean.";
+    private static final String CHARACTER_ERROR_MESSAGE = "\"%s\" must only contain a single character.";
+    private static final Map<Class<?>, TypeParser<?>> DEFAULT_TYPE_PARSERS = new HashMap<Class<?>, TypeParser<?>>();
+    private static final Map<Class<?>, Class<?>> WRAPPER_TO_PRIMITIVE = new HashMap<Class<?>, Class<?>>();
 
-    static List<TypeParser<?>> list() {
-        List<TypeParser<?>> result = new ArrayList<TypeParser<?>>();
-        for(Class<?> c : DefaultTypeParsers.class.getDeclaredClasses()){
-            if(TypeParser.class.isAssignableFrom(c)){
-                TypeParser<?> instance;
-                try {
-                    instance = (TypeParser<?>) c.newInstance();
-                    result.add(instance);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                } 
+    static Map<Class<?>, TypeParser<?>> copy() {
+        return new HashMap<Class<?>, TypeParser<?>>(DEFAULT_TYPE_PARSERS);
+    }
+
+    static{
+        WRAPPER_TO_PRIMITIVE.put(Boolean.class, boolean.class);
+        WRAPPER_TO_PRIMITIVE.put(Byte.class, byte.class);
+        WRAPPER_TO_PRIMITIVE.put(Short.class, short.class);
+        WRAPPER_TO_PRIMITIVE.put(Character.class, char.class);
+        WRAPPER_TO_PRIMITIVE.put(Integer.class, int.class);
+        WRAPPER_TO_PRIMITIVE.put(Long.class, long.class);
+        WRAPPER_TO_PRIMITIVE.put(Float.class, float.class);
+        WRAPPER_TO_PRIMITIVE.put(Double.class, double.class);
+    }
+
+    private static <T> void put(Class<T> type, TypeParser<? extends T> typeParser){
+        DEFAULT_TYPE_PARSERS.put(type, typeParser);
+        if(WRAPPER_TO_PRIMITIVE.containsKey(type)){
+            // add primitive targetType if existing, example int.class, boolean.class etc.
+            Class<?> primitiveType = WRAPPER_TO_PRIMITIVE.get(type);
+            DEFAULT_TYPE_PARSERS.put(primitiveType, typeParser);
+        }
+    }
+
+    static{
+        put(Boolean.class, new TypeParser<Boolean>() {
+            @Override
+            public Boolean parse(final String value0) {
+                String value = value0.trim().toLowerCase();
+                if(value.equals("true")){
+                    return Boolean.TRUE;
+                } else if(value.equals("false")){
+                    return Boolean.FALSE;
+                }
+                throw new IllegalArgumentException(String.format(BOOLEAN_ERROR_MESSAGE, value0));
             }
-        }
-        return result;
-    }
+        });
 
-    static class BooleanTypeParser implements TypeParser<Boolean> {
-        @Override
-        public Boolean parse(final String value0) {
-            String value = value0.trim().toLowerCase();
-            if(value.equals("true") || value.equals("1")){
-                return Boolean.TRUE;
-            } else if(value.equals("false") || value.equals("0")){
-                return Boolean.FALSE;
+        put(Character.class, new TypeParser<Character>() {
+            @Override
+            public Character parse(String value) {
+                if(value.length() == 1){
+                    return Character.valueOf(value.charAt(0));
+                }
+                throw new IllegalArgumentException(String.format(CHARACTER_ERROR_MESSAGE, value));
             }
-            String message = "\"%s\" is not parsable to a Boolean.";
-            throw new IllegalArgumentException(String.format(message, value0));
-        }
-    }
+        });
 
-    static class CharacterTypeParser implements TypeParser<Character>{
-        @Override
-        public Character parse(String value) {
-            if(value.length() == 1){
-                return Character.valueOf(value.charAt(0));
+        put(Byte.class, new TypeParser<Byte>() {
+            @Override
+            public Byte parse(String value) {
+                return Byte.valueOf(value.trim());
             }
-            String message = "\"%s\" must only contain a single character.";
-            throw new IllegalArgumentException(String.format(message, value));
-        }
-    }
+        });
 
-    static class ByteTypeParser implements TypeParser<Byte> {
-        @Override
-        public Byte parse(String value) {
-            return Byte.valueOf(value.trim());
-        }
-    }
+        put(Integer.class, new TypeParser<Integer>() {
+            @Override
+            public Integer parse(String value) {
+                return Integer.valueOf(value.trim());
+            }
+        });
 
-    static class IntegerTypeParser implements TypeParser<Integer>{
-        @Override
-        public Integer parse(String value) {
-            return Integer.valueOf(value.trim());
-        }
-    }
-    
-    static class LongTypeParser implements TypeParser<Long>{
-        @Override
-        public Long parse(String value) {
-            return Long.valueOf(value.trim());
-        }
-    }
+        put(Long.class, new TypeParser<Long>() {
+            @Override
+            public Long parse(String value) {
+                return Long.valueOf(value.trim());
+            }
+        });
 
-    static class ShortTypeParser implements TypeParser<Short>{
-        @Override
-        public Short parse(String value) {
-            return Short.valueOf(value.trim());
-        }
-    }
+        put(Short.class, new TypeParser<Short>() {
+            @Override
+            public Short parse(String value) {
+                return Short.valueOf(value.trim());
+            }
+        });
 
-    static class FloatTypeParser implements TypeParser<Float>{
-        @Override
-        public Float parse(String value) {
-            return Float.valueOf(value);
-        }
-    }
+        put(Float.class, new TypeParser<Float>() {
+            @Override
+            public Float parse(String value) {
+                return Float.valueOf(value);
+            }
+        });
 
-    static class DoubleTypeParser implements TypeParser<Double>{
-        @Override
-        public Double parse(String value) {
-            return Double.valueOf(value);
-        }
-    }
+        put(Double.class, new TypeParser<Double>() {
+            @Override
+            public Double parse(String value) {
+                return Double.valueOf(value);
+            }
+        });
 
-    static class FileTypeParser implements TypeParser<File>{
-        @Override
-        public File parse(String value) {
-            return new File(value.trim());
-        }
-    }
-    static class StringTypeParser implements TypeParser<String>{
-        @Override
-        public String parse(String value) {
-            return value;
-        }
+        put(File.class, new TypeParser<File>() {
+            @Override
+            public File parse(String value) {
+                return new File(value.trim());
+            }
+        });
+
+        put(String.class, new TypeParser<String>() {
+            @Override
+            public String parse(String value) {
+                return value;
+            }
+        });
     }
 }

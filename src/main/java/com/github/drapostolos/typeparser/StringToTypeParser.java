@@ -4,22 +4,17 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * The purpose of this class is to parse a string (read from a file for example)
- * and convert it to a specific java object/Type (like the java primitive types
- * and there wrapper classes).
+ * and convert it to a specific java object/Type (for example converting "1" to
+ * an Integer type).
  * <p>
- * There is a convenient static method (for simple usage), used as follow:</br>
- * </br>
- * {@code Integer i = StringToTypeParser.parse("125", Integer.class);}</br>
- * {@code boolean i = StringToTypeParser.parse("true", boolean.class);}</br>
- * {@code File f = StringToTypeParser.parse("/path/to", File.class);}</br>
- * </br>
- *  which supports only the following java types (and primitives): 
+ * By default, converting a string toe following types are supported:
  *  <ul>
  *  <li> {@link Byte} (byte)</li>
  *  <li> {@link Short} (short)</li>
@@ -31,10 +26,23 @@ import java.util.Map;
  *  <li> {@link Character} (char)</li>
  *  <li> {@link String} </li>
  *  <li> {@link File} </li>
- *  <li> Any types with a static factory method named: {@code valueOf(String)} (Example: {@link Enum})</li>
- *  <li> Any types with a static factory method named: {@code of(String)} (Example: {@link EnumSet}) </li>
  *  </ul>
  * <p>
+ * In addition to the above, any type that contains a static factory method 
+ * with the following signatures can also be converted.
+ * <ul>
+ *  <li> {@code .valueOf(String)}</li>
+ *  <li> {@code .of(String)}</li>
+ * </ul>
+ * (For example any {@link Enum} type, or {@link EnumSet})
+ * <p>
+ * 
+ * 
+ *  *  <li> Any types with a static factory method named: {@code valueOf(String)} (Example: {@link Enum})</li>
+ *  <li> Any types with a static factory method named: {@code of(String)} (Example: {@link EnumSet}) </li>
+ *  
+ * 
+ * 
  * Parsing and converting to additional types can be done by either:
  *  <ul>
  *  <li> Register your own implementations of the {@link TypeParser} interface</li>
@@ -52,7 +60,7 @@ import java.util.Map;
  *
  */
 public final class StringToTypeParser {
-    private static final StringToTypeParser defaultTypeParser = newBuilder().build();
+    private static final Object STATIC_METHOD = null;
     private final Map<Class<?>, TypeParser<?>> typeParsers;
 
     /**
@@ -66,21 +74,8 @@ public final class StringToTypeParser {
         return new StringToTypeParserBuilder();
     }
     
-    /**
-     * Convenient static method that only parses the types supported by default.
-     * @param value - string value to parse
-     * @param type - the expected type to convert {@code value} to.
-     * @return an instance of {@code type} corresponding to the given {@code value}.
-     * @throws NullPointerException if any of the arguments are null.
-     * @throws IllegalArgumentException if {@code value} is not parsable, or
-     * if {@code type} is not recognized.
-     */
-    public static <T> T parse(String value, Class<T> type){
-        return defaultTypeParser.parseType(value, type);
-    }
-    
-    StringToTypeParser(HashMap<Class<?>, TypeParser<?>> typeParsers) {
-        this.typeParsers = typeParsers;
+    StringToTypeParser(Map<Class<?>, TypeParser<?>> typeParsers) {
+        this.typeParsers = Collections.unmodifiableMap(new HashMap<Class<?>, TypeParser<?>>(typeParsers));
     }
 
     /**
@@ -95,20 +90,19 @@ public final class StringToTypeParser {
      * @throws IllegalArgumentException if {@code value} is not parsable, or
      * if {@code type} is not recognized.
      */
-    public <T> T parseType(String value, Class<T> type) {
+    public <T> T parse(String value, Class<T> type) {
         if (value == null) {
-            throw new NullPointerException(Util.nullArgumentErrorMsg("value"));
+            throw new NullPointerException(nullArgumentErrorMsg("value"));
         }
         if (type == null) {
-            throw new NullPointerException(Util.nullArgumentErrorMsg("type"));
+            throw new NullPointerException(nullArgumentErrorMsg("type"));
         }
         
         // convert "null" string to null type.
         if (value.trim().equalsIgnoreCase("null")) {
             if (type.isPrimitive()) {
                 String message = "'%s' primitive can not be set to null.";
-                throw new IllegalArgumentException(String.format(message,
-                        type.getName()));
+                throw new IllegalArgumentException(String.format(message, type.getName()));
             }
             return null; 
         }
@@ -128,7 +122,6 @@ public final class StringToTypeParser {
             message = canNotParseErrorMsg(value, type, message);
             throw new IllegalArgumentException(message);
         }
-
         /*
          * This cast is correct, since all above checks ensures we're casting to
          * the right type.
@@ -136,6 +129,13 @@ public final class StringToTypeParser {
         @SuppressWarnings("unchecked")
         T temp = (T) result;
         return temp;
+    }
+
+    /**
+     * This method is static because it is also called from {@link StringToTypeParserBuilder}.
+     */
+    static String nullArgumentErrorMsg(String argName) {
+        return String.format("Argument named '%s' is illegally set to null!", argName);
     }
 
     private Object callTypeParser(String value, Class<?> type) {
@@ -149,18 +149,19 @@ public final class StringToTypeParser {
         }
     }
 
-    private static String numberFormatErrorMsg(NumberFormatException e) {
+    private String numberFormatErrorMsg(NumberFormatException e) {
         return String.format("Number format exception %s.", e.getMessage());
     }
 
-    private static String canNotParseErrorMsg(String value, Class<?> type, String message) {
+    private String canNotParseErrorMsg(String value, Class<?> type, String message) {
         return String.format("Can not parse \"%s\" to type '%s' due to: %s", value, type.getName(), message);
     }
 
-    private static Object callFactoryMethodIfExisting(String methodName, String value, Class<?> type) {
+    private Object callFactoryMethodIfExisting(String methodName, String value, Class<?> type) {
         Method m;
         try {
             m = type.getDeclaredMethod(methodName, String.class);
+            m.setAccessible(true);
             if (!Modifier.isStatic(m.getModifiers())) {
                 // Static factory method does not exists, return null
                 return null;
@@ -172,18 +173,18 @@ public final class StringToTypeParser {
 
         try {
             if(type.isEnum()){
-                return m.invoke(null, value.trim());
-            } else {
-                return m.invoke(null, value);
+                value = value.trim();
             }
+            return m.invoke(STATIC_METHOD, value);
         } catch (InvocationTargetException e) {
+            // filter out the InvocationTargetException stacktrace/message.
             throw new IllegalArgumentException(makeErrorMsg(methodName, value, type), e.getCause());
         } catch (Throwable t) {
             throw new IllegalArgumentException(makeErrorMsg(methodName, value, type), t);
         }
     }
 
-    private static String makeErrorMsg(String methodName, String value,  Class<?> type) {
+    private String makeErrorMsg(String methodName, String value,  Class<?> type) {
         String methodSignature = String.format("%s.%s('%s')", type.getName(), methodName, value);
         String message = " Exception thrown in static factory method '%s'. See underlying "
                 + "exception for additional information.";

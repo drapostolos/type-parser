@@ -1,11 +1,14 @@
 package com.github.drapostolos.typeparser;
 
-import com.github.drapostolos.typeparser.TypeParser;
 
 public class TestClass1  implements TypeParser<TestClass1>{
     String value;
     
-    public static TestClass1 valueOf(String value){
+    /*
+     * This method is called through reflection in one of the unit tests.
+     */
+    @SuppressWarnings("unused")
+    private static TestClass1 valueOf(String value){
         return new TestClass1(value);
     }
 

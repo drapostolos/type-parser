@@ -15,6 +15,7 @@ abstract class AbstractTestHelper {
 	private String value;
 	private List<Class<?>> types = new ArrayList<Class<?>>();
 	private Class<?> expectedExceptionType;
+	private StringToTypeParser parser = StringToTypeParser.newBuilder().build();
 
 	/*
 	 * Mandatory to pass at least one type.
@@ -31,7 +32,7 @@ abstract class AbstractTestHelper {
 
     final void isParsedTo(Object expected){
         for(Class<?> type : types){
-            Object actual = StringToTypeParser.parse(value, type);
+            Object actual = parser.parse(value, type);
             Assertions.assertThat(actual).isEqualTo(expected);
         }
     }
@@ -48,7 +49,7 @@ abstract class AbstractTestHelper {
                     + "Exception: <%s> where message ends with: <%s>.%n";
             errorMsg = String.format(errorMsg, value, type.getSimpleName(), expectedExceptionType.getName(), message);
             try {
-                StringToTypeParser.parse(value, type);
+                parser.parse(value, type);
                 errorMsg.concat("But no exception was thrown.");
                 Assert.fail(errorMsg);
             } catch (Exception e) {

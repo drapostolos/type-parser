@@ -10,6 +10,7 @@ import com.github.drapostolos.typeparser.StringToTypeParser;
 
 
 public class StringToTypeParserTest {
+    private StringToTypeParser parser = StringToTypeParser.newBuilder().build();
 	
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -26,7 +27,7 @@ public class StringToTypeParserTest {
         .build();
         
         // then
-        parser.parseType("1", int.class);
+        parser.parse("1", int.class);
     }
 
     @Test
@@ -37,7 +38,7 @@ public class StringToTypeParserTest {
         .build();
         
         // then
-        TestClass1 actual = parser.parseType("aaa", TestClass1.class);
+        TestClass1 actual = parser.parse("aaa", TestClass1.class);
         Assertions.assertThat(actual).isEqualTo(new TestClass1("aaa"));
     }
 
@@ -48,7 +49,7 @@ public class StringToTypeParserTest {
                 + "due to:  Exception thrown in static factory method "
                 + "'com.github.drapostolos.typeparser.TestClass3.valueOf('aaa')'. "
                 + "See underlying exception for additional information.");
-        StringToTypeParser.parse("aaa", TestClass3.class); 
+        parser.parse("aaa", TestClass3.class); 
     }
 
     @Test
@@ -58,33 +59,39 @@ public class StringToTypeParserTest {
                 + "There is no registered 'TypeParser' for that type, or that type does not "
                 + "contain one of the following static factory methods: 'Object.valueOf(String)', "
                 + "or 'Object.of(String)'.");
-        StringToTypeParser.parse("aaa", Object.class); 
+        parser.parse("aaa", Object.class); 
     }
 
     @Test
     public void canParseTypeWithOfFactoryMethod() throws Exception {
-        TestClass2 actual = StringToTypeParser.parse("aaa", TestClass2.class);
+        TestClass2 actual = parser.parse("aaa", TestClass2.class);
         Assertions.assertThat(actual).isEqualTo(new TestClass2("aaa"));
     }
 
     @Test
     public void canParseTypeWithValueOfFactoryMethod() throws Exception {
-        TestClass1 actual = StringToTypeParser.parse("aaa", TestClass1.class);
+        TestClass1 actual = parser.parse("aaa", TestClass1.class);
         Assertions.assertThat(actual).isEqualTo(new TestClass1("aaa"));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void shouldThrowExceptionWhenRegisteringNullTypeParser() throws Exception {
+        thrown.expect(NullPointerException.class);
+        thrown.expectMessage("Argument named 'typeParser' is illegally set to null!");
         StringToTypeParser.newBuilder().registerTypeParser(int.class, null);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void shouldThrowExceptionWhenRegisteringNullType() throws Exception {
+        thrown.expect(NullPointerException.class);
+        thrown.expectMessage("Argument named 'type' is illegally set to null!");
         StringToTypeParser.newBuilder().registerTypeParser(null, new TestClass1());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void shouldThrowExceptionWhenUnregisteringNullTypeParser() throws Exception {
+        thrown.expect(NullPointerException.class);
+        thrown.expectMessage("Argument named 'type' is illegally set to null!");
         StringToTypeParser.newBuilder().unregisterTypeParser(null);
     }
 
@@ -92,19 +99,19 @@ public class StringToTypeParserTest {
 	public void shouldThrowExceptionWhenFirstArgumentIsNullInStaticParseMethod() throws Exception {
 		thrown.expect(NullPointerException.class);
 		thrown.expectMessage("Argument named 'value' is illegally set to null!");
-		StringToTypeParser.parse(null, Object.class);
+		parser.parse(null, Object.class);
 	}
 
 	@Test
 	public void shouldThrowExceptionWhenSecondArgumentIsNullInStaticParseMethod() throws Exception {
 		thrown.expect(NullPointerException.class);
 		thrown.expectMessage("Argument named 'type' is illegally set to null!");
-		StringToTypeParser.parse("dummy", null);
+		parser.parse("dummy", null);
 	}
 
 	@Test
 	public void canParseStringToStringType() throws Exception {
-	    String actual = StringToTypeParser.parse(" A B ", String.class);
+	    String actual = parser.parse(" A B ", String.class);
 	    Assertions.assertThat(actual).isEqualTo(" A B ");
 	}
 

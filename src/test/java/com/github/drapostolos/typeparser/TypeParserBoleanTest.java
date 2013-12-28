@@ -13,16 +13,12 @@ public class TypeParserBoleanTest extends AbstractTestHelper{
     public void canParseStringToTrue() throws Exception {
         assertThat("true").isParsedTo(true);
         assertThat(" true\t").isParsedTo(true);
-        assertThat("1").isParsedTo(true);
-        assertThat("1 ").isParsedTo(true);
     }
 
     @Test
     public void canParseStringToFalse() throws Exception {
         assertThat("false").isParsedTo(false);
         assertThat(" false ").isParsedTo(false);
-        assertThat("0").isParsedTo(false);
-        assertThat(" 0 ").isParsedTo(false);
     }
 
     @Test

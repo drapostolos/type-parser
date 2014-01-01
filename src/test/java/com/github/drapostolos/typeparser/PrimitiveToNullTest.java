@@ -2,7 +2,7 @@ package com.github.drapostolos.typeparser;
 
 import org.junit.Test;
 
-public class PrimitiveToNullTest extends AbstractTestHelper{
+public class PrimitiveToNullTest extends AbstractTypeParserTestHelper{
 
     public PrimitiveToNullTest() {
         super(boolean.class, byte.class, char.class, double.class, 

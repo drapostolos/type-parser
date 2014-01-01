@@ -2,7 +2,7 @@ package com.github.drapostolos.typeparser;
 
 import org.junit.Test;
 
-public class TypeParserEnumTest extends AbstractTestHelper{
+public class TypeParserEnumTest extends AbstractTypeParserTestHelper{
     
     public TypeParserEnumTest() {
         super(MyEnum.class);

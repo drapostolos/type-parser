@@ -1,7 +1,7 @@
 package com.github.drapostolos.typeparser;
 
 
-public class TestClass1  implements TypeParser<TestClass1>{
+public class TestClass1  implements SimpleTypeParser<TestClass1>{
     String value;
     
     /*

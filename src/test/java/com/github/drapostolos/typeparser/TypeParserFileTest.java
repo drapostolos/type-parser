@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.junit.Test;
 
-public class TypeParserFileTest extends AbstractTestHelper{
+public class TypeParserFileTest extends AbstractTypeParserTestHelper{
     
     public TypeParserFileTest() {
         super(File.class);

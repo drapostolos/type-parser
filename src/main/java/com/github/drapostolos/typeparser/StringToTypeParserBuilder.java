@@ -1,5 +1,6 @@
 package com.github.drapostolos.typeparser;
 
+import java.lang.reflect.Array;
 import java.util.Map;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Map;
  *
  */
 public final class StringToTypeParserBuilder {
-    private Map<Class<?>, TypeParser<?>> typeParsers;
+    private Map<Class<?>, TypeParser> typeParsers;
 
     StringToTypeParserBuilder() {
         // Initialize with the default typeParsers
@@ -42,7 +43,7 @@ public final class StringToTypeParserBuilder {
      * 
      * @throws NullPointerException if any given argument is null.
      */
-    public <T> StringToTypeParserBuilder registerTypeParser(Class<T> type, TypeParser<? extends T> typeParser){
+    public <T> StringToTypeParserBuilder registerTypeParser(Class<? super T> type, SimpleTypeParser<? extends T> typeParser){
         if(typeParser == null) {
             throw new NullPointerException(StringToTypeParser.nullArgumentErrorMsg("typeParser"));
         }
@@ -50,6 +51,14 @@ public final class StringToTypeParserBuilder {
             throw new NullPointerException(StringToTypeParser.nullArgumentErrorMsg("type"));
         }
         typeParsers.put(type, typeParser);
+        return this;
+    }
+    
+    public StringToTypeParserBuilder setArrayDelimiterRegEx(String regex){
+        if(regex == null) {
+            throw new NullPointerException(StringToTypeParser.nullArgumentErrorMsg("regex"));
+        }
+        typeParsers.put(Array.class, TypeParsers.array2D(regex));
         return this;
     }
     

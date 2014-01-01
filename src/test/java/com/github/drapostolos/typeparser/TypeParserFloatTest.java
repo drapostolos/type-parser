@@ -2,7 +2,7 @@ package com.github.drapostolos.typeparser;
 
 import org.junit.Test;
 
-public class TypeParserFloatTest extends AbstractTestHelper{
+public class TypeParserFloatTest extends AbstractTypeParserTestHelper{
 
     public TypeParserFloatTest() {
         super(float.class, Float.class);

@@ -98,7 +98,7 @@ public class StringToTypeParserTest {
     @Test
 	public void shouldThrowExceptionWhenFirstArgumentIsNullInStaticParseMethod() throws Exception {
 		thrown.expect(NullPointerException.class);
-		thrown.expectMessage("Argument named 'value' is illegally set to null!");
+		thrown.expectMessage("Argument named 'input' is illegally set to null!");
 		parser.parse(null, Object.class);
 	}
 

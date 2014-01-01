@@ -2,7 +2,7 @@ package com.github.drapostolos.typeparser;
 
 import org.junit.Test;
 
-public class TypeParserDoubleTest extends AbstractTestHelper{
+public class TypeParserDoubleTest extends AbstractTypeParserTestHelper{
     
     public TypeParserDoubleTest() {
         super(Double.class, double.class);

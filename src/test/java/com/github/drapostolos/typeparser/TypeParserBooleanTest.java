@@ -2,10 +2,10 @@ package com.github.drapostolos.typeparser;
 
 import org.junit.Test;
 
-public class TypeParserBoleanTest extends AbstractTestHelper{
+public class TypeParserBooleanTest extends AbstractTypeParserTestHelper{
     private static final String NOT_PARSABLE_TO_BOOLEAN = "\"%s\" is not parsable to a Boolean.";
     
-    public TypeParserBoleanTest() {
+    public TypeParserBooleanTest() {
         super(Boolean.class, boolean.class);
     }
 

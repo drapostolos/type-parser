@@ -10,7 +10,7 @@ import org.fest.assertions.api.Assertions;
 
 import com.github.drapostolos.typeparser.StringToTypeParser;
 
-abstract class AbstractTestHelper {
+abstract class AbstractTypeParserTestHelper {
     static final String NUMBER_FORMAT_ERROR_MSG = "Number format exception For input string: \"%s\".";
 	private String value;
 	private List<Class<?>> types = new ArrayList<Class<?>>();
@@ -20,12 +20,12 @@ abstract class AbstractTestHelper {
 	/*
 	 * Mandatory to pass at least one type.
 	 */
-	public AbstractTestHelper(Class<?> type, Class<?>... types) {
+	public AbstractTypeParserTestHelper(Class<?> type, Class<?>... types) {
 	    this.types.add(type);
 	    this.types.addAll(Arrays.asList(types));
     }
 	
-	final AbstractTestHelper assertThat(String value){
+	final AbstractTypeParserTestHelper assertThat(String value){
 	    this.value = value;
 	    return this;
 	}
@@ -37,7 +37,7 @@ abstract class AbstractTestHelper {
         }
     }
 
-    final AbstractTestHelper throwsIllegalArgumentException() {
+    final AbstractTypeParserTestHelper throwsIllegalArgumentException() {
         this.expectedExceptionType = IllegalArgumentException.class;
         return this;
     }
@@ -57,7 +57,7 @@ abstract class AbstractTestHelper {
                 .overridingErrorMessage(errorMsg.concat("But got exception: <%s> instead."), expectedExceptionType.getName())
                 .isInstanceOf(expectedExceptionType);
                 Assertions.assertThat(e)
-                .overridingErrorMessage(errorMsg.concat("But got exception message: <%s> instead."), e.getMessage())
+                .overridingErrorMessage(errorMsg.concat("But got exception message: <%s>."), e.getMessage())
                 .hasMessageEndingWith(message);
             }
         }

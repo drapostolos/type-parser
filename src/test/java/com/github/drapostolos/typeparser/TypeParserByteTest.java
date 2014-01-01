@@ -2,7 +2,7 @@ package com.github.drapostolos.typeparser;
 
 import org.junit.Test;
 
-public class TypeParserByteTest extends AbstractTestHelper{
+public class TypeParserByteTest extends AbstractTypeParserTestHelper{
 
     public TypeParserByteTest() {
         super(byte.class, Byte.class);

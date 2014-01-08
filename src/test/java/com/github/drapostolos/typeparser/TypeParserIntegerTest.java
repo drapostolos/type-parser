@@ -1,24 +1,60 @@
 package com.github.drapostolos.typeparser;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class TypeParserIntegerTest extends AbstractTypeParserTestHelper{
+public class TypeParserIntegerTest extends AbstractTest {
 
-    public TypeParserIntegerTest() {
-        super(Integer.class, int.class);
+    @Test public void 
+    shouldThrowExceptionWhenStringIsNotParsableToInteger() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(String.format(NUMBER_FORMAT_ERROR_MSG, "a"));
+        parser.parse("a", Integer.class);
     }
 
-    
     @Test
-    public void canParseStringToIntegerType() throws Exception {
-        assertThat("3").isParsedTo(3);
-        assertThat(" 3\t").isParsedTo(3);
-    }
-    
-    @Test
-    public void shouldThrowExceptionWhenStringIsNotParsableToInteger() throws Exception {
-        assertThat("a").throwsIllegalArgumentException()
-        .whereMessageEndsWih(NUMBER_FORMAT_ERROR_MSG, "a");
+    public void canParseStringToInteger() throws Exception {
+        assertThat(parser.parse("3", Integer.class)).isEqualTo(3);
+        assertThat(parser.parse(" 3\t", Integer.class)).isEqualTo(3);
     }
 
+    @Test
+    public void canParseToGenericIntegerArray() throws Exception {
+        assertThat(parser.parse("1, 2, 3", new GenericType<Integer[]>() {}))
+        .containsExactly(1, 2, 3);
+    }
+
+    @Test
+    public void canParseToIntegerArray() throws Exception {
+        assertThat(parser.parse("1, 2, 3", Integer[].class))
+        .containsOnly(1, 2, 3);
+    }
+
+    @Test
+    public void canParseToIntegerList() throws Exception {
+        assertThat(parser.parse("1, 2, 3", new GenericType<List<Integer>>() {}))
+        .containsExactly(1, 2, 3);
+    }
+
+    @Test
+    public void canParseToIntegerSet() throws Exception {
+        assertThat(parser.parse("1, 2, 1", new GenericType<Set<Integer>>() {}))
+        .containsExactly(1, 2);
+    }
+
+    @Test
+    public void canParseToIntegerMap() throws Exception {
+        assertThat(parser.parse("1=11, 2=22, 3=33", new GenericType<Map<Integer, Integer>>() {}))
+        .contains(MapEntry.entry(1, 11))
+        .contains(MapEntry.entry(2, 22))
+        .contains(MapEntry.entry(3, 33))
+        .hasSize(3);
+    }
+    
 }

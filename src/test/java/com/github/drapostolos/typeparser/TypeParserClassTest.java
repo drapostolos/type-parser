@@ -1,23 +1,67 @@
 package com.github.drapostolos.typeparser;
 
+import static org.fest.assertions.api.Assertions.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class TypeParserClassTest extends AbstractTypeParserTestHelper{
-    
-    public TypeParserClassTest() {
-        super(Class.class);
+public class TypeParserClassTest extends AbstractTest{
+    Class<?> cls = TypeParserClassTest.class;
+    String stringToParse = String.format("%s,  %s", cls.getName(), cls.getName());
+
+    @Test
+    public void canParseToType() throws Exception {
+        assertThat(parser.parse(cls.getName(), new GenericType<Class<?>>() {})).hasSameClassAs(cls);
     }
 
     @Test
-    public void canParseStringToClass() throws Exception {
-        assertThat(TypeParserClassTest.class.getName()).isParsedTo(TypeParserClassTest.class);
+    public void canParseToClass() throws Exception {
+        assertThat(parser.parse(cls.getName(), Class.class)).hasSameClassAs(cls);
     }
-    
+
     @Test public void 
     shouldThrowExceptionWhenStringIsNotParsableToClass() throws Exception {
-        assertThat("com.unknow.Type").throwsIllegalArgumentException()
-        .whereMessageEndsWih("\"com.unknow.Type\" is not parsable to a Class object.");
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("\"com.unknow.Type\" is not parsable to a Class object.");
+        parser.parse("com.unknow.Type", Class.class);
     }
+
+    @Test
+    public void canParseToGenericClassArray() throws Exception {
+        assertThat(parser.parse(stringToParse, new GenericType<Class<?>[]>() {}))
+        .containsExactly(cls, cls);
+    }
+
+    @Test
+    public void canParseToArray() throws Exception {
+        assertThat(parser.parse(stringToParse, Class[].class))
+        .containsOnly(cls, cls);
+    }
+
+    @Test
+    public void canParseToList() throws Exception {
+        assertThat(parser.parse(stringToParse, new GenericType<List<Class<?>>>() {}))
+        .containsExactly(cls, cls);
+    }
+
+    @Test
+    public void canParseToSet() throws Exception {
+        assertThat(parser.parse(stringToParse, new GenericType<Set<Class<?>>>() {}))
+        .containsExactly(cls);
+    }
+
+    @Test
+    public void canParseToMap() throws Exception {
+        String str = String.format("%s=%s", cls.getName(), cls.getName());
+        assertThat(parser.parse(str, new GenericType<Map<Class<?>, Class<?>>>() {}))
+        .contains(MapEntry.entry(cls, cls))
+        .hasSize(1);
+    }
+
 
 
 

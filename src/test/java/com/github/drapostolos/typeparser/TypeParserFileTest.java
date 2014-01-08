@@ -1,18 +1,52 @@
 package com.github.drapostolos.typeparser;
 
-import java.io.File;
+import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class TypeParserFileTest extends AbstractTypeParserTestHelper{
+public class TypeParserFileTest extends AbstractTest{
     
-    public TypeParserFileTest() {
-        super(File.class);
+    @Test
+    public void canParseStringToFile() throws Exception {
+        assertThat(parser.parse("/path/to", File.class)).isEqualTo(new File("/path/to"));
     }
 
     @Test
-    public void canParseStringToFileType() throws Exception {
-        assertThat("/path/to").isParsedTo(new File("/path/to"));
+    public void canParseToGenericFileArray() throws Exception {
+        assertThat(parser.parse("/path/a, /path/b, /path/c", new GenericType<File[]>() {}))
+        .containsExactly(new File("/path/a"), new File("/path/b"), new File("/path/c"));
+    }
+
+    @Test
+    public void canParseToFileArray() throws Exception {
+        assertThat(parser.parse("/path/a, /path/b, /path/c", File[].class))
+        .containsOnly(new File("/path/a"), new File("/path/b"), new File("/path/c"));
+    }
+
+    @Test
+    public void canParseToFileList() throws Exception {
+        assertThat(parser.parse("/path/a, /path/b, /path/c", new GenericType<List<File>>() {}))
+        .containsExactly(new File("/path/a"), new File("/path/b"), new File("/path/c"));
+    }
+
+    @Test
+    public void canParseToFileSet() throws Exception {
+        assertThat(parser.parse("/path/a, /path/b, /path/a", new GenericType<Set<File>>() {}))
+        .containsExactly(new File("/path/a"), new File("/path/b"));
+    }
+
+    @Test
+    public void canParseToFileMap() throws Exception {
+        assertThat(parser.parse("/path/a=/path/A, /path/b=/path/B", new GenericType<Map<File, File>>() {}))
+        .contains(MapEntry.entry(new File("/path/a"), new File("/path/A")))
+        .contains(MapEntry.entry(new File("/path/b"), new File("/path/B")))
+        .hasSize(2);
     }
 
 }

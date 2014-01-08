@@ -1,7 +1,7 @@
 package com.github.drapostolos.typeparser;
 
 
-public class TestClass1  implements SimpleTypeParser<TestClass1>{
+public class TestClass1  implements TypeParser<TestClass1>{
     String value;
     
     /*
@@ -13,7 +13,7 @@ public class TestClass1  implements SimpleTypeParser<TestClass1>{
     }
 
     @Override
-    public TestClass1 parse(String value) {
+    public TestClass1 parse(String value, ParseHelper helper) {
         return new TestClass1(value);
     }
 

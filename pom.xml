@@ -20,17 +20,15 @@
 		<developer>
 			<id>drapostolos</id>
 			<name>Alexander Poulikakos</name>
-			<email>pom@labelscans.com</email>
+			<email>type-parser@labelscans.com</email>
 		</developer>
 	</developers>
 	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.10</version>
-			<type>jar</type>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+        </dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -99,6 +97,15 @@
 		</pluginManagement>
 
 		<plugins>
+			<plugin>
+				<groupId>com.github.drapostolos</groupId>
+				<artifactId>type-parser-maven-plugin</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+				<configuration>
+                    <typeParsersClass>${project.build.sourceDirectory}/com/github/drapostolos/typeparser/TypeParsers.java</typeParsersClass>
+                    <targetSourceFile>target/generated-source/com/github/drapostolos/typeparser/GeneratedTypeParsers.java</targetSourceFile>
+				</configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-source-plugin</artifactId>
 				<version>2.2.1</version>
@@ -178,8 +185,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
 			</plugin>
 		</plugins>

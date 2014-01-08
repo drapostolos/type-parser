@@ -1,96 +1,254 @@
 package com.github.drapostolos.typeparser;
 
+import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 final class TypeParsers {
+    static final Type ANY_LIST = new GenericType<List<?>>() {}.getType();
+    static final Type ANY_SET = new GenericType<Set<?>>() {}.getType();
+    static final Type ANY_MAP = new GenericType<Map<?, ?>>() {}.getType();
+    static final Type ANY_ARRAY = Array.class;
+    static final Type CLASS_TYPE = new GenericType<Class<?>>(){}.getType();
+    private static final Type ARRAY_OF_CLASS = new GenericType<Class<?>[]>(){}.getType();
+    private static final String BOOLEAN_ERROR_MESSAGE = "\"%s\" is not parsable to a Boolean.";
+    private static final String CLASS_ERROR_MESSAGE = "\"%s\" is not parsable to a Class object.";
+    private static final String CHARACTER_ERROR_MESSAGE = "\"%s\" must only contain a single character.";
+    private static final Map<Type, TypeParser<?>> DEFAULT_TYPE_PARSERS = new HashMap<Type, TypeParser<?>>();
+    private static final Map<Class<?>, Class<?>> WRAPPER_TO_PRIMITIVE = new HashMap<Class<?>, Class<?>>();
+
     private TypeParsers() { throw new AssertionError("Not meant for instantiation"); }
 
-    static ArrayTypeParser array2D(final String delimiter){
-        return new ArrayTypeParser() {
+    static Map<Type, TypeParser<?>> copyDefault() {
+        return new HashMap<Type, TypeParser<?>>(DEFAULT_TYPE_PARSERS);
+    }
+
+    /*
+     * Map wrapper classes to respectively primitive type
+     */
+    static{
+        WRAPPER_TO_PRIMITIVE.put(Boolean.class, boolean.class);
+        WRAPPER_TO_PRIMITIVE.put(Byte.class, byte.class);
+        WRAPPER_TO_PRIMITIVE.put(Short.class, short.class);
+        WRAPPER_TO_PRIMITIVE.put(Character.class, char.class);
+        WRAPPER_TO_PRIMITIVE.put(Integer.class, int.class);
+        WRAPPER_TO_PRIMITIVE.put(Long.class, long.class);
+        WRAPPER_TO_PRIMITIVE.put(Float.class, float.class);
+        WRAPPER_TO_PRIMITIVE.put(Double.class, double.class);
+    }
+
+    /*
+     * Register all default TypeParsers.
+     */
+
+    static{
+        registerTypeParser(ANY_LIST, TypeParsers.forLists());
+        registerTypeParser(ANY_SET, TypeParsers.forSets());
+        registerTypeParser(ANY_MAP, TypeParsers.forMaps());
+        registerTypeParser(ANY_ARRAY, TypeParsers.forArrays());
+        registerTypeParser(Boolean.class, new TypeParser<Boolean>(){
+            @Override
+            public Boolean parse(final String value0, ParseHelper helper) {
+                String value = value0.trim().toLowerCase();
+                if(value.equals("true")){
+                    return Boolean.TRUE;
+                } else if(value.equals("false")){
+                    return Boolean.FALSE;
+                }
+                throw new IllegalArgumentException(String.format(BOOLEAN_ERROR_MESSAGE, value0));
+            }
+        });
+        registerTypeParser(Character.class, new TypeParser<Character>() {
+            @Override
+            public Character parse(String value, ParseHelper helper) {
+                if(value.length() == 1){
+                    return Character.valueOf(value.charAt(0));
+                }
+                throw new IllegalArgumentException(String.format(CHARACTER_ERROR_MESSAGE, value));
+            }
+        });
+        registerTypeParser(BigDecimal.class, new TypeParser<BigDecimal>() {
+            @Override
+            public BigDecimal parse(String value, ParseHelper helper) {
+                try {
+                    return new BigDecimal(value.trim());
+                } catch (NumberFormatException e){
+                    String message = String.format("For input string: \"%s\"", value.trim());
+                    throw new NumberFormatException(message);
+                }
+            }
+        });
+        registerTypeParser(Byte.class, new TypeParser<Byte>() {
+            @Override
+            public Byte parse(String value, ParseHelper helper) {
+                return Byte.valueOf(value.trim());
+            }
+        });
+        registerTypeParser(Integer.class, new TypeParser<Integer>() {
+            @Override
+            public Integer parse(String value, ParseHelper helper) {
+                return Integer.valueOf(value.trim());
+            }
+        });
+        registerTypeParser(Long.class, new TypeParser<Long>() {
+            @Override
+            public Long parse(String value, ParseHelper helper) {
+                return Long.valueOf(value.trim());
+            }
+        });
+        registerTypeParser(Short.class, new TypeParser<Short>() {
+            @Override
+            public Short parse(String value, ParseHelper helper) {
+                return Short.valueOf(value.trim());
+            }
+        });
+        registerTypeParser(Float.class, new TypeParser<Float>() {
+            @Override
+            public Float parse(String value, ParseHelper helper) {
+                return Float.valueOf(value);
+            }
+        });
+        registerTypeParser(Double.class, new TypeParser<Double>() {
+            @Override
+            public Double parse(String value, ParseHelper helper) {
+                return Double.valueOf(value);
+            }
+        });
+        registerTypeParser(File.class, new TypeParser<File>() {
+            @Override
+            public File parse(String value, ParseHelper helper) {
+                return new File(value.trim());
+            }
+        });
+        registerTypeParser(String.class, new TypeParser<String>() {
+            @Override
+            public String parse(String value, ParseHelper helper) {
+                return value;
+            }
+        });
+        registerTypeParser(Class.class, new TypeParser<Class<?>>() {
 
             @Override
-            public <T> Object parse(String input, Class<T> type, Helper helper) {
-                String[] strArray = input.split(delimiter);
-                List<T> list = new ArrayList<T>();
-                for(String value : strArray){
-                    list.add(helper.parse(value, type));
+            public Class<?> parse(String input, ParseHelper helper) {
+                try {
+                    return Class.forName(input.trim());
+                } catch (ClassNotFoundException e) {
+                    throw new IllegalArgumentException(String.format(CLASS_ERROR_MESSAGE, input));
+                }
+            }
+        });
+        registerTypeParser(ARRAY_OF_CLASS, new TypeParser<Class<?>[]>() {
+
+            @Override
+            public Class<?>[] parse(String input, ParseHelper helper) {
+                List<String> strList = helper.split(input);
+                Class<?>[] array = new Class<?>[strList.size()];
+                for(int i = 0; i < strList.size(); i++){
+                    Class<?> element = helper.parse(strList.get(i), Class.class);
+                    array[i] = element;
+                }
+                return array;
+            }
+        });
+    }
+
+    private static void registerTypeParser(Type type, TypeParser<?> typeParser) {
+        DEFAULT_TYPE_PARSERS.put(type, typeParser);
+        if(WRAPPER_TO_PRIMITIVE.containsKey(type)){
+            Class<?> primitiveType = WRAPPER_TO_PRIMITIVE.get(type);
+            DEFAULT_TYPE_PARSERS.put(primitiveType, typeParser);
+        }
+        if(type.equals(Class.class)){
+            DEFAULT_TYPE_PARSERS.put(CLASS_TYPE, typeParser);
+        }
+    }
+
+    static <T> TypeParser<T> forArrays(){
+        return new TypeParser<T>() {
+
+            @Override
+            public T parse(String input, ParseHelper helper) {
+                List<String> strList = helper.split(input);
+                Class<?> componentType = helper.getComponentClass();
+                Object array = Array.newInstance(componentType, strList.size());
+                for(int i = 0; i < strList.size(); i++){
+                    Object element = helper.parse(strList.get(i), componentType);
+                    Array.set(array, i, element);
                 }
                 @SuppressWarnings("unchecked")
-                T[] result = list.toArray((T[]) Array.newInstance(type, list.size()));
-                return result;
+                T temp = (T) array;
+                return temp;
             }
         };
     }
-    
-    static ParameterizedTypeParser<List<?>> list(final String delimiter) {
-        return new ParameterizedTypeParser<List<?>>() {
 
-            @SuppressWarnings("unchecked")
-            public List<?> parse(String input, ParameterizedTypeHelper helper) {
-                
-                // TODO add check only one type argument exists (we don't support anything else at the moment)
-                boolean todo;
-                Type t = helper.getActualTypeArguments()[0];
-                System.out.println(t.getClass());
-                Class<?> targetType = (Class<?>) helper.getActualTypeArguments()[0];
-                @SuppressWarnings("rawtypes")
-                List list = new ArrayList();
-                for(String value : input.split(delimiter)){
+    static <T> TypeParser<List<T>> forLists() {
+        return new TypeParser<List<T>>() {
+
+            public List<T> parse(String input, ParseHelper helper) {
+                Class<T> targetType = getParameterizedTypeArgument(helper);
+                List<T> list = new ArrayList<T>();
+                for(String value : helper.split(input)){
                     list.add(helper.parse(value, targetType));
                 }
                 return list;
             }
         };
     }
-    
-    static ParameterizedTypeParser<Set<?>> set(final String delimiter) {
-        return new ParameterizedTypeParser<Set<?>>() {
 
-            @SuppressWarnings("unchecked")
-            public Set<?> parse(String input, ParameterizedTypeHelper helper) {
-                
-                // TODO add check only one type argument exists (we don't support anything else at the moment)
-                boolean todo;
-                Type targetType = helper.getActualTypeArguments()[0];
-//                System.out.println(t.getClass());
-//                Class<?> targetType = (Class<?>) helper.getActualTypeArguments()[0];
-                @SuppressWarnings("rawtypes")
-                Set set = new TreeSet();
-                for(String value : input.split(delimiter)){
-                    set.add(helper.parseType(value, targetType));
+    static <T> TypeParser<Set<T>> forSets() {
+        return new TypeParser<Set<T>>() {
+            public Set<T> parse(String input, ParseHelper helper) {
+                Class<T> targetType = getParameterizedTypeArgument(helper);
+                Set<T> set = new LinkedHashSet<T>();
+                for(String value : helper.split(input)){
+                    set.add(helper.parse(value, targetType));
                 }
                 return set;
             }
         };
     }
-    
-    static ParameterizedTypeParser<Map<?, ?>> map(final String delimiter, final String keyValueDelimiter) {
-        return new ParameterizedTypeParser<Map<?, ?>>() {
 
-            @SuppressWarnings("unchecked")
-            public Map<?, ?> parse(String input, ParameterizedTypeHelper helper) {
-                
-                // TODO add check only one type argument exists (we don't support anything else at the moment)
-                boolean todo;
-                Class<?> keyType = (Class<?>) helper.getActualTypeArguments()[0];
-                Class<?> valueType = (Class<?>) helper.getActualTypeArguments()[1];
-                @SuppressWarnings("rawtypes")
-                Map map = new HashMap();
-                for(String value : input.split(delimiter)){
-                    String[] entry = value.split(keyValueDelimiter);
-                    map.put(helper.parse(entry[0], keyType), helper.parse(entry[1], valueType));
+    static <K,V> TypeParser<Map<K, V>> forMaps() {
+        return new TypeParser<Map<K, V>>() {
+            private static final int KEY = 0;
+            private static final int VALUE = 1;
+            public Map<K, V> parse(String input, ParseHelper helper) {
+
+                Class<K> keyType = getParameterizedTypeArgument(helper, KEY);
+                Class<V> valueType = getParameterizedTypeArgument(helper, VALUE);
+                Map<K, V> map = new HashMap<K, V>();
+                for(String entryString : helper.split(input)){
+                    List<String> entry = helper.splitKeyValuePair(entryString);
+                    map.put(helper.parse(entry.get(KEY), keyType), helper.parse(entry.get(VALUE), valueType));
                 }
                 return map;
             }
         };
+
     }
-    
+
+    private static <T> Class<T> getParameterizedTypeArgument(ParseHelper helper) {
+        return getParameterizedTypeArgument(helper, 0);
+    }
+    private static <T> Class<T> getParameterizedTypeArgument(ParseHelper helper, int index) {
+        Class<?> type = helper.getParameterizedTypeArguments().get(index);
+        try {
+            @SuppressWarnings("unchecked")
+            Class<T> temp = (Class<T>) type;
+            return temp;
+        } catch (ClassCastException e){
+            // TODO
+            String message = "FIX ERROR MESSAGE! See underlying exception";
+            throw new IllegalStateException(message, e);
+        }
+    }
 
 }

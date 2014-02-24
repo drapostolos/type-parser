@@ -1,11 +1,9 @@
 package com.github.drapostolos.typeparser;
 
-import java.io.File;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,52 +11,8 @@ import java.util.Set;
 
 /**
  * The purpose of this class is to parse a string (read from a file for example)
- * and convert it to a specific java object/Type (for example converting "1" to
- * an Integer type).
- * <p>
- * By default, converting a string toe following types are supported:
- *  <ul>
- *  <li> {@link Byte} (byte)</li>
- *  <li> {@link Short} (short)</li>
- *  <li> {@link Integer} (int)</li>
- *  <li> {@link Long} (long)</li>
- *  <li> {@link Float} (float)</li>
- *  <li> {@link Double} (double)</li>
- *  <li> {@link Boolean} (boolean)</li>
- *  <li> {@link Character} (char)</li>
- *  <li> {@link String} </li>
- *  <li> {@link File} </li>
- *  </ul>
- * <p>
- * In addition to the above, any type that contains a static factory method 
- * with the following signatures can also be converted.
- * <ul>
- *  <li> {@code .valueOf(String)}</li>
- * </ul>
- * (For example any {@link Enum} type, or {@link EnumSet})
- * <p>
- * 
- * 
- *  *  <li> Any types with a static factory method named: {@code valueOf(String)} (Example: {@link Enum})</li>
- *  <li> Any types with a static factory method named: {@code of(String)} (Example: {@link EnumSet}) </li>
- *  
- * 
- * 
- * Parsing and converting to additional types can be done by either:
- *  <ul>
- *  <li> Register your own implementations of the {@link TypeParserBase} interface</li>
- *  <li> Add one of these static factory methods in your class:  {@code valueOf(String)} or  {@code of(String)}</li>
- *  </ul>
- * <p>
- * Here's an example how to register your own {@link TypeParserBase}'s:
- * </br></br>
- * {@code StringToTypeParser parser = StringToTypeParser.newBuilder() }</br>
- * {@code .registerTypeParser(new XTypeParser())}</br>
- * {@code .registerTypeParser(new YTypeParser())}</br>
- * {@code .build();}</br>
- * </br>
- * {@code X x = parser.parseType("some-string", X.class);}</br>
- *
+ * and convert it to a specific java object/Type. For example converting "1" to
+ * an {@code Integer} type, or "1,2,3" to a {@code List<Integer>} type.
  */
 public final class StringToTypeParser {
     private final Map<Type, TypeParser<?>> typeParsers;
@@ -79,14 +33,11 @@ public final class StringToTypeParser {
     }
 
     /**
-     * TODO
-     * Parses the given {@code input} to the given {@code targetType}. Where {@code targetType}
-     * is either one of the default supported java types or a registered {@link TypeParser}
-     * (for custom made types).
+     * Parses the given {@code input} string to the given {@code targetType}. 
      * 
      * @param input - string value to parse
-     * @param targetType - the expected type to convert {@code value} to.
-     * @return an instance of {@code type} corresponding to the given {@code value}.
+     * @param targetType - the expected type to convert {@code input} to.
+     * @return an instance of {@code targetType} corresponding to the given {@code input}.
      * @throws NullPointerException if any of the arguments are null.
      * @throws IllegalArgumentException if {@code input} is not parsable, or
      * if {@code type} is not recognized.
@@ -172,6 +123,12 @@ public final class StringToTypeParser {
             }
         }
         
+        /*
+         * In java 1.6, when retrieving a methods parameter types through
+         * reflection (using java.lang.reflect.Method#getGenericParameterTypes())
+         * sometimes GenericArrayType is returned. Even if it is a regular array 
+         * type (e.g. java.lang.String[]). The below is to handle this case.
+         */
         if(targetType instanceof GenericArrayType){
             return invokeTypeParser(input, TypeParsers.ANY_ARRAY, targetType);
         }

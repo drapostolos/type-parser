@@ -7,7 +7,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 
 

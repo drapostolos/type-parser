@@ -56,6 +56,12 @@ public class NullParameterCheckTest extends AbstractTest{
     }
 
     @Test
+    public void shouldThrowExceptionWhenSettingNullInputProcessor() throws Exception {
+        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("inputPreprocessor");
+        builder.setInputPreprocessor(null);
+    }
+
+    @Test
     public void shouldThrowExceptionWhenSettingNullSplitter() throws Exception {
         prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("splitter");
         builder.setSplitter(null);

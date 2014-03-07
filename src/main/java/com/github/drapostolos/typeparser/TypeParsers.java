@@ -15,6 +15,7 @@ final class TypeParsers {
     static final Type ANY_LIST = new GenericType<List<?>>() {}.getType();
     static final Type ANY_SET = new GenericType<Set<?>>() {}.getType();
     static final Type ANY_MAP = new GenericType<Map<?, ?>>() {}.getType();
+    static final Type ANY_CLASS_WITH_STATIC_VALUEOF_METHOD = FactoryMethodTypeParser.class;
     static final Type ANY_ARRAY = Array.class;
     static final Type CLASS_TYPE = new GenericType<Class<?>>(){}.getType();
     private static final Type ARRAY_OF_CLASS = new GenericType<Class<?>[]>(){}.getType();
@@ -53,6 +54,7 @@ final class TypeParsers {
         registerTypeParser(ANY_SET, TypeParsers.forSets());
         registerTypeParser(ANY_MAP, TypeParsers.forMaps());
         registerTypeParser(ANY_ARRAY, TypeParsers.forArrays());
+        registerTypeParser(ANY_CLASS_WITH_STATIC_VALUEOF_METHOD, new FactoryMethodTypeParser());
         registerTypeParser(Boolean.class, new TypeParser<Boolean>(){
             @Override
             public Boolean parse(final String value0, ParseHelper helper) {
@@ -145,7 +147,6 @@ final class TypeParsers {
             }
         });
         registerTypeParser(ARRAY_OF_CLASS, new TypeParser<Class<?>[]>() {
-
             @Override
             public Class<?>[] parse(String input, ParseHelper helper) {
                 List<String> strList = helper.split(input);
@@ -170,9 +171,8 @@ final class TypeParsers {
         }
     }
 
-    static <T> TypeParser<T> forArrays(){
+    private static <T> TypeParser<T> forArrays(){
         return new TypeParser<T>() {
-
             @Override
             public T parse(String input, ParseHelper helper) {
                 List<String> strList = helper.split(input);
@@ -189,7 +189,7 @@ final class TypeParsers {
         };
     }
 
-    static <T> TypeParser<List<T>> forLists() {
+    private static <T> TypeParser<List<T>> forLists() {
         return new TypeParser<List<T>>() {
 
             public List<T> parse(String input, ParseHelper helper) {
@@ -203,7 +203,7 @@ final class TypeParsers {
         };
     }
 
-    static <T> TypeParser<Set<T>> forSets() {
+    private static <T> TypeParser<Set<T>> forSets() {
         return new TypeParser<Set<T>>() {
             public Set<T> parse(String input, ParseHelper helper) {
                 Class<T> targetType = getParameterizedTypeArgument(helper);
@@ -216,12 +216,11 @@ final class TypeParsers {
         };
     }
 
-    static <K,V> TypeParser<Map<K, V>> forMaps() {
+    private static <K,V> TypeParser<Map<K, V>> forMaps() {
         return new TypeParser<Map<K, V>>() {
             private static final int KEY = 0;
             private static final int VALUE = 1;
             public Map<K, V> parse(String input, ParseHelper helper) {
-
                 Class<K> keyType = getParameterizedTypeArgument(helper, KEY);
                 Class<V> valueType = getParameterizedTypeArgument(helper, VALUE);
                 Map<K, V> map = new HashMap<K, V>();
@@ -240,15 +239,9 @@ final class TypeParsers {
     }
     private static <T> Class<T> getParameterizedTypeArgument(ParseHelper helper, int index) {
         Class<?> type = helper.getParameterizedTypeArguments().get(index);
-        try {
-            @SuppressWarnings("unchecked")
-            Class<T> temp = (Class<T>) type;
-            return temp;
-        } catch (ClassCastException e){
-            // TODO
-            String message = "FIX ERROR MESSAGE! See underlying exception";
-            throw new IllegalStateException(message, e);
-        }
+        @SuppressWarnings("unchecked")
+        Class<T> temp = (Class<T>) type;
+        return temp;
     }
 
 }

@@ -16,8 +16,6 @@ public class TypeParserArrayTest extends AbstractTest{
         thrown.expectMessage("due to: TargetType: 'T[]'");
         thrown.expectMessage("is either not an array or the componet type is generic.");
         parser.parse(DUMMY_STRING, new GenericType<T[]>() {});
-
-        //        .whereErrorMessageContains("type does not contain the following static factory method: 'T[].valueOf(String)'.");
     }
 
     @Test

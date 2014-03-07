@@ -17,25 +17,6 @@ public class GenericTypeTest {
         new GenericType() {};
     }
     
-    @SuppressWarnings("rawtypes")
-    @Test
-    public void canCreateGenericTypeFromRawTypeList() throws Exception {
-        GenericType<List> gt = GenericType.forClass(List.class);
-        assertThat(gt).isEqualTo(new GenericType<List>(){});
-    }
-    
-    @Test
-    public void testToString() throws Exception {
-        GenericType<String> gt = GenericType.forClass(String.class);
-        assertThat(gt.toString()).isEqualTo("class java.lang.String");
-    }
-    
-    @Test
-    public void canCreateGenericTypeFromClass() throws Exception {
-        GenericType<String> gt = GenericType.forClass(String.class);
-        assertThat(gt).isEqualTo(new GenericType<String>(){});
-    }
-    
     @Test
     public void canExtractParameterizedTypeFromSubclass() throws Exception {
         GenericType<List<String>> gt = new GenericType<List<String>>() {};

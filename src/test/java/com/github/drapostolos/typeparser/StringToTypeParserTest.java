@@ -2,7 +2,7 @@ package com.github.drapostolos.typeparser;
 
 
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -25,6 +25,12 @@ public class StringToTypeParserTest extends AbstractTest{
                 e.printStackTrace();
             }
         }
+    }
+
+    @Test
+    public void canParseGenericTypeToNullValue() throws Exception {
+        GenericType<List<Long>> type = new GenericType<List<Long>>() {};
+        assertThat(parser.parse("null", type)).isNull();
     }
 
     @Test
@@ -156,9 +162,62 @@ public class StringToTypeParserTest extends AbstractTest{
     }
 
     @Test
+    public void canParseTypeWithStaticFactoryMethodToNullValue() throws Exception {
+        TestClass1 actual = parser.parse("null", TestClass1.class);
+        assertThat(actual).isNull();
+    }
+
+    @Test
     public void canParseStringToStringType() throws Exception {
         String actual = parser.parse(" A B ", String.class);
         assertThat(actual).isEqualTo(" A B ");
+    }
+
+    @Test
+    public void canChangeInputPreprocessor() throws Exception {
+        // given
+        parser = StringToTypeParser.newBuilder()
+                .setInputPreprocessor(new InputPreprocessor() {
+                    @Override
+                    public String prepare(String input, InputPreprocessorHelper helper) {
+                        if(helper.getTargetType().equals(String.class)){
+                            if (input.equals("DEFAULT")){
+                                return "MY-DEFAULT";
+                            }
+                        }
+                        return helper.prepareWithDefaultInputPreprocessor(input);
+                    }
+                })
+                .build();
+        
+        // then
+        assertThat(parser.parse("DEFAULT", String.class)).isEqualTo("MY-DEFAULT");
+        assertThat(parser.parse("nuLL", String.class)).isNull();
+        assertThat(parser.parse("AAA", String.class)).isEqualTo("AAA");
+        assertThat(parser.parse("null ", Integer.class)).isNull();;
+    }
+    
+    @Test
+    public void shouldThrowIllegalArgumentExceptionIfInputPreprocessorThrows() throws Exception {
+        // given
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Exception thrown from InputPreprocessor");
+        thrown.expectMessage("some-message");
+
+       
+        // when
+        parser = StringToTypeParser.newBuilder()
+                .setInputPreprocessor(new InputPreprocessor() {
+                    @Override
+                    public String prepare(String input, InputPreprocessorHelper helper) {
+                        throw new RuntimeException("some-message");
+                    }
+                })
+                .build();
+        
+        // then
+        parser.parse(DUMMY_STRING, String.class);
+        
     }
 
 }

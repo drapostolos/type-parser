@@ -10,6 +10,12 @@ import org.junit.Test;
 public class TypeParserListTest extends AbstractTest {
     
     @Test
+    public void canParseStringToEmptyList() throws Exception {
+        GenericType<List<Long>> type = new GenericType<List<Long>>() {};
+        assertThat(parser.parse(" ", type)).isEmpty();
+    }
+
+    @Test
     public void shouldThrowExceptionWhenParsingListOfWildcardType() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Can not parse \"dummy-string\" to type");
@@ -20,7 +26,7 @@ public class TypeParserListTest extends AbstractTest {
     @Test
     public void canChangeSplitter() throws Exception {
         // given
-        StringToTypeParser parser = StringToTypeParser.newBuilder()
+        parser = StringToTypeParser.newBuilder()
         .setSplitter(new Splitter() {
             @Override
             public List<String> split(String input, SplitHelper helper) {

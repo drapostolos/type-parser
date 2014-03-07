@@ -10,7 +10,7 @@ import java.util.List;
  * Helper class providing helper methods to implementations of
  * {@link TypeParser} when parsing a string to a type. 
  * <p/>
- * The {@link StringToTypeParser} will inject an instance of this
+ * The {@link StringToTypeParser} will automatically inject an instance of this
  * class into the {@link TypeParser} implementation.
  */
 public final class ParseHelper{
@@ -171,6 +171,10 @@ public final class ParseHelper{
                 + "the componet type is generic.";
         message = String.format(message, targetType, targetType.getClass());
         throw new IllegalStateException(message);
+    }
+
+    Type getTargetType() {
+        return targetType;
     }
 
 }

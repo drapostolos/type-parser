@@ -3,13 +3,30 @@ package com.github.drapostolos.typeparser;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+/**
+ * Define a generic type (known in compile time) by sub-classing this class. 
+ * <br/>
+ * Below example defines a {@code List<String>}: <br/><code>
+ *  new {@code GenericType<List<Integer>>} () {};
+ * </code><br/>
+ * Note the ending "{}".
+ * 
+ * <p/>
+ * Use a subclass of this class as an argument to {@link StringToTypeParser#parse(String, GenericType)}
+ * when you want to convert a string to a generic type known at compile time.
+ * <p/>
+ * Additionally, use a subclass of this class when you want to register or unregister a {@link TypeParser}
+ * for a generic type, by using these methods: 
+ * {@link StringToTypeParserBuilder#registerTypeParser(GenericType, TypeParser)},
+ * {@link StringToTypeParserBuilder#unregisterTypeParser(GenericType)}.
+ * 
+ * 
+ * 
+ * @param <T> a generic type, example: {@code List<String>}
+ */
 public abstract class GenericType<T> {
     private final Type type;
     
-    static <T> GenericType<T> forClass(Class<T> type) {
-        return new GenericType<T>(type){};
-    }
-
     public GenericType() {
         if(GenericType.class != getClass().getSuperclass()){
             String errorMsg = "'%s' must be a direct subclass of '%s'";
@@ -27,10 +44,6 @@ public abstract class GenericType<T> {
         }
     }
     
-    GenericType(Class<?> type) {
-        this.type = type;
-    }
-
     final Type getType(){
         return type;
     }
@@ -39,31 +52,4 @@ public abstract class GenericType<T> {
     final public String toString() {
         return type.toString();
     }
-
-    @Override
-   final public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
-        return result;
-    }
-
-    @Override
-    final public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if(obj instanceof GenericType){
-            GenericType<?> other = (GenericType<?>) obj;
-            if(type.equals(other.type)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    
-    
 }

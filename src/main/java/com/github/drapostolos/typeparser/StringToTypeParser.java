@@ -1,5 +1,10 @@
 package com.github.drapostolos.typeparser;
 
+import static com.github.drapostolos.typeparser.TypeParserUtility.STATIC_FACTORY_METHOD_NAME;
+import static com.github.drapostolos.typeparser.TypeParserUtility.containsStaticMethodNamedValueOf;
+import static com.github.drapostolos.typeparser.TypeParserUtility.makeNullArgumentErrorMsg;
+import static com.github.drapostolos.typeparser.TypeParserUtility.makeParseErrorMsg;
+
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -18,6 +23,7 @@ public final class StringToTypeParser {
     private final Map<Type, TypeParser<?>> typeParsers;
     final Splitter splitter;
     final Splitter keyValuePairSplitter;
+    final InputPreprocessor inputPreprocessor;;
 
     /**
      * @return a new instance of {@link StringToTypeParserBuilder}
@@ -30,24 +36,33 @@ public final class StringToTypeParser {
         this.typeParsers = Collections.unmodifiableMap(new HashMap<Type, TypeParser<?>>(builder.typeParsers));
         this.splitter = builder.splitter;
         this.keyValuePairSplitter = builder.keyValuePairSplitter;
+        this.inputPreprocessor = builder.inputPreprocessor;
     }
 
     /**
      * Parses the given {@code input} string to the given {@code targetType}. 
+     * <p/>
+     * Example: <br/><code>
+     * StringToTypeParser parser = StringToTypeParser.newBuilder().build();<br/>
+     * Integer i = parser.parse("1", Integer.class);
+     * </code>
      * 
      * @param input - string value to parse
      * @param targetType - the expected type to convert {@code input} to.
      * @return an instance of {@code targetType} corresponding to the given {@code input}.
-     * @throws NullPointerException if any of the arguments are null.
+     * @throws NullPointerException if {@code targetType} argument is {@code null}.
+     * @throws NullPointerException if {@code input} argument is {@code null}, when 
+     * default {@link InputPreprocessor} strategy is used. This behavior can be changed by
+     * setting your own {@link InputPreprocessor} strategy with {@link StringToTypeParserBuilder#setInputPreprocessor(InputPreprocessor)}.
      * @throws IllegalArgumentException if {@code input} is not parsable, or
-     * if {@code type} is not recognized.
+     * if {@code targetType} is not recognized.
      */
     public <T> T parse(String input, Class<T> targetType) {
         if (input == null) {
-            throw new NullPointerException(TypeParserUtility.makeNullArgumentErrorMsg("input"));
+            throw new NullPointerException(makeNullArgumentErrorMsg("input"));
         }
         if (targetType == null) {
-            throw new NullPointerException(TypeParserUtility.makeNullArgumentErrorMsg("targetType"));
+            throw new NullPointerException(makeNullArgumentErrorMsg("targetType"));
         }
         
         @SuppressWarnings("unchecked")
@@ -57,17 +72,30 @@ public final class StringToTypeParser {
     }
 
     /**
-     * TODO
-     * @param input
-     * @param genericType
-     * @return
+     * Parses the given {@code input} string to the given {@code genericType}. 
+     * <p/>
+     * Example: <br/><code>
+     * StringToTypeParser parser = StringToTypeParser.newBuilder().build();<br/>
+     * {@code List<Integer>} list = parser.parse("1, 2", new {@code GenericType<List<Integer>>}() {});
+     * </code><br/>
+     * Note the ending "{}".
+     * 
+     * @param input - string value to parse.
+     * @param genericType - the expected generic type to convert {@code input} to.
+     * @return an instance of {@code genericType} corresponding to the given {@code input}.
+     * @throws NullPointerException if {@code targetType} argument is {@code null}.
+     * @throws NullPointerException if {@code input} argument is {@code null}, when 
+     * default {@link InputPreprocessor} strategy is used. This behavior can be changed by
+     * setting your own {@link InputPreprocessor} strategy with {@link StringToTypeParserBuilder#setInputPreprocessor(InputPreprocessor)}.
+     * @throws IllegalArgumentException if {@code input} is not parsable, or
+     * if {@code genericType} is not recognized.
      */
     public <T> T parse(String input, GenericType<T> genericType) {
         if (input == null) {
-            throw new NullPointerException(TypeParserUtility.makeNullArgumentErrorMsg("input"));
+            throw new NullPointerException(makeNullArgumentErrorMsg("input"));
         }
         if (genericType == null) {
-            throw new NullPointerException(TypeParserUtility.makeNullArgumentErrorMsg("genericType"));
+            throw new NullPointerException(makeNullArgumentErrorMsg("genericType"));
         }
 
         @SuppressWarnings("unchecked")
@@ -76,50 +104,67 @@ public final class StringToTypeParser {
     }
 
     /**
-     * TODO
-     * @param input
-     * @param targetType
-     * @return
+     * Parses the given {@code input} string to the given {@code targetType}. 
+     * <p/>
+     * 
+     * @param input - string value to parse.
+     * @param targetType - the expected type to convert {@code input} to.
+     * @return an instance of {@code targetType} corresponding to the given {@code input}.
+     * @throws NullPointerException if {@code targetType} argument is {@code null}.
+     * @throws NullPointerException if {@code input} argument is {@code null}, when 
+     * default {@link InputPreprocessor} strategy is used. This behavior can be changed by
+     * setting your own {@link InputPreprocessor} strategy with {@link StringToTypeParserBuilder#setInputPreprocessor(InputPreprocessor)}.
+     * @throws IllegalArgumentException if {@code input} is not parsable.
+     * @throws IllegalArgumentException if there is no registered {@link TypeParser} for the given {@code targetType}.
      */
     public Object parseType(String input, Type targetType) {
         if (input == null) {
-            throw new NullPointerException(TypeParserUtility.makeNullArgumentErrorMsg("input"));
+            throw new NullPointerException(makeNullArgumentErrorMsg("input"));
         }
         if (targetType == null) {
-            throw new NullPointerException(TypeParserUtility.makeNullArgumentErrorMsg("targetType"));
+            throw new NullPointerException(makeNullArgumentErrorMsg("targetType"));
         }
         
         return parseType2(input, targetType);
 
     }
     
-    private Object parseType2(String input, Type targetType) {
+    private Object parseType2(final String input, Type targetType) {
+        String preprocessedInput = preProcessInputString(input, targetType);
+        
+        if(preprocessedInput == null){
+            if (isPrimitive(targetType)) {
+                String message = "'%s' primitive can not be set to null. Input: \"%s\"; Preprocessed input: '%s'";
+                throw new IllegalArgumentException(String.format(message, targetType, input, preprocessedInput));
+            }
+            return null; 
+        }
+
         if(typeParsers.containsKey(targetType)){
-            return invokeTypeParser(input, targetType, targetType);
+            return invokeTypeParser(preprocessedInput, targetType, targetType);
         } 
 
         if(targetType instanceof ParameterizedType){
             ParameterizedType type = (ParameterizedType) targetType;
             Class<?> rawType = (Class<?>) type.getRawType();
             if(List.class.isAssignableFrom(rawType)){
-                return invokeTypeParser(input, TypeParsers.ANY_LIST, targetType);
+                return invokeTypeParser(preprocessedInput, TypeParsers.ANY_LIST, targetType);
             }
             if(Set.class.isAssignableFrom(rawType)){
-                return invokeTypeParser(input, TypeParsers.ANY_SET, targetType);
+                return invokeTypeParser(preprocessedInput, TypeParsers.ANY_SET, targetType);
             }
             if(Map.class.isAssignableFrom(rawType)){
-                return invokeTypeParser(input, TypeParsers.ANY_MAP, targetType);
+                return invokeTypeParser(preprocessedInput, TypeParsers.ANY_MAP, targetType);
             }
         }
         
         if(targetType instanceof Class){
             Class<?> cls = (Class<?>) targetType;
             if(cls.isArray()){
-                return invokeTypeParser(input, TypeParsers.ANY_ARRAY, targetType);
+                return invokeTypeParser(preprocessedInput, TypeParsers.ANY_ARRAY, targetType);
             }
-            FactoryMethodInvoker invoker  = new FactoryMethodInvoker(cls);
-            if(invoker.containsFactoryMethod()){
-                return invoker.invokeFactoryMethod(input);
+            if(containsStaticMethodNamedValueOf(cls)){
+                return invokeTypeParser(preprocessedInput, TypeParsers.ANY_CLASS_WITH_STATIC_VALUEOF_METHOD, targetType);
             }
         }
         
@@ -130,7 +175,7 @@ public final class StringToTypeParser {
          * type (e.g. java.lang.String[]). The below is to handle this case.
          */
         if(targetType instanceof GenericArrayType){
-            return invokeTypeParser(input, TypeParsers.ANY_ARRAY, targetType);
+            return invokeTypeParser(preprocessedInput, TypeParsers.ANY_ARRAY, targetType);
         }
         
         /*
@@ -140,34 +185,35 @@ public final class StringToTypeParser {
          */
         String message = "There is either no registered 'TypeParser' for that type, or that "
                 + "type does not contain the following static factory method: '%s.%s(String)'.";
-        message = String.format(message, targetType, FactoryMethodInvoker.FACTORY_METHOD_NAME);
-        message = TypeParserUtility.makeParseErrorMsg(input, message, targetType);
+        message = String.format(message, targetType, STATIC_FACTORY_METHOD_NAME);
+        message = makeParseErrorMsg(preprocessedInput, message, targetType);
         throw new IllegalArgumentException(message);
     }
 
-    private Object invokeTypeParser(String input, Type key, Type targetType) {
-        /*
-         * TODO
-         * preProcess input? interface InputPreprocessor 
-         */
-        if (input.trim().equalsIgnoreCase("null")) {
-            if (isPrimitive(targetType)) {
-                String message = "'%s' primitive can not be set to null.";
-                throw new IllegalArgumentException(String.format(message, targetType));
-            }
-            return null; 
+    private String preProcessInputString(String input, Type targetType) {
+        try {
+            return inputPreprocessor.prepare(input, new InputPreprocessorHelper(targetType));
+        } catch (Exception e) {
+            String message = "Exception thrown from InputPreprocessor: %s [%s] with message:  "
+                    + "%s. See underlying exception for more information.";
+            message = String.format(message, 
+                    inputPreprocessor, inputPreprocessor.getClass(), e.getMessage());
+            message = makeParseErrorMsg(input, message, targetType);
+            throw new IllegalArgumentException(message, e);
         }
+    }
 
+    private Object invokeTypeParser(String input, Type key, Type targetType) {
         try {
             TypeParser<?> typeParser = typeParsers.get(key);
             ParseHelper parseHelper = new ParseHelper(this, targetType);
             return typeParser.parse(input, parseHelper);
         } catch (NumberFormatException e) {
             String message =  String.format("Number format exception %s.", e.getMessage());
-            message = TypeParserUtility.makeParseErrorMsg(input, message, targetType);
+            message = makeParseErrorMsg(input, message, targetType);
             throw new IllegalArgumentException(message, e);
         } catch (RuntimeException e) {
-            String message = TypeParserUtility.makeParseErrorMsg(input, e.getMessage(),targetType);
+            String message = makeParseErrorMsg(input, e.getMessage(),targetType);
             throw new IllegalArgumentException(message, e);
         }
 

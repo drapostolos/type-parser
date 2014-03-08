@@ -15,7 +15,7 @@ final class TypeParsers {
     static final Type ANY_LIST = new GenericType<List<?>>() {}.getType();
     static final Type ANY_SET = new GenericType<Set<?>>() {}.getType();
     static final Type ANY_MAP = new GenericType<Map<?, ?>>() {}.getType();
-    static final Type ANY_CLASS_WITH_STATIC_VALUEOF_METHOD = FactoryMethodTypeParser.class;
+    static final Type ANY_CLASS_WITH_STATIC_VALUEOF_METHOD = ValueOfTypeParser.class;
     static final Type ANY_ARRAY = Array.class;
     static final Type CLASS_TYPE = new GenericType<Class<?>>(){}.getType();
     private static final Type ARRAY_OF_CLASS = new GenericType<Class<?>[]>(){}.getType();
@@ -54,7 +54,7 @@ final class TypeParsers {
         registerTypeParser(ANY_SET, TypeParsers.forSets());
         registerTypeParser(ANY_MAP, TypeParsers.forMaps());
         registerTypeParser(ANY_ARRAY, TypeParsers.forArrays());
-        registerTypeParser(ANY_CLASS_WITH_STATIC_VALUEOF_METHOD, new FactoryMethodTypeParser());
+        registerTypeParser(ANY_CLASS_WITH_STATIC_VALUEOF_METHOD, new ValueOfTypeParser());
         registerTypeParser(Boolean.class, new TypeParser<Boolean>(){
             @Override
             public Boolean parse(final String value0, ParseHelper helper) {

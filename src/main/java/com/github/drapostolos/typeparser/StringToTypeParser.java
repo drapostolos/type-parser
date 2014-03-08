@@ -51,9 +51,7 @@ public final class StringToTypeParser {
      * @param targetType - the expected type to convert {@code input} to.
      * @return an instance of {@code targetType} corresponding to the given {@code input}.
      * @throws NullPointerException if {@code targetType} argument is {@code null}.
-     * @throws NullPointerException if {@code input} argument is {@code null}, when 
-     * default {@link InputPreprocessor} strategy is used. This behavior can be changed by
-     * setting your own {@link InputPreprocessor} strategy with {@link StringToTypeParserBuilder#setInputPreprocessor(InputPreprocessor)}.
+     * @throws NullPointerException if {@code input} argument is {@code null}.
      * @throws IllegalArgumentException if {@code input} is not parsable, or
      * if {@code targetType} is not recognized.
      */
@@ -84,9 +82,7 @@ public final class StringToTypeParser {
      * @param genericType - the expected generic type to convert {@code input} to.
      * @return an instance of {@code genericType} corresponding to the given {@code input}.
      * @throws NullPointerException if {@code targetType} argument is {@code null}.
-     * @throws NullPointerException if {@code input} argument is {@code null}, when 
-     * default {@link InputPreprocessor} strategy is used. This behavior can be changed by
-     * setting your own {@link InputPreprocessor} strategy with {@link StringToTypeParserBuilder#setInputPreprocessor(InputPreprocessor)}.
+     * @throws NullPointerException if {@code input} argument is {@code null}.
      * @throws IllegalArgumentException if {@code input} is not parsable, or
      * if {@code genericType} is not recognized.
      */
@@ -111,9 +107,7 @@ public final class StringToTypeParser {
      * @param targetType - the expected type to convert {@code input} to.
      * @return an instance of {@code targetType} corresponding to the given {@code input}.
      * @throws NullPointerException if {@code targetType} argument is {@code null}.
-     * @throws NullPointerException if {@code input} argument is {@code null}, when 
-     * default {@link InputPreprocessor} strategy is used. This behavior can be changed by
-     * setting your own {@link InputPreprocessor} strategy with {@link StringToTypeParserBuilder#setInputPreprocessor(InputPreprocessor)}.
+     * @throws NullPointerException if {@code input} argument is {@code null}
      * @throws IllegalArgumentException if {@code input} is not parsable.
      * @throws IllegalArgumentException if there is no registered {@link TypeParser} for the given {@code targetType}.
      */
@@ -131,7 +125,6 @@ public final class StringToTypeParser {
     
     private Object parseType2(final String input, Type targetType) {
         String preprocessedInput = preProcessInputString(input, targetType);
-        
         if(preprocessedInput == null){
             if (isPrimitive(targetType)) {
                 String message = "'%s' primitive can not be set to null. Input: \"%s\"; Preprocessed input: '%s'";

@@ -4,12 +4,19 @@ package com.github.drapostolos.typeparser;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 
 public class TypeParserMapTest extends AbstractTest{
+
+    @Test
+    public void canParseStringToEmptyMap() throws Exception {
+        GenericType<Map<String, String>> type = new GenericType<Map<String, String>>() {};
+        assertThat(parser.parse("null", type)).isEmpty();
+    }
 
     @Test
     public void shouldThrowExceptionWhenParsingMapWithWildcardKey() throws Exception {
@@ -28,12 +35,12 @@ public class TypeParserMapTest extends AbstractTest{
     }
 
     @Test
-    public void canChangeKeyValuePairSplitter() throws Exception {
+    public void canChangeKeyValueSplitStrategy() throws Exception {
         // given
         StringToTypeParser parser = StringToTypeParser.newBuilder()
-                .setKeyValuePairSplitter(new Splitter() {
+                .setKeyValueSplitStrategy(new SplitStrategy() {
                     @Override
-                    public List<String> split(String input, SplitHelper helper) {
+                    public List<String> split(String input, SplitStrategyHelper helper) {
                         return Arrays.asList(input.split("#"));
                     }
                 })
@@ -47,5 +54,14 @@ public class TypeParserMapTest extends AbstractTest{
         assertThat(map.get("aaa")).isEqualTo("AAA");
         assertThat(map.get("bbb")).isEqualTo("BBB");
     }
+    
+    @Test
+    public void canParseStringToLinkedHashMapList() throws Exception {
+        GenericType<LinkedHashMap<Long, String>> type = new GenericType<LinkedHashMap<Long, String>>() {};
+        assertThat(parser.parse("1=one", type)).containsKey(1l);
+        assertThat(parser.parse("1=one", type)).containsValue("one");
+    }
+
+
 
 }

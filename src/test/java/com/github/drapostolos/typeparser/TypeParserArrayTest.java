@@ -10,6 +10,11 @@ import org.junit.Test;
 public class TypeParserArrayTest extends AbstractTest{
 
     @Test
+    public void canParseStringToEmptyArray() throws Exception {
+        assertThat(parser.parse("null", String[].class)).isEmpty();
+    }
+
+    @Test
     public <T> void shouldThrowExceptionWhenParsingGenericArrayOfUnknownType() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Can not parse \"dummy-string\" to type \"T[]\"");
@@ -54,7 +59,7 @@ public class TypeParserArrayTest extends AbstractTest{
         parser = StringToTypeParser.newBuilder()
                 .registerTypeParser(int[].class, new TypeParser<int[]>(){
                     @Override
-                    public int[] parse(String input, ParseHelper helper) {
+                    public int[] parse(String input, TypeParserHelper helper) {
                         return new int[]{5, 4};
                     }})
                 .build();
@@ -67,12 +72,12 @@ public class TypeParserArrayTest extends AbstractTest{
     }
 
     @Test
-    public void canChangeSplitter() throws Exception {
+    public void canChangeSplitStrategy() throws Exception {
         // given
         StringToTypeParser parser = StringToTypeParser.newBuilder()
-                .setSplitter(new Splitter() {
+                .setSplitStrategy(new SplitStrategy() {
                     @Override
-                    public List<String> split(String input, SplitHelper helper) {
+                    public List<String> split(String input, SplitStrategyHelper helper) {
                         return Arrays.asList(input.split("AAA"));
                     }
                 })

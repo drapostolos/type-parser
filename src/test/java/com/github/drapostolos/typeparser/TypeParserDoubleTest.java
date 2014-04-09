@@ -20,6 +20,8 @@ public class TypeParserDoubleTest extends AbstractTest{
 
     @Test
     public void canParseStringToDoubleType() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(Double.class)).isTrue();
+    	assertThat(parser.isTargetTypeParsable(double.class)).isTrue();
         assertThat(parser.parse("01.2", Double.class)).isEqualTo(1.2d);
         assertThat(parser.parse("1", double.class)).isEqualTo(1d);
         assertThat(parser.parse("1d", double.class)).isEqualTo(1d);
@@ -29,30 +31,35 @@ public class TypeParserDoubleTest extends AbstractTest{
 
     @Test
     public void canParseToGenericDoubleArray() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(new GenericType<Double[]>() {})).isTrue();
         assertThat(parser.parse("1, 1.2, .1", new GenericType<Double[]>() {}))
         .containsExactly(1d, 1.2d, 0.1d);
     }
 
     @Test
     public void canParseToCharacerArray() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(double[].class)).isTrue();
         assertThat(parser.parse("1, 1.2, .1", double[].class))
         .containsOnly(1d, 1.2d, 0.1d);
     }
 
     @Test
     public void canParseToDoubleList() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(new GenericType<List<Double>>() {})).isTrue();
         assertThat(parser.parse("1, 1.2, .1", new GenericType<List<Double>>() {}))
         .containsExactly(1d, 1.2d, 0.1d);
     }
 
     @Test
     public void canParseToDoubleSet() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(new GenericType<Set<Double>>() {})).isTrue();
         assertThat(parser.parse("1, 1.2, 1", new GenericType<Set<Double>>() {}))
         .containsExactly(1d, 1.2d);
     }
 
     @Test
     public void canParseToDoubleMap() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(new GenericType<Map<Double, Double>>() {})).isTrue();
         assertThat(parser.parse("1=.1, 2=.2", new GenericType<Map<Double, Double>>() {}))
         .contains(MapEntry.entry(1d, .1d))
         .contains(MapEntry.entry(2d, .2d))

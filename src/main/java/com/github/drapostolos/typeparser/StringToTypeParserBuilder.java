@@ -3,17 +3,19 @@ package com.github.drapostolos.typeparser;
 import static com.github.drapostolos.typeparser.TypeParserUtility.makeNullArgumentErrorMsg;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 /**
  * Builder class for constructing and configuring instances of {@link StringToTypeParser}.
  *
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>
  */
 public final class StringToTypeParserBuilder {
     Map<Type, TypeParser<?>> typeParsers;
-    Splitter splitter = TypeParserUtility.defaultSplitter();
-    Splitter keyValuePairSplitter = TypeParserUtility.defaultKeyValuePairSplitter();
+    SplitStrategy splitStrategy = TypeParserUtility.defaultSplitStrategy();
+    SplitStrategy keyValueSplitStrategy = TypeParserUtility.defaultKeyValueSplitStrategy();
     InputPreprocessor inputPreprocessor = TypeParserUtility.defaultInputPreprocessor();
 
     StringToTypeParserBuilder() {
@@ -40,7 +42,7 @@ public final class StringToTypeParserBuilder {
 
     /**
      * Unregister the {@link TypeParser} associated with the given {@code targetType}.
-     * {@code targetType} will be ignored if not associated with ay {@link TypeParser}.
+     * {@code targetType} will be ignored if not associated with any {@link TypeParser}.
      * 
      * @param targetType The type associated with {@link TypeParser} to unregister.
      * @return {@link StringToTypeParserBuilder}
@@ -65,7 +67,7 @@ public final class StringToTypeParserBuilder {
      * 
      * @throws NullPointerException if any given argument is null.
      */
-    public <T> StringToTypeParserBuilder registerTypeParser(Class<? super T> targetType, TypeParser<T> typeParser){
+    public <T> StringToTypeParserBuilder registerTypeParser(Class<T> targetType, TypeParser<T> typeParser){
         if(typeParser == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("typeParser"));
         }
@@ -98,71 +100,66 @@ public final class StringToTypeParserBuilder {
     }
     
     /**
-     * Set a custom made {@link Splitter} implementation to be used by 
-     * the {@link StringToTypeParser} built by this instance.
+     * Set a custom made {@link SplitStrategy} implementation to be used by 
+     * the {@link StringToTypeParser} (as built by this instance).
      * <p/>
-     * The default behavior, when parsing a string to a collection (e.g {@link List}, {@link Set} etc.), 
-     * array or {@link Map} type, is to:
-     * <ul>
-     * <li>if {@code input.trim()} is empty (i.e. lenth is 0) then an empty {@code List<String>} is returned</li>
-     * <li>split the {@code input} String by a comma ",".</li>
-     * </ul>
+     * The default behavior, when parsing a string to a generic type (example: {@link Collection} / {@link List} / {@link Set} etc.),
+     * Array or {@link Map} type, is to split by comma (','). 
      *   
      * <p/>
-     * Use this method to register your own {@link Splitter} implementation to override
+     * Use this method to register your own {@link SplitStrategy} implementation to override
      * the default behavior.
      * 
-     * @param splitter {@link Splitter} implementation.
+     * @param splitStrategy {@link SplitStrategy} implementation.
      * @return {@link StringToTypeParserBuilder}
      * 
      * @throws NullPointerException if any given argument is null.
      */
-    public StringToTypeParserBuilder setSplitter(Splitter splitter){
-        if(splitter == null) {
-            throw new NullPointerException(makeNullArgumentErrorMsg("splitter"));
+    public StringToTypeParserBuilder setSplitStrategy(SplitStrategy splitStrategy){
+        if(splitStrategy == null) {
+            throw new NullPointerException(makeNullArgumentErrorMsg("splitStrategy"));
         }
-        this.splitter = splitter;
+        this.splitStrategy = splitStrategy;
         return this;
     }
     
     /**
-     * Set a custom made {@link Splitter} implementation to separate the 
-     * {@code key} and {@code value} pair in a Map entry, as used by 
-     * the {@link StringToTypeParser} built by this instance.
+     * Set a custom made {@link SplitStrategy} implementation to separate the 
+     * {@code key} and {@code value} pair in a Map entry, to be used by 
+     * the {@link StringToTypeParser} (as built by this instance).
      * <p/>
      * The default behavior, when parsing a string to a {@link Map} instance, is to split
      * each map entry by a "=" sign. 
      * <p/>
      * For example this input string: <br/>
-     * <code>"key1=valueA, key2=valueB"</code> will first be split using the {@link Splitter} strategy
-     * as set with {@link #setSplitter(Splitter)} to get a list of map entries (key/value pairs). Then
+     * <code>"key1=valueA,key2=valueB"</code> will first be split using the {@link SplitStrategy} strategy
+     * as set with {@link #setSplitStrategy(SplitStrategy)} to get a list of map entries (key/value pairs). Then
      * each map entry is split by "=" where first element is the {@code key} and the second
      * element is the {@code value}.
      * <p/>
      * 
-     * Use this method to register your own key/value pair {@link Splitter} implementation
+     * Use this method to register your own key/value {@link SplitStrategy} implementation
      * to override the default behavior. I.e replace using the "=" sign with some other character.
      * 
-     * @param splitter {@link Splitter} implementation.
+     * @param splitStrategy {@link SplitStrategy} implementation.
      * @return {@link StringToTypeParserBuilder}
      * 
      * @throws NullPointerException if any given argument is null.
      */
-    public StringToTypeParserBuilder setKeyValuePairSplitter(Splitter splitter){
-        if(splitter == null) {
-            throw new NullPointerException(makeNullArgumentErrorMsg("splitter"));
+    public StringToTypeParserBuilder setKeyValueSplitStrategy(SplitStrategy splitStrategy){
+        if(splitStrategy == null) {
+            throw new NullPointerException(makeNullArgumentErrorMsg("splitStrategy"));
         }
-        this.keyValuePairSplitter = splitter;
+        this.keyValueSplitStrategy = splitStrategy;
         return this;
     }
     
     /**
      * Set a custom made {@link InputPreprocessor} implementation to be used by 
-     * the {@link StringToTypeParser} built by this instance.
+     * the {@link StringToTypeParser} (as built by this instance).
      * <p/>
      * The default behavior, when pre-processing an input String, is:
      * <ul>
-     * <li>throw {@link NullPointerException} if input String is a {@code null} object.</li>
      * <li>if input string equals the string "null" (case ignored and trimmed) then a {@code null}
      * object is returned by the {@link StringToTypeParser}</li>
      * </ul>

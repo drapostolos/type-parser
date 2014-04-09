@@ -22,34 +22,43 @@ public class TypeParserShortTest extends AbstractTest {
     public void canParseStringToShort() throws Exception {
         assertThat(parser.parse("3", Short.class)).isEqualTo((short) 3);
         assertThat(parser.parse(" 3\t", Short.class)).isEqualTo((short) 3);
+        assertThat(parser.parse("3", short.class)).isEqualTo((short) 3);
+        assertThat(parser.parse(" 3\t", short.class)).isEqualTo((short) 3);
+    	assertThat(parser.isTargetTypeParsable(Short.class)).isTrue();
+    	assertThat(parser.isTargetTypeParsable(short.class)).isTrue();
     }
 
     @Test
     public void canParseToGenericShortArray() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(new GenericType<Short[]>() {})).isTrue();
         assertThat(parser.parse("1, 2, 3", new GenericType<Short[]>() {}))
         .containsExactly((short) 1, (short) 2, (short) 3);
     }
 
     @Test
     public void canParseToShortArray() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(Short[].class)).isTrue();
         assertThat(parser.parse("1, 2, 3", Short[].class))
         .containsOnly((short) 1, (short) 2, (short) 3);
     }
 
     @Test
     public void canParseToShortList() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(new GenericType<List<Short>>() {})).isTrue();
         assertThat(parser.parse("1, 2, 3", new GenericType<List<Short>>() {}))
         .containsExactly((short) 1, (short) 2, (short) 3);
     }
 
     @Test
     public void canParseToShortSet() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(new GenericType<Set<Short>>() {})).isTrue();
         assertThat(parser.parse("1, 2, 1", new GenericType<Set<Short>>() {}))
         .containsExactly((short) 1, (short) 2);
     }
 
     @Test
     public void canParseToShortMap() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(new GenericType<Map<Short, Short>>() {})).isTrue();
         assertThat(parser.parse("1=11, 2=22", new GenericType<Map<Short, Short>>() {}))
         .contains(MapEntry.entry((short) 1, (short) 11))
         .contains(MapEntry.entry((short) 2, (short) 22))

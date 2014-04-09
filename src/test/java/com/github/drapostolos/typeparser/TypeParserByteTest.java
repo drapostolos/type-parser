@@ -13,6 +13,8 @@ public class TypeParserByteTest extends AbstractTest{
 
     @Test
     public void canParseStringToByteType() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(Byte.class)).isTrue();
+    	assertThat(parser.isTargetTypeParsable(byte.class)).isTrue();
         assertThat(parser.parse("55", byte.class)).isEqualTo((byte) 55);
         assertThat(parser.parse("\t55 ", Byte.class)).isEqualTo((byte) 55);
     }
@@ -40,30 +42,35 @@ public class TypeParserByteTest extends AbstractTest{
 
     @Test
     public void canParseToGenericByteArray() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(new GenericType<Byte[]>() {})).isTrue();
         assertThat(parser.parse("55, 45, 35", new GenericType<Byte[]>() {}))
         .containsExactly((byte) 55, (byte) 45, (byte) 35);
     }
 
     @Test
     public void canParseToByteArray() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(Byte[].class)).isTrue();
         assertThat(parser.parse("55, 45, 35", Byte[].class))
         .containsExactly((byte) 55, (byte) 45, (byte) 35);
     }
 
     @Test
     public void canParseToByteList() throws Exception {
-        assertThat(parser.parse("55, 45, 35", new GenericType<List<Byte>>() {} ))
+    	assertThat(parser.isTargetTypeParsable(new GenericType<List<Byte>>() {})).isTrue();
+        assertThat(parser.parse("55, 45, 35", new GenericType<List<Byte>>() {}))
         .containsExactly((byte) 55, (byte) 45, (byte) 35);
     }
 
     @Test
     public void canParseToByteSet() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(new GenericType<Set<Byte>>() {})).isTrue();
         assertThat(parser.parse("55, 45, 35", new GenericType<Set<Byte>>() {}))
         .containsExactly((byte) 55, (byte) 45, (byte) 35);
     }
 
     @Test
     public void canParseToBooleanMap() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(new GenericType<Map<Byte, Byte>>() {})).isTrue();
         assertThat(parser.parse("55=56, 57=58", new GenericType<Map<Byte, Byte>>() {}))
         .contains(MapEntry.entry((byte) 55, (byte) 56))
         .contains(MapEntry.entry((byte) 57, (byte) 58))

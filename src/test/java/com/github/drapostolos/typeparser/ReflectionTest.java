@@ -13,7 +13,7 @@ import org.junit.Test;
 public class ReflectionTest extends AbstractTest{
     
     @Test
-    public void canParseArgumentsToMethodThroughReflection() throws Exception {
+    public void canParseTypeArgumentsAndCallMethodThroughReflection() throws Exception {
         // given
         Method m = getMethod("m");
         String[] strArgs = {"1, 2, 3", "a,b,c"};

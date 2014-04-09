@@ -1,27 +1,27 @@
 package com.github.drapostolos.typeparser;
 
 
-public class TestClass1  implements TypeParser<TestClass1>{
+public class MyClass1  implements TypeParser<MyClass1>{
     String value;
     
     /*
      * This method is called through reflection in one of the unit tests.
      */
     @SuppressWarnings("unused")
-    private static TestClass1 valueOf(String value){
-        return new TestClass1(value);
+    private static MyClass1 valueOf(String value){
+        return new MyClass1(value);
     }
 
     @Override
-    public TestClass1 parse(String value, ParseHelper helper) {
-        return new TestClass1(value);
+    public MyClass1 parse(String value, TypeParserHelper helper) {
+        return new MyClass1(value);
     }
 
-    public TestClass1(String value) {
+    public MyClass1(String value) {
         this.value = value;
     }
 
-    public TestClass1() {
+    public MyClass1() {
         this.value = "default";
     }
     
@@ -41,7 +41,7 @@ public class TestClass1  implements TypeParser<TestClass1>{
             return false;
         if (getClass() != obj.getClass())
             return false;
-        TestClass1 other = (TestClass1) obj;
+        MyClass1 other = (MyClass1) obj;
         if (value == null) {
             if (other.value != null)
                 return false;

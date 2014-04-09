@@ -7,10 +7,10 @@ import static com.github.drapostolos.typeparser.TypeParserUtility.makeParseError
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-final class ValueOfTypeParser implements TypeParser<Object>{
+final class StaticFactoryMethodTypeParser implements TypeParser<Object>{
     private static final Object STATIC_METHOD = null;
 
-    public Object parse(String input, ParseHelper helper) {
+    public Object parse(String input, TypeParserHelper helper) {
         Class<?> targetType = (Class<?>) helper.getTargetType();
         Method method = getMethodNamedValueOf(targetType);
         try {
@@ -32,6 +32,6 @@ final class ValueOfTypeParser implements TypeParser<Object>{
         String message = " Exception thrown in static factory method '%s'. "
                 + "See underlying exception for additional information.";
         message = String.format(message, methodSignature);
-        return makeParseErrorMsg(input, message, targetType);
+        return makeParseErrorMsg(input, targetType, message);
     }
 }

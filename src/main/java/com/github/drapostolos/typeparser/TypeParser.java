@@ -5,15 +5,17 @@ package com.github.drapostolos.typeparser;
  * a specific type. Any implementation of this interface is expected to be immutable.
  * 
  * @param <T> the type to convert the parsed string to. 
+ * 
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>
  */
 public interface TypeParser<T>{
 
     /**
      * Parses the given string and converts it to an instance of type T.
      * 
-     * @param value input string to parse.
+     * @param input input string to parse.
      * @param helper Helper class injected automatically by the {@link StringToTypeParser}.
      * @return an instance of type T.
      */
-    T parse(String input, ParseHelper helper);
+    T parse(String input, TypeParserHelper helper);
 }

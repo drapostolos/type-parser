@@ -14,12 +14,14 @@ public class TypeParserClassTest extends AbstractTest{
     String stringToParse = String.format("%s,  %s", cls.getName(), cls.getName());
 
     @Test
-    public void canParseToType() throws Exception {
+    public void canParseToGenericType() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(new GenericType<Class<?>>(){})).isTrue();
         assertThat(parser.parse(cls.getName(), new GenericType<Class<?>>() {})).hasSameClassAs(cls);
     }
 
     @Test
     public void canParseToClass() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(Class.class)).isTrue();
         assertThat(parser.parse(cls.getName(), Class.class)).hasSameClassAs(cls);
     }
 
@@ -32,30 +34,35 @@ public class TypeParserClassTest extends AbstractTest{
 
     @Test
     public void canParseToGenericClassArray() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(new GenericType<Class<?>[]>() {})).isTrue();
         assertThat(parser.parse(stringToParse, new GenericType<Class<?>[]>() {}))
         .containsExactly(cls, cls);
     }
 
     @Test
     public void canParseToArray() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(Class[].class)).isTrue();
         assertThat(parser.parse(stringToParse, Class[].class))
         .containsOnly(cls, cls);
     }
 
     @Test
     public void canParseToList() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(new GenericType<List<Class<?>>>() {})).isTrue();
         assertThat(parser.parse(stringToParse, new GenericType<List<Class<?>>>() {}))
         .containsExactly(cls, cls);
     }
 
     @Test
     public void canParseToSet() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(new GenericType<Set<Class<?>>>() {})).isTrue();
         assertThat(parser.parse(stringToParse, new GenericType<Set<Class<?>>>() {}))
         .containsExactly(cls);
     }
 
     @Test
     public void canParseToMap() throws Exception {
+    	assertThat(parser.isTargetTypeParsable(new GenericType<Map<Class<?>, Class<?>>>() {})).isTrue();
         String str = String.format("%s=%s", cls.getName(), cls.getName());
         assertThat(parser.parse(str, new GenericType<Map<Class<?>, Class<?>>>() {}))
         .contains(MapEntry.entry(cls, cls))

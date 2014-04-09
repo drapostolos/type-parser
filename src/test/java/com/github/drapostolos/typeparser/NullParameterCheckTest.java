@@ -30,15 +30,15 @@ public class NullParameterCheckTest extends AbstractTest{
     @Test
     public void shouldThrowExceptionWhenRegisteringTypeParser_NullClass_TypeParser() throws Exception {
         prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("targetType");
-        Class<TestClass1> arg = null;
-        builder.registerTypeParser(arg, new TestClass1());
+        Class<MyClass1> arg = null;
+        builder.registerTypeParser(arg, new MyClass1());
     }
 
     @Test
     public void shouldThrowExceptionWhenRegisteringTypeParser_NullGenmericType_TypeParser() throws Exception {
         prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("targetType");
-        GenericType<TestClass1> arg = null;
-        builder.registerTypeParser(arg, new TestClass1());
+        GenericType<MyClass1> arg = null;
+        builder.registerTypeParser(arg, new MyClass1());
     }
 
     @Test
@@ -62,15 +62,15 @@ public class NullParameterCheckTest extends AbstractTest{
     }
 
     @Test
-    public void shouldThrowExceptionWhenSettingNullSplitter() throws Exception {
-        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("splitter");
-        builder.setSplitter(null);
+    public void shouldThrowExceptionWhenSettingNullSplitStrategy() throws Exception {
+        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("splitStrategy");
+        builder.setSplitStrategy(null);
     }
 
     @Test
-    public void shouldThrowExceptionWhenSettingNullMakKeyValueSplitter() throws Exception {
-        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("splitter");
-        builder.setKeyValuePairSplitter(null);
+    public void shouldThrowExceptionWhenSettingNullMakKeyValueSplitStrategy() throws Exception {
+        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("splitStrategy");
+        builder.setKeyValueSplitStrategy(null);
     }
 
     @Test

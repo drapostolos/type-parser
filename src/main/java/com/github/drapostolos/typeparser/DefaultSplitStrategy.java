@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-final class DefaultSplitter implements Splitter{
+final class DefaultSplitStrategy implements SplitStrategy{
 
     @Override
-    public List<String> split(String input, SplitHelper helper) {
-        if(input.trim().isEmpty()){
+    public List<String> split(String input, SplitStrategyHelper helper) {
+        if(input == null){
             return new ArrayList<String>();
         }
         return Arrays.asList(input.split(","));
     }
-
 }
+
+

@@ -3,7 +3,7 @@ package com.github.drapostolos.typeparser;
 import java.util.Arrays;
 import java.util.List;
 
-final class KeyValueSplitStrategy implements SplitStrategy{
+final class KeyValueSplitStrategy implements SplitStrategy {
 
     @Override
     public List<String> split(String input, SplitStrategyHelper helper) {

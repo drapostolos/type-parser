@@ -10,13 +10,14 @@ import java.lang.reflect.Type;
  * 
  * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>
  */
-public final class NoSuchRegisteredTypeParserException extends RuntimeException{
+public final class NoSuchRegisteredTypeParserException extends RuntimeException {
+
     private static final long serialVersionUID = 1L;
-    
+
     NoSuchRegisteredTypeParserException(String preprocessedInput, Type targetType) {
         super(constructMessage(preprocessedInput, targetType));
     }
-    
+
     private static String constructMessage(String preprocessedInput, Type targetType) {
         String message = "There is either no registered 'TypeParser' for that type, or that "
                 + "type does not contain the following static factory method: '%s.%s(String)'.";

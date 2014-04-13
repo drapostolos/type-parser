@@ -4,11 +4,10 @@ package com.github.drapostolos.typeparser;
  * Interface for implementations that parses a given string and then converts it to
  * a specific type. Any implementation of this interface is expected to be immutable.
  * 
- * @param <T> the type to convert the parsed string to. 
- * 
+ * @param <T> the type to convert the parsed string to.
  * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>
  */
-public interface TypeParser<T>{
+public interface TypeParser<T> {
 
     /**
      * Parses the given string and converts it to an instance of type T.

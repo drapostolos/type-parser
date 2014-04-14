@@ -6,7 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.junit.Test;
 
 public class DefeatConstructorInstantiationTest {
-    
+
     @Test(expected = InvocationTargetException.class)
     public void shouldThrowAssertionErrorWhenInstantiatinTypeParsers() throws Exception {
         throwExceptionWhenInstantiating(TypeParsers.class);

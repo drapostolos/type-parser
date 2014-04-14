@@ -1,6 +1,5 @@
 package com.github.drapostolos.typeparser;
 
-
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -13,29 +12,27 @@ import java.util.TreeSet;
 
 import org.junit.Test;
 
+public class StringToTypeParserTest extends AbstractTest {
 
-public class StringToTypeParserTest extends AbstractTest{
+    @Test
+    public void canNotParseTheseTypesByDefault() throws Exception {
+        assertThat(parser.isTargetTypeParsable(Math.class)).isFalse();
+        assertThat(parser.isTargetTypeParsable(StringToTypeParser.class)).isFalse();
+        assertThat(parser.isTargetTypeParsable(StringToTypeParserBuilder.class)).isFalse();
+        assertThat(parser.isTargetTypeParsable(new GenericType<TreeSet<String>>() {}.getType())).isFalse();
+        assertThat(parser.isTargetTypeParsable(new GenericType<TreeMap<String, String>>() {}.getType())).isFalse();
 
-	@Test
-	public void canNotParseTheseTypesByDefault() throws Exception {
-		assertThat(parser.isTargetTypeParsable(Math.class)).isFalse();
-		assertThat(parser.isTargetTypeParsable(StringToTypeParser.class)).isFalse();
-		assertThat(parser.isTargetTypeParsable(StringToTypeParserBuilder.class)).isFalse();
-		assertThat(parser.isTargetTypeParsable(new GenericType<TreeSet<String>>() {}.getType())).isFalse();
-		assertThat(parser.isTargetTypeParsable(new GenericType<TreeMap<String, String>>() {}.getType())).isFalse();
-		
-		
-	}
-	
+    }
+
     @Test
     public void shouldThrowExceptionWhenParsingPrimitiveToNullValue() throws Exception {
-        Class<?>[] classes = {boolean.class, byte.class, char.class, double.class, int.class, 
-                float.class, long.class, short.class};
-        for(Class<?> c : classes){
+        Class<?>[] classes = { boolean.class, byte.class, char.class, double.class, int.class,
+                float.class, long.class, short.class };
+        for (Class<?> c : classes) {
             try {
                 parser.parse("null", c);
                 fail(String.format("Primitive type '%s' is set to null, when it should not be possible"));
-            } catch (IllegalArgumentException e){
+            } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             }
         }
@@ -50,9 +47,9 @@ public class StringToTypeParserTest extends AbstractTest{
 
     @Test
     public void canParseWrapperClassToNullValue() throws Exception {
-        Class<?>[] classes = {Boolean.class, Byte.class, Character.class, Double.class, 
-                Integer.class, Float.class, Long.class, Short.class};
-        for(Class<?> c : classes){
+        Class<?>[] classes = { Boolean.class, Byte.class, Character.class, Double.class,
+                Integer.class, Float.class, Long.class, Short.class };
+        for (Class<?> c : classes) {
             assertThat(parser.parse("null", c)).isNull();
         }
     }
@@ -73,19 +70,19 @@ public class StringToTypeParserTest extends AbstractTest{
         thrown.expect(NoSuchRegisteredTypeParserException.class);
         parser.parse("a,b,c", new GenericType<TreeSet<String>>() {});
     }
-    
+
     @Test
     public void shouldThrowExceptionWhenTargetTypeIsUnsupportedListImplementation() throws Exception {
         thrown.expect(NoSuchRegisteredTypeParserException.class);
         parser.parse("a,b,c", new GenericType<LinkedList<String>>() {});
     }
-    
+
     @Test
     public void shouldThrowExceptionWhenTargetTypeIsUnsupportedMapImplementation() throws Exception {
         thrown.expect(NoSuchRegisteredTypeParserException.class);
         parser.parse("a=A,b=B,c=C", new GenericType<TreeMap<String, String>>() {});
     }
-    
+
     @Test
     public void shouldThrowExceptionWhenFactoryMethodIsNotStatic() throws Exception {
         thrown.expect(NoSuchRegisteredTypeParserException.class);
@@ -97,12 +94,12 @@ public class StringToTypeParserTest extends AbstractTest{
     @Test(expected = IllegalArgumentException.class)
     public void canUnregisterDefaultTypeParserByGenericType() throws Exception {
         // given
-        GenericType<List<Integer>> type = new GenericType<List<Integer>>(){};
+        GenericType<List<Integer>> type = new GenericType<List<Integer>>() {};
         assertThat(parser.parse("1,2", type)).containsExactly(1, 2);
-        
+
         // when
         StringToTypeParser parser = StringToTypeParser.newBuilder()
-                .unregisterTypeParser(new GenericType<List<?>>(){})
+                .unregisterTypeParser(new GenericType<List<?>>() {})
                 .build();
 
         // then 
@@ -113,7 +110,7 @@ public class StringToTypeParserTest extends AbstractTest{
     public void canUnregisterDefaultTypeParserByClass() throws Exception {
         // given
         assertThat(parser.parse("1", int.class)).isEqualTo(1);
-        
+
         // when
         StringToTypeParser parser = StringToTypeParser.newBuilder()
                 .unregisterTypeParser(int.class)
@@ -151,7 +148,7 @@ public class StringToTypeParserTest extends AbstractTest{
     public void shouldThrowExceptionWhenStaticFactoryMethodFails() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Exception thrown in static factory method ");
-        parser.parse("aaa", MyClass3.class); 
+        parser.parse("aaa", MyClass3.class);
     }
 
     @Test
@@ -161,14 +158,15 @@ public class StringToTypeParserTest extends AbstractTest{
         thrown.expectMessage("must be a parameterized type when calling this method, but it is not.");
         parser = StringToTypeParser.newBuilder()
                 .registerTypeParser(MyClass1.class, new TypeParser<MyClass1>() {
+
                     public MyClass1 parse(String input, TypeParserHelper helper) {
                         TypeParserUtility.getParameterizedTypeArguments(helper.getTargetType());
                         return null;
                     }
                 })
                 .build();
-        
-        parser.parse("aaa", MyClass1.class); 
+
+        parser.parse("aaa", MyClass1.class);
     }
 
     @Test
@@ -178,14 +176,15 @@ public class StringToTypeParserTest extends AbstractTest{
         thrown.expectMessage("is either not an array or the componet type is generic.");
         parser = StringToTypeParser.newBuilder()
                 .registerTypeParser(MyClass1.class, new TypeParser<MyClass1>() {
+
                     public MyClass1 parse(String input, TypeParserHelper helper) {
                         TypeParserUtility.getComponentClass(helper.getTargetType());
                         return null;
                     }
                 })
                 .build();
-        
-        parser.parse("aaa", MyClass1.class); 
+
+        parser.parse("aaa", MyClass1.class);
     }
 
     @Test
@@ -217,10 +216,11 @@ public class StringToTypeParserTest extends AbstractTest{
         // given
         parser = StringToTypeParser.newBuilder()
                 .setInputPreprocessor(new InputPreprocessor() {
+
                     @Override
                     public String prepare(String input, InputPreprocessorHelper helper) {
-                        if(helper.getTargetType().equals(String.class)){
-                            if (input.equals("DEFAULT")){
+                        if (helper.getTargetType().equals(String.class)) {
+                            if (input.equals("DEFAULT")) {
                                 return "MY-DEFAULT";
                             }
                         }
@@ -228,14 +228,15 @@ public class StringToTypeParserTest extends AbstractTest{
                     }
                 })
                 .build();
-        
+
         // then
         assertThat(parser.parse("DEFAULT", String.class)).isEqualTo("MY-DEFAULT");
         assertThat(parser.parse("nuLL", String.class)).isNull();
         assertThat(parser.parse("AAA", String.class)).isEqualTo("AAA");
-        assertThat(parser.parse("null ", Integer.class)).isNull();;
+        assertThat(parser.parse("null ", Integer.class)).isNull();
+        ;
     }
-    
+
     @Test
     public void shouldThrowIllegalArgumentExceptionIfInputPreprocessorThrows() throws Exception {
         // given
@@ -243,20 +244,20 @@ public class StringToTypeParserTest extends AbstractTest{
         thrown.expectMessage("Exception thrown from InputPreprocessor");
         thrown.expectMessage("some-message");
 
-       
         // when
         parser = StringToTypeParser.newBuilder()
                 .setInputPreprocessor(new InputPreprocessor() {
+
                     @Override
                     public String prepare(String input, InputPreprocessorHelper helper) {
                         throw new RuntimeException("some-message");
                     }
                 })
                 .build();
-        
+
         // then
         parser.parse(DUMMY_STRING, String.class);
-        
+
     }
 
 }

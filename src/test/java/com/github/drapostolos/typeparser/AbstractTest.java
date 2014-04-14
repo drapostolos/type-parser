@@ -4,6 +4,7 @@ import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
 public abstract class AbstractTest {
+
     static final String DUMMY_STRING = "dummy-string";
     static final String NUMBER_FORMAT_ERROR_MSG = "Number format exception For input string: \"%s\".";
     StringToTypeParser parser = StringToTypeParser.newBuilder().build();

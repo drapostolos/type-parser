@@ -1,14 +1,14 @@
 package com.github.drapostolos.typeparser;
 
+public class MyClass1 implements TypeParser<MyClass1> {
 
-public class MyClass1  implements TypeParser<MyClass1>{
     String value;
-    
+
     /*
      * This method is called through reflection in one of the unit tests.
      */
     @SuppressWarnings("unused")
-    private static MyClass1 valueOf(String value){
+    private static MyClass1 valueOf(String value) {
         return new MyClass1(value);
     }
 
@@ -24,7 +24,7 @@ public class MyClass1  implements TypeParser<MyClass1>{
     public MyClass1() {
         this.value = "default";
     }
-    
+
     @Override
     public int hashCode() {
         final int prime = 31;

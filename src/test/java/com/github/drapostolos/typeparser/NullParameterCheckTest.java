@@ -1,6 +1,6 @@
 package com.github.drapostolos.typeparser;
 
-import java.lang.reflect.Type; 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
 
@@ -8,13 +8,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class NullParameterCheckTest extends AbstractTest{
+public class NullParameterCheckTest extends AbstractTest {
+
     private StringToTypeParserBuilder builder = StringToTypeParser.newBuilder();
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-    
-    
+
     @Test
     public void shouldThrowExceptionWhenRegisteringTypeParser_Class_Null() throws Exception {
         prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("typeParser");
@@ -102,8 +102,7 @@ public class NullParameterCheckTest extends AbstractTest{
     @Test
     public void shouldThrowExceptionWhenParsingNullStringToGenericType() throws Exception {
         prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("input");
-        parser.parse(null, new GenericType<List<Integer>>() {
-        });
+        parser.parse(null, new GenericType<List<Integer>>() {});
     }
 
     @Test
@@ -113,12 +112,9 @@ public class NullParameterCheckTest extends AbstractTest{
         parser.parse("dummy", t);
     }
 
-
     private void prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed(String argName) {
         thrown.expect(NullPointerException.class);
         thrown.expectMessage(String.format("Argument named '%s' is illegally set to null!", argName));
     }
-    
-    
 
 }

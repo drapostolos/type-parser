@@ -1,6 +1,5 @@
 package com.github.drapostolos.typeparser;
 
-
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.Arrays;
@@ -10,7 +9,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class TypeParserMapTest extends AbstractTest{
+public class TypeParserMapTest extends AbstractTest {
 
     @Test
     public void canParseStringToEmptyMap() throws Exception {
@@ -39,6 +38,7 @@ public class TypeParserMapTest extends AbstractTest{
         // given
         StringToTypeParser parser = StringToTypeParser.newBuilder()
                 .setKeyValueSplitStrategy(new SplitStrategy() {
+
                     @Override
                     public List<String> split(String input, SplitStrategyHelper helper) {
                         return Arrays.asList(input.split("#"));
@@ -54,14 +54,12 @@ public class TypeParserMapTest extends AbstractTest{
         assertThat(map.get("aaa")).isEqualTo("AAA");
         assertThat(map.get("bbb")).isEqualTo("BBB");
     }
-    
+
     @Test
     public void canParseStringToLinkedHashMapList() throws Exception {
         GenericType<LinkedHashMap<Long, String>> type = new GenericType<LinkedHashMap<Long, String>>() {};
         assertThat(parser.parse("1=one", type)).containsKey(1l);
         assertThat(parser.parse("1=one", type)).containsValue("one");
     }
-
-
 
 }

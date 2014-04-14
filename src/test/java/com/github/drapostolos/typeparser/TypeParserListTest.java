@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.Test;
 
 public class TypeParserListTest extends AbstractTest {
-    
+
     @Test
     public void canParseSpaceToSingleElementList() throws Exception {
         GenericType<List<String>> type = new GenericType<List<String>>() {};
@@ -35,24 +35,25 @@ public class TypeParserListTest extends AbstractTest {
         thrown.expectMessage("contains the following illegal type argument: '?' ");
         parser.parse(DUMMY_STRING, new GenericType<List<?>>() {});
     }
-    
+
     @Test
     public void canChangeSplitStrategy() throws Exception {
         // given
         parser = StringToTypeParser.newBuilder()
-        .setSplitStrategy(new SplitStrategy() {
-            @Override
-            public List<String> split(String input, SplitStrategyHelper helper) {
-                return Arrays.asList(input.split("A+"));
-            }
-        })
-        .build();
-        
+                .setSplitStrategy(new SplitStrategy() {
+
+                    @Override
+                    public List<String> split(String input, SplitStrategyHelper helper) {
+                        return Arrays.asList(input.split("A+"));
+                    }
+                })
+                .build();
+
         // when
         List<String> strList = parser.parse("aaaAAAbbb", new GenericType<List<String>>() {});
-        
+
         // then
         assertThat(strList).containsExactly("aaa", "bbb");
     }
-    
+
 }

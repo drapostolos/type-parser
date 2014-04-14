@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class TypeParserArrayTest extends AbstractTest{
+public class TypeParserArrayTest extends AbstractTest {
 
     @Test
     public void canParseStringToEmptyArray() throws Exception {
@@ -57,11 +57,13 @@ public class TypeParserArrayTest extends AbstractTest{
     public void testCustomMadeArrayclassTypeParser() throws Exception {
         // given
         parser = StringToTypeParser.newBuilder()
-                .registerTypeParser(int[].class, new TypeParser<int[]>(){
+                .registerTypeParser(int[].class, new TypeParser<int[]>() {
+
                     @Override
                     public int[] parse(String input, TypeParserHelper helper) {
-                        return new int[]{5, 4};
-                    }})
+                        return new int[] { 5, 4 };
+                    }
+                })
                 .build();
 
         // when
@@ -76,6 +78,7 @@ public class TypeParserArrayTest extends AbstractTest{
         // given
         StringToTypeParser parser = StringToTypeParser.newBuilder()
                 .setSplitStrategy(new SplitStrategy() {
+
                     @Override
                     public List<String> split(String input, SplitStrategyHelper helper) {
                         return Arrays.asList(input.split("AAA"));

@@ -8,11 +8,6 @@ import org.junit.Test;
 public class DefeatConstructorInstantiationTest {
 
     @Test(expected = InvocationTargetException.class)
-    public void shouldThrowAssertionErrorWhenInstantiatinTypeParsers() throws Exception {
-        throwExceptionWhenInstantiating(TypeParsers.class);
-    }
-
-    @Test(expected = InvocationTargetException.class)
     public void shouldThrowAssertionErrorWhenInstantiatinTypeParserUtility() throws Exception {
         throwExceptionWhenInstantiating(TypeParserUtility.class);
     }

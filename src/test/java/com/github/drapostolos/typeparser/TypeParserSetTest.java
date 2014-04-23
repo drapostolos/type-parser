@@ -49,7 +49,7 @@ public class TypeParserSetTest extends AbstractTest {
     @Test
     public void canParseToLinkedHashSet() throws Exception {
         // when
-        Set<String> strSet = parser.parse("aaa,bbb", new GenericType<LinkedHashSet<String>>() {});
+        LinkedHashSet<String> strSet = parser.parse("aaa,bbb", new GenericType<LinkedHashSet<String>>() {});
 
         // then
         assertThat(strSet).containsExactly("aaa", "bbb");

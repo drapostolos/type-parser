@@ -1,6 +1,6 @@
 package com.github.drapostolos.typeparser;
 
-public class MyClass1 implements TypeParser<MyClass1> {
+public class MyClass1 extends MyBaseClass implements TypeParser<MyClass1> {
 
     String value;
 

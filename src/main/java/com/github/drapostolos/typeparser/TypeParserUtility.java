@@ -6,6 +6,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 final class TypeParserUtility {
@@ -17,6 +18,10 @@ final class TypeParserUtility {
 
     private TypeParserUtility() {
         throw new AssertionError("Not meant for instantiation");
+    }
+
+    static <K, V> LinkedHashMap<K, V> newLinkedHashMap() {
+        return new LinkedHashMap<K, V>();
     }
 
     static InputPreprocessor defaultInputPreprocessor() {
@@ -108,7 +113,8 @@ final class TypeParserUtility {
                 }
             }
             String message = "TargetType: '%s' [%s] contains the following illegal type argument: '%s' [%s]";
-            message = String.format(message, targetType, targetType.getClass(), typeArgument, typeArgument.getClass());
+            message = String.format(message,
+                    targetType, targetType.getClass(), typeArgument, typeArgument.getClass());
             throw new IllegalStateException(message);
         }
         return result;

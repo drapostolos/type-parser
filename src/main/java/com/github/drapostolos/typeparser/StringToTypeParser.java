@@ -4,9 +4,6 @@ import static com.github.drapostolos.typeparser.TypeParserUtility.makeNullArgume
 import static com.github.drapostolos.typeparser.TypeParserUtility.makeParseErrorMsg;
 
 import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The purpose of this class is to parse a string (read from a properties file
@@ -18,7 +15,7 @@ import java.util.Map;
  */
 public final class StringToTypeParser {
 
-    final Map<Type, TypeParser<?>> typeParsers;
+    final TypeParsers typeParsers;
     final SplitStrategy splitStrategy;
     final SplitStrategy keyValueSplitStrategy;
     final InputPreprocessor inputPreprocessor;
@@ -33,7 +30,7 @@ public final class StringToTypeParser {
     }
 
     StringToTypeParser(StringToTypeParserBuilder builder) {
-        this.typeParsers = Collections.unmodifiableMap(new HashMap<Type, TypeParser<?>>(builder.typeParsers));
+        this.typeParsers = TypeParsers.unmodifiableCopy(builder.typeParsers);
         this.splitStrategy = builder.splitStrategy;
         this.keyValueSplitStrategy = builder.keyValueSplitStrategy;
         this.inputPreprocessor = builder.inputPreprocessor;

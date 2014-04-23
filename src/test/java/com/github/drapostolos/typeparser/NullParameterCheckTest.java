@@ -16,6 +16,18 @@ public class NullParameterCheckTest extends AbstractTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
+    public void shouldThrowWhenRegisteringTypeParser_Null_TypeParser() throws Exception {
+        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("targetType");
+        builder.registerTypeParserForTypesAssignableTo(null, new MyClass1());
+    }
+
+    @Test
+    public void shouldThrowWhenRegisteringTypeParser_Class_Null() throws Exception {
+        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("typeParser");
+        builder.registerTypeParserForTypesAssignableTo(List.class, null);
+    }
+
+    @Test
     public void shouldThrowExceptionWhenRegisteringTypeParser_Class_Null() throws Exception {
         prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("typeParser");
         builder.registerTypeParser(int.class, null);
@@ -39,6 +51,13 @@ public class NullParameterCheckTest extends AbstractTest {
         prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("targetType");
         GenericType<MyClass1> arg = null;
         builder.registerTypeParser(arg, new MyClass1());
+    }
+
+    @Test
+    public void shouldThrowWhenUnregisteringNullAssignableTypeParser() throws Exception {
+        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("targetType");
+        Class<?> c = null;
+        builder.unregisterTypeParserForTypesAssignableTo(c);
     }
 
     @Test

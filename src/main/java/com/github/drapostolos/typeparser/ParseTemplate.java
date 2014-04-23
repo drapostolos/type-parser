@@ -5,60 +5,57 @@ import static com.github.drapostolos.typeparser.TypeParserUtility.containsStatic
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 
 abstract class ParseTemplate<T> {
 
     final Type targetType;
-    final StringToTypeParser parser;
+    final TypeParsers typeParsers;
 
-    protected ParseTemplate(StringToTypeParser parser, Type targetType) {
+    protected ParseTemplate(TypeParsers typeParsers, Type targetType) {
         this.targetType = targetType;
-        this.parser = parser;
+        this.typeParsers = typeParsers;
     }
 
-    abstract T actionWhenTargetTypeHasTypeParser();
+    abstract T actionWhenTargetTypeHasNormalTypeParser();
 
-    abstract T actionWhenTargetTypeIsAssignableFromLinkedHashSet();
-
-    abstract T actionWhenTargetTypeIsAssignableFromLinkedHashMap();
-
-    abstract T actionWhenTargetTypeIsAssignableFromArrayList();
+    abstract T actionWhenTaretTypeIsGeneric(Class<?> cls);
 
     abstract T actionWhenTargetTypeIsArrayClass();
 
-    abstract T actionWhenTargetTypeHasStaticFactoryMethod();
-
     abstract T actionWhenTargetTypeIsGenericArrayType();
+
+    abstract T actionWhenTargetTypeIsAssignalbleTo(Class<?> superClass);
+
+    abstract T actionWhenTargetTypeHasStaticFactoryMethod();
 
     abstract T lastAction();
 
     final T execute() {
-        if (parser.typeParsers.containsKey(targetType)) {
-            return actionWhenTargetTypeHasTypeParser();
+        if (typeParsers.normalTypeParsers.containsKey(targetType)) {
+            return actionWhenTargetTypeHasNormalTypeParser();
         }
         if (targetType instanceof ParameterizedType) {
             ParameterizedType type = (ParameterizedType) targetType;
-            Class<?> rawType = (Class<?>) type.getRawType();
-            if (rawType.isAssignableFrom(LinkedHashSet.class)) {
-                return actionWhenTargetTypeIsAssignableFromLinkedHashSet();
-            }
-            if (rawType.isAssignableFrom(LinkedHashMap.class)) {
-                return actionWhenTargetTypeIsAssignableFromLinkedHashMap();
-            }
-            if (rawType.isAssignableFrom(ArrayList.class)) {
-                return actionWhenTargetTypeIsAssignableFromArrayList();
+            Class<?> rawTargetType = (Class<?>) type.getRawType();
+
+            for (Class<?> rawSuperType : typeParsers.assignableTypeParsers.keySet()) {
+                if (rawTargetType.isAssignableFrom(rawSuperType)) {
+                    return actionWhenTaretTypeIsGeneric(rawSuperType);
+                }
             }
         }
 
         if (targetType instanceof Class) {
-            Class<?> cls = (Class<?>) targetType;
-            if (cls.isArray()) {
+            Class<?> targetClass = (Class<?>) targetType;
+            if (targetClass.isArray()) {
                 return actionWhenTargetTypeIsArrayClass();
             }
-            if (containsStaticFactoryMethodNamedValueOf(cls)) {
+            for (Class<?> superClass : typeParsers.assignableTypeParsers.keySet()) {
+                if (superClass.isAssignableFrom(targetClass)) {
+                    return actionWhenTargetTypeIsAssignalbleTo(superClass);
+                }
+            }
+            if (containsStaticFactoryMethodNamedValueOf(targetClass)) {
                 return actionWhenTargetTypeHasStaticFactoryMethod();
             }
         }

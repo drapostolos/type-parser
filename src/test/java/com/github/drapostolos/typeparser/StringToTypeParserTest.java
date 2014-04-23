@@ -4,9 +4,11 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.lang.reflect.Type;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -21,7 +23,7 @@ public class StringToTypeParserTest extends AbstractTest {
         assertThat(parser.isTargetTypeParsable(StringToTypeParserBuilder.class)).isFalse();
         assertThat(parser.isTargetTypeParsable(new GenericType<TreeSet<String>>() {}.getType())).isFalse();
         assertThat(parser.isTargetTypeParsable(new GenericType<TreeMap<String, String>>() {}.getType())).isFalse();
-
+        assertThat(parser.isTargetTypeParsable(new GenericType<List<Thread>>() {}.getType())).isFalse();
     }
 
     @Test
@@ -91,15 +93,15 @@ public class StringToTypeParserTest extends AbstractTest {
         parser.parse(DUMMY_STRING, MyClass2.class);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void canUnregisterDefaultTypeParserByGenericType() throws Exception {
+    @Test(expected = NoSuchRegisteredTypeParserException.class)
+    public void canUnregisterTypeParserForTypesAssignableToSets() throws Exception {
         // given
-        GenericType<List<Integer>> type = new GenericType<List<Integer>>() {};
+        GenericType<Set<Integer>> type = new GenericType<Set<Integer>>() {};
         assertThat(parser.parse("1,2", type)).containsExactly(1, 2);
 
         // when
         StringToTypeParser parser = StringToTypeParser.newBuilder()
-                .unregisterTypeParser(new GenericType<List<?>>() {})
+                .unregisterTypeParserForTypesAssignableTo(LinkedHashSet.class)
                 .build();
 
         // then 

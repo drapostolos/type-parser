@@ -4,11 +4,32 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
 
 public class TypeParserListTest extends AbstractTest {
+
+    @Test
+    public void canRegisterListTypeParserThatOverridesDefaultArrayListTypeParser() throws Exception {
+        // GIVEN
+        StringToTypeParser parser = StringToTypeParser.newBuilder()
+                .registerTypeParserForTypesAssignableTo(List.class, new TypeParser<List<String>>() {
+
+                    @Override
+                    public List<String> parse(String input, TypeParserHelper helper) {
+                        return Arrays.asList("my-string");
+                    }
+                })
+                .build();
+
+        // WHEN
+        List<String> s = parser.parse("something", new GenericType<List<String>>() {});
+
+        // THEN
+        assertThat(s).containsExactly("my-string");
+    }
 
     @Test
     public void canParseSpaceToSingleElementList() throws Exception {
@@ -26,6 +47,20 @@ public class TypeParserListTest extends AbstractTest {
     public void canParseStringToArrayList() throws Exception {
         GenericType<ArrayList<Long>> type = new GenericType<ArrayList<Long>>() {};
         assertThat(parser.parse(" 1", type)).containsExactly(1l);
+    }
+
+    @Test
+    public void canParseStringToIterable() throws Exception {
+        GenericType<Iterable<Integer>> type = new GenericType<Iterable<Integer>>() {};
+        Iterable<Integer> collection = parser.parse("1,2,3", type);
+        assertThat(collection).containsExactly(1, 2, 3);
+    }
+
+    @Test
+    public void canParseStringToCollection() throws Exception {
+        GenericType<Collection<Integer>> type = new GenericType<Collection<Integer>>() {};
+        Collection<Integer> collection = parser.parse("1,2,3", type);
+        assertThat(collection).containsExactly(1, 2, 3);
     }
 
     @Test

@@ -16,8 +16,14 @@ public class TypeParserClassTest extends AbstractTest {
 
     @Test
     public void canParseToGenericType() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Class<?>>() {})).isTrue();
-        assertThat(parser.parse(cls.getName(), new GenericType<Class<?>>() {})).hasSameClassAs(cls);
+        assertThat(parser.isTargetTypeParsable(new GenericType<Class<?>>() {}))
+                .isTrue();
+        assertThat(parser.isTargetTypeParsable(new GenericType<Class<Long>>() {}))
+                .isTrue();
+        assertThat(parser.parse(cls.getName(), new GenericType<Class<?>>() {}))
+                .hasSameClassAs(cls);
+        assertThat(parser.parse("java.lang.Long", new GenericType<Class<Long>>() {}))
+                .hasSameClassAs(Long.class);
     }
 
     @Test

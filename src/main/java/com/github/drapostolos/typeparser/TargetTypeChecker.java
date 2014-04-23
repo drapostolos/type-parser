@@ -1,37 +1,19 @@
 package com.github.drapostolos.typeparser;
 
 import java.lang.reflect.Type;
-import java.util.List;
 
 class TargetTypeChecker extends ParseTemplate<Boolean> {
 
+    private final StringToTypeParser parser;
+
     public TargetTypeChecker(StringToTypeParser parser, Type targetType) {
-        super(parser, targetType);
+        super(parser.typeParsers, targetType);
+        this.parser = parser;
     }
 
     @Override
-    Boolean actionWhenTargetTypeHasTypeParser() {
+    Boolean actionWhenTargetTypeHasNormalTypeParser() {
         return true;
-    }
-
-    @Override
-    Boolean actionWhenTargetTypeIsAssignableFromLinkedHashSet() {
-        Class<?> type = TypeParserUtility.getParameterizedTypeArguments(targetType).get(0);
-        return parser.isTargetTypeParsable(type);
-    }
-
-    @Override
-    Boolean actionWhenTargetTypeIsAssignableFromLinkedHashMap() {
-        List<Class<?>> types = TypeParserUtility.getParameterizedTypeArguments(targetType);
-        Class<?> keyType = types.get(0);
-        Class<?> valueType = types.get(1);
-        return parser.isTargetTypeParsable(keyType) && parser.isTargetTypeParsable(valueType);
-    }
-
-    @Override
-    Boolean actionWhenTargetTypeIsAssignableFromArrayList() {
-        Class<?> type = TypeParserUtility.getParameterizedTypeArguments(targetType).get(0);
-        return parser.isTargetTypeParsable(type);
     }
 
     @Override
@@ -54,6 +36,21 @@ class TargetTypeChecker extends ParseTemplate<Boolean> {
     @Override
     Boolean lastAction() {
         return false;
+    }
+
+    @Override
+    Boolean actionWhenTaretTypeIsGeneric(Class<?> cls) {
+        for (Class<?> type : TypeParserUtility.getParameterizedTypeArguments(targetType)) {
+            if (!parser.isTargetTypeParsable(type)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    Boolean actionWhenTargetTypeIsAssignalbleTo(Class<?> superClass) {
+        return true;
     }
 
 }

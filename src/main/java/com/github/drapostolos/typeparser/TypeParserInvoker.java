@@ -6,39 +6,39 @@ import java.lang.reflect.Type;
 
 class TypeParserInvoker extends ParseTemplate<Object> {
 
+    private final StringToTypeParser parser;
     private final String preprocessedInput;
 
     public TypeParserInvoker(StringToTypeParser parser, Type targetType, String preprocessedInput) {
-        super(parser, targetType);
+        super(parser.typeParsers, targetType);
         this.preprocessedInput = preprocessedInput;
+        this.parser = parser;
     }
 
     @Override
-    Object actionWhenTargetTypeHasTypeParser() {
+    Object actionWhenTargetTypeHasNormalTypeParser() {
         if (preprocessedInput == null) {
             return null;
         }
-        return invokeTypeParser(targetType);
+        return invokeTypeParser(typeParsers.normalTypeParsers.get(targetType));
     }
 
     @Override
-    Object actionWhenTargetTypeIsAssignableFromLinkedHashSet() {
-        return invokeTypeParser(TypeParsers.ANY_SET);
+    Object actionWhenTaretTypeIsGeneric(Class<?> cls) {
+        TypeParser<?> tp = typeParsers.assignableTypeParsers.get(cls);
+        return invokeTypeParser(tp);
     }
 
     @Override
-    Object actionWhenTargetTypeIsAssignableFromLinkedHashMap() {
-        return invokeTypeParser(TypeParsers.ANY_MAP);
-    }
-
-    @Override
-    Object actionWhenTargetTypeIsAssignableFromArrayList() {
-        return invokeTypeParser(TypeParsers.ANY_LIST);
+    Object actionWhenTargetTypeIsAssignalbleTo(Class<?> superClass) {
+        TypeParser<?> tp = typeParsers.assignableTypeParsers.get(superClass);
+        return invokeTypeParser(tp);
     }
 
     @Override
     Object actionWhenTargetTypeIsArrayClass() {
-        return invokeTypeParser(TypeParsers.ANY_ARRAY);
+        TypeParser<?> tp = typeParsers.normalTypeParsers.get(TypeParsers.ANY_ARRAY);
+        return invokeTypeParser(tp);
     }
 
     @Override
@@ -46,12 +46,14 @@ class TypeParserInvoker extends ParseTemplate<Object> {
         if (preprocessedInput == null) {
             return null;
         }
-        return invokeTypeParser(TypeParsers.ANY_CLASS_WITH_STATIC_VALUEOF_METHOD);
+        TypeParser<?> tp = typeParsers.normalTypeParsers.get(TypeParsers.ANY_CLASS_WITH_STATIC_VALUEOF_METHOD);
+        return invokeTypeParser(tp);
     }
 
     @Override
     Object actionWhenTargetTypeIsGenericArrayType() {
-        return invokeTypeParser(TypeParsers.ANY_ARRAY);
+        TypeParser<?> tp = typeParsers.normalTypeParsers.get(TypeParsers.ANY_ARRAY);
+        return invokeTypeParser(tp);
     }
 
     /*
@@ -64,9 +66,8 @@ class TypeParserInvoker extends ParseTemplate<Object> {
         throw new NoSuchRegisteredTypeParserException(preprocessedInput, targetType);
     }
 
-    private Object invokeTypeParser(Type key) {
+    private Object invokeTypeParser(TypeParser<?> typeParser) {
         try {
-            TypeParser<?> typeParser = parser.typeParsers.get(key);
             TypeParserHelper parseHelper = new TypeParserHelper(parser, targetType);
             return typeParser.parse(preprocessedInput, parseHelper);
         } catch (NumberFormatException e) {
@@ -78,5 +79,4 @@ class TypeParserInvoker extends ParseTemplate<Object> {
             throw new IllegalArgumentException(message, e);
         }
     }
-
 }

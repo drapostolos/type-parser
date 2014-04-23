@@ -77,8 +77,29 @@ public final class TypeParserHelper {
         return mapKeyValueSplitStrategy.split(keyValue, new SplitStrategyHelper(targetType));
     }
 
-    Type getTargetType() {
+    /**
+     * Returns the type to parse the input string to.
+     * 
+     * @return the {@link Type} to parse to.
+     */
+    public Type getTargetType() {
         return targetType;
+    }
+
+    /**
+     * When the {@code targetType} is a parameterized type this method
+     * returns a list with the type arguments.
+     * <p/>
+     * All type arguments must be none parameterized types (i.e. nested parameterized types are not
+     * allowed), with one exception: {@link Class<?>}. <br/>
+     * 
+     * @return List of {@link Class} types.
+     * @throws IllegalStateException if the {@code targetType} is not a parameterized type.
+     * @throws IllegalStateException if any of the parameterized type arguments is of a
+     *         parameterized type (with exception of {@link Class}).
+     */
+    public List<Class<?>> getParameterizedTypeArguments() {
+        return TypeParserUtility.getParameterizedTypeArguments(targetType);
     }
 
 }

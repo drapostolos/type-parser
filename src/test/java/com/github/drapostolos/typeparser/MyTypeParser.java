@@ -3,7 +3,7 @@ package com.github.drapostolos.typeparser;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyTypeParser implements TypeParser<List<?>> {
+public class MyTypeParser implements StringToTypeParser<List<?>> {
 
     @Override
     public List<?> parse(String input, TypeParserHelper helper) {

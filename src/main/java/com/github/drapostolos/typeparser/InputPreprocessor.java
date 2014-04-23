@@ -15,7 +15,7 @@ public interface InputPreprocessor {
     /**
      * Prepares the input string to be parsed.
      * <p/>
-     * If a null object is returned from this method, the {@link StringToTypeParser} will return
+     * If a null object is returned from this method, the {@link TypeParser} will return
      * either:
      * <ul>
      * <li>An empty {@link Collection}/ {@link Map} / Array type (matching the requested type).
@@ -23,11 +23,11 @@ public interface InputPreprocessor {
      * <li>A null object for raw types.</li>
      * </ul>
      * <p/>
-     * Any exceptions thrown by this method will be caught in the {@link StringToTypeParser} and
+     * Any exceptions thrown by this method will be caught in the {@link TypeParser} and
      * re-thrown converted to a {@link IllegalArgumentException}.
      * 
      * @param input String to prepare for parsing.
-     * @param helper Helper class injected automatically by the {@link StringToTypeParser}.
+     * @param helper Helper class injected automatically by the {@link TypeParser}.
      * @return a prepared string to be parsed
      */
     String prepare(String input, InputPreprocessorHelper helper);

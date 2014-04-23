@@ -8,31 +8,31 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Builder class for constructing and configuring instances of {@link StringToTypeParser}.
+ * Builder class for constructing and configuring instances of {@link TypeParser}.
  * 
  * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>
  */
-public final class StringToTypeParserBuilder {
+public final class TypeParserBuilder {
 
     TypeParsers typeParsers;
     SplitStrategy splitStrategy = TypeParserUtility.defaultSplitStrategy();
     SplitStrategy keyValueSplitStrategy = TypeParserUtility.defaultKeyValueSplitStrategy();
     InputPreprocessor inputPreprocessor = TypeParserUtility.defaultInputPreprocessor();
 
-    StringToTypeParserBuilder() {
+    TypeParserBuilder() {
         // Initialize with the default typeParsers
         typeParsers = TypeParsers.copyDefault();
     }
 
     /**
-     * Unregister the {@link TypeParser} associated with the given {@code targetType}.
-     * {@code targetType} will be ignored if not associated with any {@link TypeParser}.
+     * Unregister the {@link StringToTypeParser} associated with the given {@code targetType}.
+     * {@code targetType} will be ignored if not associated with any {@link StringToTypeParser}.
      * 
-     * @param targetType The type associated with {@link TypeParser} to unregister.
-     * @return {@link StringToTypeParserBuilder}
+     * @param targetType The type associated with {@link StringToTypeParser} to unregister.
+     * @return {@link TypeParserBuilder}
      * @throws NullPointerException if given argument is null.
      */
-    public StringToTypeParserBuilder unregisterTypeParser(Class<?> targetType) {
+    public TypeParserBuilder unregisterTypeParser(Class<?> targetType) {
         if (targetType == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("targetType"));
         }
@@ -41,14 +41,14 @@ public final class StringToTypeParserBuilder {
     }
 
     /**
-     * Unregister the {@link TypeParser} associated with the given {@code targetType}.
-     * {@code targetType} will be ignored if not associated with any {@link TypeParser}.
+     * Unregister the {@link StringToTypeParser} associated with the given {@code targetType}.
+     * {@code targetType} will be ignored if not associated with any {@link StringToTypeParser}.
      * 
-     * @param targetType The type associated with {@link TypeParser} to unregister.
-     * @return {@link StringToTypeParserBuilder}
+     * @param targetType The type associated with {@link StringToTypeParser} to unregister.
+     * @return {@link TypeParserBuilder}
      * @throws NullPointerException if given argument is null.
      */
-    public <T> StringToTypeParserBuilder unregisterTypeParser(GenericType<T> targetType) {
+    public <T> TypeParserBuilder unregisterTypeParser(GenericType<T> targetType) {
         if (targetType == null) {
             throw new NullPointerException(TypeParserUtility.makeNullArgumentErrorMsg("targetType"));
         }
@@ -57,14 +57,14 @@ public final class StringToTypeParserBuilder {
     }
 
     /**
-     * Unregister the {@link TypeParser} associated with the given {@code targetType}.
-     * {@code targetType} will be ignored if not associated with any {@link TypeParser}.
+     * Unregister the {@link StringToTypeParser} associated with the given {@code targetType}.
+     * {@code targetType} will be ignored if not associated with any {@link StringToTypeParser}.
      * 
-     * @param targetType The type associated with {@link TypeParser} to unregister.
-     * @return {@link StringToTypeParserBuilder}
+     * @param targetType The type associated with {@link StringToTypeParser} to unregister.
+     * @return {@link TypeParserBuilder}
      * @throws NullPointerException if given argument is null.
      */
-    public StringToTypeParserBuilder unregisterTypeParserForTypesAssignableTo(Class<?> targetType) {
+    public TypeParserBuilder unregisterTypeParserForTypesAssignableTo(Class<?> targetType) {
         if (targetType == null) {
             throw new NullPointerException(TypeParserUtility.makeNullArgumentErrorMsg("targetType"));
         }
@@ -73,15 +73,15 @@ public final class StringToTypeParserBuilder {
     }
 
     /**
-     * Register a custom made {@link TypeParser} implementation, associated with
+     * Register a custom made {@link StringToTypeParser} implementation, associated with
      * the given {@code targetType}.
      * 
      * @param targetType associated with given {@code typeParser}.
-     * @param typeParser custom made {@link TypeParser} implementation.
-     * @return {@link StringToTypeParserBuilder}
+     * @param typeParser custom made {@link StringToTypeParser} implementation.
+     * @return {@link TypeParserBuilder}
      * @throws NullPointerException if any given argument is null.
      */
-    public <T> StringToTypeParserBuilder registerTypeParser(Class<T> targetType, TypeParser<T> typeParser) {
+    public <T> TypeParserBuilder registerTypeParser(Class<T> targetType, StringToTypeParser<T> typeParser) {
         if (typeParser == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("typeParser"));
         }
@@ -93,16 +93,16 @@ public final class StringToTypeParserBuilder {
     }
 
     /**
-     * Register a custom made {@link TypeParser} implementation, associated with
+     * Register a custom made {@link StringToTypeParser} implementation, associated with
      * any type assignable to the given {@code targetType}.
      * 
      * @param targetType associated with given {@code typeParser}.
-     * @param typeParser custom made {@link TypeParser} implementation.
-     * @return {@link StringToTypeParserBuilder}
+     * @param typeParser custom made {@link StringToTypeParser} implementation.
+     * @return {@link TypeParserBuilder}
      * @throws NullPointerException if any given argument is null.
      */
-    public StringToTypeParserBuilder registerTypeParserForTypesAssignableTo(Class<?> targetType,
-            TypeParser<?> typeParser) {
+    public TypeParserBuilder registerTypeParserForTypesAssignableTo(Class<?> targetType,
+            StringToTypeParser<?> typeParser) {
         if (typeParser == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("typeParser"));
         }
@@ -114,15 +114,15 @@ public final class StringToTypeParserBuilder {
     }
 
     /**
-     * Register a custom made {@link TypeParser} implementation, associated with
+     * Register a custom made {@link StringToTypeParser} implementation, associated with
      * the given generic {@code targetType}.
      * 
      * @param targetType generic type associated with given {@code typeParser}.
-     * @param typeParser custom made {@link TypeParser} implementation.
-     * @return {@link StringToTypeParserBuilder}
+     * @param typeParser custom made {@link StringToTypeParser} implementation.
+     * @return {@link TypeParserBuilder}
      * @throws NullPointerException if any given argument is null.
      */
-    public <T> StringToTypeParserBuilder registerTypeParser(GenericType<T> targetType, TypeParser<T> typeParser) {
+    public <T> TypeParserBuilder registerTypeParser(GenericType<T> targetType, StringToTypeParser<T> typeParser) {
         if (typeParser == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("typeParser"));
         }
@@ -135,7 +135,7 @@ public final class StringToTypeParserBuilder {
 
     /**
      * Set a custom made {@link SplitStrategy} implementation to be used by
-     * the {@link StringToTypeParser} (as built by this instance).
+     * the {@link TypeParser} (as built by this instance).
      * <p/>
      * The default behavior, when parsing a string to a generic type (example: {@link Collection} /
      * {@link List} / {@link Set} etc.), Array or {@link Map} type, is to split by comma (',').
@@ -144,10 +144,10 @@ public final class StringToTypeParserBuilder {
      * default behavior.
      * 
      * @param splitStrategy {@link SplitStrategy} implementation.
-     * @return {@link StringToTypeParserBuilder}
+     * @return {@link TypeParserBuilder}
      * @throws NullPointerException if any given argument is null.
      */
-    public StringToTypeParserBuilder setSplitStrategy(SplitStrategy splitStrategy) {
+    public TypeParserBuilder setSplitStrategy(SplitStrategy splitStrategy) {
         if (splitStrategy == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("splitStrategy"));
         }
@@ -158,7 +158,7 @@ public final class StringToTypeParserBuilder {
     /**
      * Set a custom made {@link SplitStrategy} implementation to separate the {@code key} and
      * {@code value} pair in a Map entry, to be used by
-     * the {@link StringToTypeParser} (as built by this instance).
+     * the {@link TypeParser} (as built by this instance).
      * <p/>
      * The default behavior, when parsing a string to a {@link Map} instance, is to split each map
      * entry by a "=" sign.
@@ -173,10 +173,10 @@ public final class StringToTypeParserBuilder {
      * override the default behavior. I.e replace using the "=" sign with some other character.
      * 
      * @param splitStrategy {@link SplitStrategy} implementation.
-     * @return {@link StringToTypeParserBuilder}
+     * @return {@link TypeParserBuilder}
      * @throws NullPointerException if any given argument is null.
      */
-    public StringToTypeParserBuilder setKeyValueSplitStrategy(SplitStrategy splitStrategy) {
+    public TypeParserBuilder setKeyValueSplitStrategy(SplitStrategy splitStrategy) {
         if (splitStrategy == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("splitStrategy"));
         }
@@ -186,21 +186,21 @@ public final class StringToTypeParserBuilder {
 
     /**
      * Set a custom made {@link InputPreprocessor} implementation to be used by
-     * the {@link StringToTypeParser} (as built by this instance).
+     * the {@link TypeParser} (as built by this instance).
      * <p/>
      * The default behavior, when pre-processing an input String, is:
      * <ul>
      * <li>if input string equals the string "null" (case ignored and trimmed) then a {@code null}
-     * object is returned by the {@link StringToTypeParser}</li>
+     * object is returned by the {@link TypeParser}</li>
      * </ul>
      * Use this method to set your own {@link InputPreprocessor} implementation to override the
      * default behavior.
      * 
      * @param inputPreprocessor {@link InputPreprocessor} implementation.
-     * @return {@link StringToTypeParserBuilder}
+     * @return {@link TypeParserBuilder}
      * @throws NullPointerException if any given argument is null.
      */
-    public StringToTypeParserBuilder setInputPreprocessor(InputPreprocessor inputPreprocessor) {
+    public TypeParserBuilder setInputPreprocessor(InputPreprocessor inputPreprocessor) {
         if (inputPreprocessor == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("inputPreprocessor"));
         }
@@ -209,12 +209,12 @@ public final class StringToTypeParserBuilder {
     }
 
     /**
-     * Constructs a new instance of {@link StringToTypeParser} as configured
-     * with this {@link StringToTypeParserBuilder}.
+     * Constructs a new instance of {@link TypeParser} as configured
+     * with this {@link TypeParserBuilder}.
      * 
-     * @return new instance of {@link StringToTypeParser}.
+     * @return new instance of {@link TypeParser}.
      */
-    public StringToTypeParser build() {
-        return new StringToTypeParser(this);
+    public TypeParser build() {
+        return new TypeParser(this);
     }
 }

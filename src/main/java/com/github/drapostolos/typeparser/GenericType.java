@@ -12,13 +12,13 @@ import java.lang.reflect.Type;
  * Note the ending "{}".
  * <p/>
  * Use a subclass of this class as an argument to
- * {@link StringToTypeParser#parse(String, GenericType)} when you want to convert a string to a
+ * {@link TypeParser#parse(String, GenericType)} when you want to convert a string to a
  * generic type known at compile time.
  * <p/>
  * Additionally, use a subclass of this class when you want to register or unregister a
- * {@link TypeParser} for a generic type, by using these methods:
- * {@link StringToTypeParserBuilder#registerTypeParser(GenericType, TypeParser)},
- * {@link StringToTypeParserBuilder#unregisterTypeParser(GenericType)}.
+ * {@link StringToTypeParser} for a generic type, by using these methods:
+ * {@link TypeParserBuilder#registerTypeParser(GenericType, StringToTypeParser)},
+ * {@link TypeParserBuilder#unregisterTypeParser(GenericType)}.
  * 
  * @param <T> a generic type, example: {@code List<String>}
  * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>

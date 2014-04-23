@@ -15,7 +15,7 @@ public interface SplitStrategy {
      * empty list must be returned.
      * 
      * @param input String to split.
-     * @param helper Helper class injected automatically by the {@link StringToTypeParser}.
+     * @param helper Helper class injected automatically by the {@link TypeParser}.
      * @return A list of string computed by splitting the {@code input} string using this
      *         {@link SplitStrategy}.
      */

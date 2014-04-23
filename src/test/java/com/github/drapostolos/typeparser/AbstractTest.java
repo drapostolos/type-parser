@@ -7,7 +7,7 @@ public abstract class AbstractTest {
 
     static final String DUMMY_STRING = "dummy-string";
     static final String NUMBER_FORMAT_ERROR_MSG = "Number format exception For input string: \"%s\".";
-    StringToTypeParser parser = StringToTypeParser.newBuilder().build();
+    TypeParser parser = TypeParser.newBuilder().build();
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();

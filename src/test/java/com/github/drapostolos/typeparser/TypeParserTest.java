@@ -14,13 +14,13 @@ import java.util.TreeSet;
 
 import org.junit.Test;
 
-public class StringToTypeParserTest extends AbstractTest {
+public class TypeParserTest extends AbstractTest {
 
     @Test
     public void canNotParseTheseTypesByDefault() throws Exception {
         assertThat(parser.isTargetTypeParsable(Math.class)).isFalse();
-        assertThat(parser.isTargetTypeParsable(StringToTypeParser.class)).isFalse();
-        assertThat(parser.isTargetTypeParsable(StringToTypeParserBuilder.class)).isFalse();
+        assertThat(parser.isTargetTypeParsable(TypeParser.class)).isFalse();
+        assertThat(parser.isTargetTypeParsable(TypeParserBuilder.class)).isFalse();
         assertThat(parser.isTargetTypeParsable(new GenericType<TreeSet<String>>() {}.getType())).isFalse();
         assertThat(parser.isTargetTypeParsable(new GenericType<TreeMap<String, String>>() {}.getType())).isFalse();
         assertThat(parser.isTargetTypeParsable(new GenericType<List<Thread>>() {}.getType())).isFalse();
@@ -100,7 +100,7 @@ public class StringToTypeParserTest extends AbstractTest {
         assertThat(parser.parse("1,2", type)).containsExactly(1, 2);
 
         // when
-        StringToTypeParser parser = StringToTypeParser.newBuilder()
+        TypeParser parser = TypeParser.newBuilder()
                 .unregisterTypeParserForTypesAssignableTo(LinkedHashSet.class)
                 .build();
 
@@ -114,7 +114,7 @@ public class StringToTypeParserTest extends AbstractTest {
         assertThat(parser.parse("1", int.class)).isEqualTo(1);
 
         // when
-        StringToTypeParser parser = StringToTypeParser.newBuilder()
+        TypeParser parser = TypeParser.newBuilder()
                 .unregisterTypeParser(int.class)
                 .build();
 
@@ -125,7 +125,7 @@ public class StringToTypeParserTest extends AbstractTest {
     @Test
     public void canRegisterTypeParserByClass() throws Exception {
         // given
-        StringToTypeParser parser = StringToTypeParser.newBuilder()
+        TypeParser parser = TypeParser.newBuilder()
                 .registerTypeParser(MyClass1.class, new MyClass1())
                 .build();
 
@@ -137,7 +137,7 @@ public class StringToTypeParserTest extends AbstractTest {
     @Test
     public void canRegisterTypeParserByGenericType() throws Exception {
         // given
-        StringToTypeParser parser = StringToTypeParser.newBuilder()
+        TypeParser parser = TypeParser.newBuilder()
                 .registerTypeParser(new GenericType<MyClass1>() {}, new MyClass1())
                 .build();
 
@@ -158,8 +158,8 @@ public class StringToTypeParserTest extends AbstractTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage(MyClass1.class.toString());
         thrown.expectMessage("must be a parameterized type when calling this method, but it is not.");
-        parser = StringToTypeParser.newBuilder()
-                .registerTypeParser(MyClass1.class, new TypeParser<MyClass1>() {
+        parser = TypeParser.newBuilder()
+                .registerTypeParser(MyClass1.class, new StringToTypeParser<MyClass1>() {
 
                     public MyClass1 parse(String input, TypeParserHelper helper) {
                         TypeParserUtility.getParameterizedTypeArguments(helper.getTargetType());
@@ -176,8 +176,8 @@ public class StringToTypeParserTest extends AbstractTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage(MyClass1.class.toString());
         thrown.expectMessage("is either not an array or the componet type is generic.");
-        parser = StringToTypeParser.newBuilder()
-                .registerTypeParser(MyClass1.class, new TypeParser<MyClass1>() {
+        parser = TypeParser.newBuilder()
+                .registerTypeParser(MyClass1.class, new StringToTypeParser<MyClass1>() {
 
                     public MyClass1 parse(String input, TypeParserHelper helper) {
                         TypeParserUtility.getComponentClass(helper.getTargetType());
@@ -216,7 +216,7 @@ public class StringToTypeParserTest extends AbstractTest {
     @Test
     public void canChangeInputPreprocessor() throws Exception {
         // given
-        parser = StringToTypeParser.newBuilder()
+        parser = TypeParser.newBuilder()
                 .setInputPreprocessor(new InputPreprocessor() {
 
                     @Override
@@ -247,7 +247,7 @@ public class StringToTypeParserTest extends AbstractTest {
         thrown.expectMessage("some-message");
 
         // when
-        parser = StringToTypeParser.newBuilder()
+        parser = TypeParser.newBuilder()
                 .setInputPreprocessor(new InputPreprocessor() {
 
                     @Override

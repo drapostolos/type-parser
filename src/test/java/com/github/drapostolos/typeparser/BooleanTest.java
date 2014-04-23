@@ -9,7 +9,7 @@ import java.util.Set;
 import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class TypeParserBooleanTest extends AbstractTest {
+public class BooleanTest extends AbstractTest {
 
     @Test
     public void canParseStringToTrue() throws Exception {

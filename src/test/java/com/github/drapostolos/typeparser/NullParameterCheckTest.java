@@ -10,7 +10,7 @@ import org.junit.rules.ExpectedException;
 
 public class NullParameterCheckTest extends AbstractTest {
 
-    private StringToTypeParserBuilder builder = StringToTypeParser.newBuilder();
+    private TypeParserBuilder builder = TypeParser.newBuilder();
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();

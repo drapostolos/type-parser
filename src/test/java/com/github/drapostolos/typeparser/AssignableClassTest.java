@@ -4,12 +4,12 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-public class TypeParserAssignableClassTest extends AbstractTest {
+public class AssignableClassTest extends AbstractTest {
 
     @Test
     public void canParseSubclassOfAssignableTypeParser() throws Exception {
         // GIVEN
-        TypeParser<MyBaseClass> typeParser = new TypeParser<MyBaseClass>() {
+        StringToTypeParser<MyBaseClass> typeParser = new StringToTypeParser<MyBaseClass>() {
 
             @Override
             public MyBaseClass parse(String input, TypeParserHelper helper) {
@@ -19,7 +19,7 @@ public class TypeParserAssignableClassTest extends AbstractTest {
                 return new MyClass2();
             }
         };
-        StringToTypeParser parser = StringToTypeParser.newBuilder()
+        TypeParser parser = TypeParser.newBuilder()
                 .registerTypeParserForTypesAssignableTo(MyBaseClass.class, typeParser)
                 .build();
 

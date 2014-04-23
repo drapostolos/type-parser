@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class TypeParserMapTest extends AbstractTest {
+public class MapTest extends AbstractTest {
 
     @Test
     public void canParseStringToEmptyMap() throws Exception {
@@ -36,7 +36,7 @@ public class TypeParserMapTest extends AbstractTest {
     @Test
     public void canChangeKeyValueSplitStrategy() throws Exception {
         // given
-        StringToTypeParser parser = StringToTypeParser.newBuilder()
+        TypeParser parser = TypeParser.newBuilder()
                 .setKeyValueSplitStrategy(new SplitStrategy() {
 
                     @Override

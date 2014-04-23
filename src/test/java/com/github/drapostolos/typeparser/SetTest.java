@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-public class TypeParserSetTest extends AbstractTest {
+public class SetTest extends AbstractTest {
 
     @Test
     public void canParseStringToEmptySet() throws Exception {
@@ -29,7 +29,7 @@ public class TypeParserSetTest extends AbstractTest {
     @Test
     public void canChangeSplitStrategyr() throws Exception {
         // given
-        StringToTypeParser parser = StringToTypeParser.newBuilder()
+        TypeParser parser = TypeParser.newBuilder()
                 .setSplitStrategy(new SplitStrategy() {
 
                     @Override

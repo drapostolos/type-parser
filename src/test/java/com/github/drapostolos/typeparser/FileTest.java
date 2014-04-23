@@ -10,7 +10,7 @@ import java.util.Set;
 import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class TypeParserFileTest extends AbstractTest {
+public class FileTest extends AbstractTest {
 
     @Test
     public void canParseStringToFile() throws Exception {

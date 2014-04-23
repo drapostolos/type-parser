@@ -10,7 +10,7 @@ import java.util.Set;
 import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class TypeParserBigDecimalTest extends AbstractTest {
+public class BigDecimalTest extends AbstractTest {
 
     @Test
     public void canParseStringToBigDecimalType() throws Exception {

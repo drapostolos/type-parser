@@ -9,13 +9,13 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class TypeParserListTest extends AbstractTest {
+public class ListTest extends AbstractTest {
 
     @Test
     public void canRegisterListTypeParserThatOverridesDefaultArrayListTypeParser() throws Exception {
         // GIVEN
-        StringToTypeParser parser = StringToTypeParser.newBuilder()
-                .registerTypeParserForTypesAssignableTo(List.class, new TypeParser<List<String>>() {
+        TypeParser parser = TypeParser.newBuilder()
+                .registerTypeParserForTypesAssignableTo(List.class, new StringToTypeParser<List<String>>() {
 
                     @Override
                     public List<String> parse(String input, TypeParserHelper helper) {
@@ -74,7 +74,7 @@ public class TypeParserListTest extends AbstractTest {
     @Test
     public void canChangeSplitStrategy() throws Exception {
         // given
-        parser = StringToTypeParser.newBuilder()
+        parser = TypeParser.newBuilder()
                 .setSplitStrategy(new SplitStrategy() {
 
                     @Override

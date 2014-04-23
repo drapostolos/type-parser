@@ -9,7 +9,7 @@ import java.util.Set;
 import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class TypeParserLongTest extends AbstractTest {
+public class LongTest extends AbstractTest {
 
     @Test
     public void

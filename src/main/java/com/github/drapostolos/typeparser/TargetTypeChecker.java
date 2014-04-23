@@ -4,9 +4,9 @@ import java.lang.reflect.Type;
 
 class TargetTypeChecker extends ParseTemplate<Boolean> {
 
-    private final StringToTypeParser parser;
+    private final TypeParser parser;
 
-    public TargetTypeChecker(StringToTypeParser parser, Type targetType) {
+    public TargetTypeChecker(TypeParser parser, Type targetType) {
         super(parser.typeParsers, targetType);
         this.parser = parser;
     }

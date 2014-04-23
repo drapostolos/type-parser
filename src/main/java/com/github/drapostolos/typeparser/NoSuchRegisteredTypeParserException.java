@@ -6,7 +6,7 @@ import static com.github.drapostolos.typeparser.TypeParserUtility.makeParseError
 import java.lang.reflect.Type;
 
 /**
- * Exception thrown when there is no {@link TypeParser} registered for a given Type.
+ * Exception thrown when there is no {@link StringToTypeParser} registered for a given Type.
  * 
  * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>
  */

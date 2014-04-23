@@ -7,7 +7,7 @@ import static com.github.drapostolos.typeparser.TypeParserUtility.makeParseError
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-final class StaticFactoryMethodTypeParser implements TypeParser<Object> {
+final class StaticFactoryMethodTypeParser implements StringToTypeParser<Object> {
 
     private static final Object STATIC_METHOD = null;
 

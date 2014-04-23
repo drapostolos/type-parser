@@ -9,7 +9,7 @@ import java.util.Set;
 import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class TypeParserEnumTest extends AbstractTest {
+public class EnumTest extends AbstractTest {
 
     public enum MyEnum {
         AAA, BBB, CCC

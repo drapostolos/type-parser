@@ -9,7 +9,7 @@ import java.util.Set;
 import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class TypeParserCharacterTest extends AbstractTest {
+public class CharacterTest extends AbstractTest {
 
     @Test
     public void canParseStringToCharacterType() throws Exception {

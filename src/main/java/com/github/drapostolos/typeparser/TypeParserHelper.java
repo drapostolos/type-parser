@@ -4,22 +4,22 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * Helper class providing helper methods to implementations of {@link TypeParser} when parsing a
+ * Helper class providing helper methods to implementations of {@link StringToTypeParser} when parsing a
  * string to a type.
  * <p/>
- * The {@link StringToTypeParser} will automatically inject an instance of this class into the
- * {@link TypeParser} implementation.
+ * The {@link TypeParser} will automatically inject an instance of this class into the
+ * {@link StringToTypeParser} implementation.
  * 
  * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>
  */
 public final class TypeParserHelper {
 
     private final Type targetType;
-    private final StringToTypeParser stringParser;
+    private final TypeParser stringParser;
     private final SplitStrategy splitStrategy;
     private final SplitStrategy mapKeyValueSplitStrategy;
 
-    TypeParserHelper(StringToTypeParser stringParser, Type targetType) {
+    TypeParserHelper(TypeParser stringParser, Type targetType) {
         this.stringParser = stringParser;
         this.targetType = targetType;
         this.splitStrategy = stringParser.splitStrategy;
@@ -27,7 +27,7 @@ public final class TypeParserHelper {
     }
 
     /**
-     * This method gives access to {@link StringToTypeParser#parse(String, Class)}.
+     * This method gives access to {@link TypeParser#parse(String, Class)}.
      * 
      * @param input String to parse.
      * @param targetType to parse it to.
@@ -38,7 +38,7 @@ public final class TypeParserHelper {
     }
 
     /**
-     * This method gives access to {@link StringToTypeParser#parseType(String, Type)}.
+     * This method gives access to {@link TypeParser#parseType(String, Type)}.
      * 
      * @param input String to parse.
      * @param targetType The target type to parse the given input to.
@@ -51,7 +51,7 @@ public final class TypeParserHelper {
     /**
      * Splits the {@code input} string into a list of sub-strings by using the {@link SplitStrategy}
      * implementation, as registered with
-     * {@link StringToTypeParserBuilder#setSplitStrategy(SplitStrategy)}.
+     * {@link TypeParserBuilder#setSplitStrategy(SplitStrategy)}.
      * <p/>
      * For example this string "1, 2, 3, 4" is split into ["1", " 2", " 3", " 4"].
      * 
@@ -65,7 +65,7 @@ public final class TypeParserHelper {
     /**
      * Splits the {@code keyValue} string into a list of sub-strings by using the
      * {@link SplitStrategy} implementation, as registered with
-     * {@link StringToTypeParserBuilder#setKeyValueSplitStrategy(SplitStrategy)}.
+     * {@link TypeParserBuilder#setKeyValueSplitStrategy(SplitStrategy)}.
      * <p/>
      * For example this string "a=AAA" is split into ["a", "AAA"].
      * 

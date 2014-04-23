@@ -9,9 +9,9 @@ import java.util.Set;
 import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class TypeParserClassTest extends AbstractTest {
+public class ClassTest extends AbstractTest {
 
-    Class<?> cls = TypeParserClassTest.class;
+    Class<?> cls = ClassTest.class;
     String stringToParse = String.format("%s,  %s", cls.getName(), cls.getName());
 
     @Test

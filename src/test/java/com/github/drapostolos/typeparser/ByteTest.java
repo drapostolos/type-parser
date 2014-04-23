@@ -9,7 +9,7 @@ import java.util.Set;
 import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class TypeParserByteTest extends AbstractTest {
+public class ByteTest extends AbstractTest {
 
     @Test
     public void canParseStringToByteType() throws Exception {

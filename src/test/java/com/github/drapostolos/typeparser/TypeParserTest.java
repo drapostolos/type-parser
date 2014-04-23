@@ -161,7 +161,7 @@ public class TypeParserTest extends AbstractTest {
         parser = TypeParser.newBuilder()
                 .registerTypeParser(MyClass1.class, new StringToTypeParser<MyClass1>() {
 
-                    public MyClass1 parse(String input, TypeParserHelper helper) {
+                    public MyClass1 parse(String input, StringToTypeParserHelper helper) {
                         TypeParserUtility.getParameterizedTypeArguments(helper.getTargetType());
                         return null;
                     }
@@ -179,7 +179,7 @@ public class TypeParserTest extends AbstractTest {
         parser = TypeParser.newBuilder()
                 .registerTypeParser(MyClass1.class, new StringToTypeParser<MyClass1>() {
 
-                    public MyClass1 parse(String input, TypeParserHelper helper) {
+                    public MyClass1 parse(String input, StringToTypeParserHelper helper) {
                         TypeParserUtility.getComponentClass(helper.getTargetType());
                         return null;
                     }

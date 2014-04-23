@@ -18,7 +18,7 @@ public class ListTest extends AbstractTest {
                 .registerTypeParserForTypesAssignableTo(List.class, new StringToTypeParser<List<String>>() {
 
                     @Override
-                    public List<String> parse(String input, TypeParserHelper helper) {
+                    public List<String> parse(String input, StringToTypeParserHelper helper) {
                         return Arrays.asList("my-string");
                     }
                 })

@@ -60,7 +60,7 @@ public class ArrayTest extends AbstractTest {
                 .registerTypeParser(int[].class, new StringToTypeParser<int[]>() {
 
                     @Override
-                    public int[] parse(String input, TypeParserHelper helper) {
+                    public int[] parse(String input, StringToTypeParserHelper helper) {
                         return new int[] { 5, 4 };
                     }
                 })

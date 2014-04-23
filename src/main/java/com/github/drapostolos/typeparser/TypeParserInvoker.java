@@ -68,7 +68,7 @@ class TypeParserInvoker extends ParseTemplate<Object> {
 
     private Object invokeTypeParser(StringToTypeParser<?> typeParser) {
         try {
-            TypeParserHelper parseHelper = new TypeParserHelper(parser, targetType);
+            StringToTypeParserHelper parseHelper = new StringToTypeParserHelper(parser, targetType);
             return typeParser.parse(preprocessedInput, parseHelper);
         } catch (NumberFormatException e) {
             String message = String.format("Number format exception %s.", e.getMessage());

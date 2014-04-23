@@ -13,7 +13,7 @@ public class MyClass1 extends MyBaseClass implements StringToTypeParser<MyClass1
     }
 
     @Override
-    public MyClass1 parse(String value, TypeParserHelper helper) {
+    public MyClass1 parse(String value, StringToTypeParserHelper helper) {
         return new MyClass1(value);
     }
 

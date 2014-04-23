@@ -16,5 +16,5 @@ public interface StringToTypeParser<T> {
      * @param helper Helper class injected automatically by the {@link TypeParser}.
      * @return an instance of type T.
      */
-    T parse(String input, TypeParserHelper helper);
+    T parse(String input, StringToTypeParserHelper helper);
 }

@@ -91,7 +91,7 @@ final class TypeParsers {
         registerTypeParser(types(Boolean.class, boolean.class), new StringToTypeParser<Boolean>() {
 
             @Override
-            public Boolean parse(final String value0, TypeParserHelper helper) {
+            public Boolean parse(final String value0, StringToTypeParserHelper helper) {
                 String value = value0.trim().toLowerCase();
                 if (value.equals("true")) {
                     return Boolean.TRUE;
@@ -104,7 +104,7 @@ final class TypeParsers {
         registerTypeParser(types(Character.class, char.class), new StringToTypeParser<Character>() {
 
             @Override
-            public Character parse(String value, TypeParserHelper helper) {
+            public Character parse(String value, StringToTypeParserHelper helper) {
                 if (value.length() == 1) {
                     return Character.valueOf(value.charAt(0));
                 }
@@ -114,7 +114,7 @@ final class TypeParsers {
         registerTypeParser(BigDecimal.class, new StringToTypeParser<BigDecimal>() {
 
             @Override
-            public BigDecimal parse(String value, TypeParserHelper helper) {
+            public BigDecimal parse(String value, StringToTypeParserHelper helper) {
                 try {
                     return new BigDecimal(value.trim());
                 } catch (NumberFormatException e) {
@@ -126,63 +126,63 @@ final class TypeParsers {
         registerTypeParser(types(byte.class, Byte.class), new StringToTypeParser<Byte>() {
 
             @Override
-            public Byte parse(String value, TypeParserHelper helper) {
+            public Byte parse(String value, StringToTypeParserHelper helper) {
                 return Byte.valueOf(value.trim());
             }
         });
         registerTypeParser(types(Integer.class, int.class), new StringToTypeParser<Integer>() {
 
             @Override
-            public Integer parse(String value, TypeParserHelper helper) {
+            public Integer parse(String value, StringToTypeParserHelper helper) {
                 return Integer.valueOf(value.trim());
             }
         });
         registerTypeParser(types(long.class, Long.class), new StringToTypeParser<Long>() {
 
             @Override
-            public Long parse(String value, TypeParserHelper helper) {
+            public Long parse(String value, StringToTypeParserHelper helper) {
                 return Long.valueOf(value.trim());
             }
         });
         registerTypeParser(types(Short.class, short.class), new StringToTypeParser<Short>() {
 
             @Override
-            public Short parse(String value, TypeParserHelper helper) {
+            public Short parse(String value, StringToTypeParserHelper helper) {
                 return Short.valueOf(value.trim());
             }
         });
         registerTypeParser(types(float.class, Float.class), new StringToTypeParser<Float>() {
 
             @Override
-            public Float parse(String value, TypeParserHelper helper) {
+            public Float parse(String value, StringToTypeParserHelper helper) {
                 return Float.valueOf(value);
             }
         });
         registerTypeParser(types(double.class, Double.class), new StringToTypeParser<Double>() {
 
             @Override
-            public Double parse(String value, TypeParserHelper helper) {
+            public Double parse(String value, StringToTypeParserHelper helper) {
                 return Double.valueOf(value);
             }
         });
         registerTypeParser(File.class, new StringToTypeParser<File>() {
 
             @Override
-            public File parse(String value, TypeParserHelper helper) {
+            public File parse(String value, StringToTypeParserHelper helper) {
                 return new File(value.trim());
             }
         });
         registerTypeParser(String.class, new StringToTypeParser<String>() {
 
             @Override
-            public String parse(String value, TypeParserHelper helper) {
+            public String parse(String value, StringToTypeParserHelper helper) {
                 return value;
             }
         });
         registerTypeParser(ARRAY_OF_CLASS, new StringToTypeParser<Class<?>[]>() {
 
             @Override
-            public Class<?>[] parse(String input, TypeParserHelper helper) {
+            public Class<?>[] parse(String input, StringToTypeParserHelper helper) {
                 List<String> strList = helper.split(input);
                 Class<?>[] array = new Class<?>[strList.size()];
                 for (int i = 0; i < strList.size(); i++) {
@@ -212,7 +212,7 @@ final class TypeParsers {
         return new StringToTypeParser<Class<?>>() {
 
             @Override
-            public Class<?> parse(String input, TypeParserHelper helper) {
+            public Class<?> parse(String input, StringToTypeParserHelper helper) {
                 try {
                     return Class.forName(input.trim());
                 } catch (ClassNotFoundException e) {
@@ -226,7 +226,7 @@ final class TypeParsers {
         return new StringToTypeParser<T>() {
 
             @Override
-            public T parse(String input, TypeParserHelper helper) {
+            public T parse(String input, StringToTypeParserHelper helper) {
                 List<String> strList = helper.split(input);
                 Class<?> componentType = TypeParserUtility.getComponentClass(helper.getTargetType());
                 Object array = Array.newInstance(componentType, strList.size());
@@ -244,7 +244,7 @@ final class TypeParsers {
     private static <T> StringToTypeParser<ArrayList<T>> forArrayLists() {
         return new StringToTypeParser<ArrayList<T>>() {
 
-            public ArrayList<T> parse(String input, TypeParserHelper helper) {
+            public ArrayList<T> parse(String input, StringToTypeParserHelper helper) {
                 @SuppressWarnings("unchecked")
                 Class<T> targetType = (Class<T>) helper.getParameterizedTypeArguments().get(0);
                 ArrayList<T> list = new ArrayList<T>();
@@ -259,7 +259,7 @@ final class TypeParsers {
     private static <T> StringToTypeParser<Set<T>> forLinkedHashSets() {
         return new StringToTypeParser<Set<T>>() {
 
-            public Set<T> parse(String input, TypeParserHelper helper) {
+            public Set<T> parse(String input, StringToTypeParserHelper helper) {
                 @SuppressWarnings("unchecked")
                 Class<T> targetType = (Class<T>) helper.getParameterizedTypeArguments().get(0);
                 Set<T> set = new LinkedHashSet<T>();
@@ -277,7 +277,7 @@ final class TypeParsers {
             private static final int KEY = 0;
             private static final int VALUE = 1;
 
-            public LinkedHashMap<K, V> parse(String input, TypeParserHelper helper) {
+            public LinkedHashMap<K, V> parse(String input, StringToTypeParserHelper helper) {
                 @SuppressWarnings("unchecked")
                 Class<K> keyType = (Class<K>) helper.getParameterizedTypeArguments().get(KEY);
                 @SuppressWarnings("unchecked")

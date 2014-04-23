@@ -12,7 +12,7 @@ public class AssignableClassTest extends AbstractTest {
         StringToTypeParser<MyBaseClass> typeParser = new StringToTypeParser<MyBaseClass>() {
 
             @Override
-            public MyBaseClass parse(String input, TypeParserHelper helper) {
+            public MyBaseClass parse(String input, StringToTypeParserHelper helper) {
                 if (input.equals("1")) {
                     return new MyClass1();
                 }

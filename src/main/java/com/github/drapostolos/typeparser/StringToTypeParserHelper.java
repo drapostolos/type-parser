@@ -12,14 +12,14 @@ import java.util.List;
  * 
  * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>
  */
-public final class TypeParserHelper {
+public final class StringToTypeParserHelper {
 
     private final Type targetType;
     private final TypeParser stringParser;
     private final SplitStrategy splitStrategy;
     private final SplitStrategy mapKeyValueSplitStrategy;
 
-    TypeParserHelper(TypeParser stringParser, Type targetType) {
+    StringToTypeParserHelper(TypeParser stringParser, Type targetType) {
         this.stringParser = stringParser;
         this.targetType = targetType;
         this.splitStrategy = stringParser.splitStrategy;

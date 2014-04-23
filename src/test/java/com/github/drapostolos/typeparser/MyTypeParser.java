@@ -6,7 +6,7 @@ import java.util.List;
 public class MyTypeParser implements StringToTypeParser<List<?>> {
 
     @Override
-    public List<?> parse(String input, TypeParserHelper helper) {
+    public List<?> parse(String input, StringToTypeParserHelper helper) {
         // TODO Auto-generated method stub
         return new ArrayList<String>();
     }

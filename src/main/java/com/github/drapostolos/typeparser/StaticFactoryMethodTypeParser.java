@@ -11,7 +11,7 @@ final class StaticFactoryMethodTypeParser implements StringToTypeParser<Object> 
 
     private static final Object STATIC_METHOD = null;
 
-    public Object parse(String input, TypeParserHelper helper) {
+    public Object parse(String input, StringToTypeParserHelper helper) {
         Class<?> targetType = (Class<?>) helper.getTargetType();
         Method method = getMethodNamedValueOf(targetType);
         try {

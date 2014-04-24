@@ -9,9 +9,9 @@ import java.lang.reflect.Type;
 abstract class ParseTemplate<T> {
 
     final Type targetType;
-    final TypeParsers typeParsers;
+    final Parsers typeParsers;
 
-    protected ParseTemplate(TypeParsers typeParsers, Type targetType) {
+    protected ParseTemplate(Parsers typeParsers, Type targetType) {
         this.targetType = targetType;
         this.typeParsers = typeParsers;
     }
@@ -31,14 +31,14 @@ abstract class ParseTemplate<T> {
     abstract T lastAction();
 
     final T execute() {
-        if (typeParsers.normalTypeParsers.containsKey(targetType)) {
+        if (typeParsers.parsers.containsKey(targetType)) {
             return actionWhenTargetTypeHasNormalTypeParser();
         }
         if (targetType instanceof ParameterizedType) {
             ParameterizedType type = (ParameterizedType) targetType;
             Class<?> rawTargetType = (Class<?>) type.getRawType();
 
-            for (Class<?> rawSuperType : typeParsers.assignableTypeParsers.keySet()) {
+            for (Class<?> rawSuperType : typeParsers.assignableParsers.keySet()) {
                 if (rawTargetType.isAssignableFrom(rawSuperType)) {
                     return actionWhenTaretTypeIsGeneric(rawSuperType);
                 }
@@ -50,7 +50,7 @@ abstract class ParseTemplate<T> {
             if (targetClass.isArray()) {
                 return actionWhenTargetTypeIsArrayClass();
             }
-            for (Class<?> superClass : typeParsers.assignableTypeParsers.keySet()) {
+            for (Class<?> superClass : typeParsers.assignableParsers.keySet()) {
                 if (superClass.isAssignableFrom(targetClass)) {
                     return actionWhenTargetTypeIsAssignalbleTo(superClass);
                 }

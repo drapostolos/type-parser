@@ -7,7 +7,7 @@ class TargetTypeChecker extends ParseTemplate<Boolean> {
     private final TypeParser parser;
 
     public TargetTypeChecker(TypeParser parser, Type targetType) {
-        super(parser.typeParsers, targetType);
+        super(parser.parsers, targetType);
         this.parser = parser;
     }
 

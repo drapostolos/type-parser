@@ -4,22 +4,22 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * Helper class providing helper methods to implementations of {@link StringToTypeParser} when parsing a
+ * Helper class providing helper methods to implementations of {@link Parser} when parsing a
  * string to a type.
  * <p/>
  * The {@link TypeParser} will automatically inject an instance of this class into the
- * {@link StringToTypeParser} implementation.
+ * {@link Parser} implementation.
  * 
  * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>
  */
-public final class StringToTypeParserHelper {
+public final class ParserHelper {
 
     private final Type targetType;
     private final TypeParser stringParser;
     private final SplitStrategy splitStrategy;
     private final SplitStrategy mapKeyValueSplitStrategy;
 
-    StringToTypeParserHelper(TypeParser stringParser, Type targetType) {
+    ParserHelper(TypeParser stringParser, Type targetType) {
         this.stringParser = stringParser;
         this.targetType = targetType;
         this.splitStrategy = stringParser.splitStrategy;

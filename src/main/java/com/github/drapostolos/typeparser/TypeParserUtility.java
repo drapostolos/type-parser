@@ -90,7 +90,7 @@ final class TypeParserUtility {
     static List<Class<?>> getParameterizedTypeArguments(Type targetType) {
         if (!(targetType instanceof ParameterizedType)) {
             String message = "TargetType: '%s' [%s] must be a parameterized "
-                    + "type when calling this method, but it is not.";
+                    + "type when calling this method.";
             throw new IllegalStateException(String.format(message, targetType, targetType.getClass()));
         }
 

@@ -15,16 +15,15 @@ public interface InputPreprocessor {
     /**
      * Prepares the input string to be parsed.
      * <p/>
-     * If a null object is returned from this method, the {@link TypeParser} will return
-     * either:
+     * If a null object is returned from this method, the {@link TypeParser} will return either:
      * <ul>
-     * <li>An empty {@link Collection}/ {@link Map} / Array type (matching the requested type).
-     * Example: an empty {@code ArrayList<Integer>}.</li>
-     * <li>A null object for raw types.</li>
+     * <li>An empty {@link Collection}/ {@link Map} / Array type (matching the requested target
+     * type). Example: an empty {@code ArrayList<Integer>}.</li>
+     * <li>A null object for non-generic types.</li>
      * </ul>
      * <p/>
-     * Any exceptions thrown by this method will be caught in the {@link TypeParser} and
-     * re-thrown converted to a {@link IllegalArgumentException}.
+     * Any exceptions thrown by this method will be caught in the {@link TypeParser} and re-thrown
+     * converted to a {@link IllegalArgumentException}.
      * 
      * @param input String to prepare for parsing.
      * @param helper Helper class injected automatically by the {@link TypeParser}.

@@ -1,6 +1,6 @@
 package com.github.drapostolos.typeparser;
 
-public class MyClass1 extends MyBaseClass implements StringToTypeParser<MyClass1> {
+public class MyClass1 extends MyBaseClass implements Parser<MyClass1> {
 
     String value;
 
@@ -13,7 +13,7 @@ public class MyClass1 extends MyBaseClass implements StringToTypeParser<MyClass1
     }
 
     @Override
-    public MyClass1 parse(String value, StringToTypeParserHelper helper) {
+    public MyClass1 parse(String value, ParserHelper helper) {
         return new MyClass1(value);
     }
 

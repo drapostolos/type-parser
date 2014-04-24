@@ -9,10 +9,10 @@ public class AssignableClassTest extends AbstractTest {
     @Test
     public void canParseSubclassOfAssignableTypeParser() throws Exception {
         // GIVEN
-        StringToTypeParser<MyBaseClass> typeParser = new StringToTypeParser<MyBaseClass>() {
+        Parser<MyBaseClass> typeParser = new Parser<MyBaseClass>() {
 
             @Override
-            public MyBaseClass parse(String input, StringToTypeParserHelper helper) {
+            public MyBaseClass parse(String input, ParserHelper helper) {
                 if (input.equals("1")) {
                     return new MyClass1();
                 }
@@ -20,7 +20,7 @@ public class AssignableClassTest extends AbstractTest {
             }
         };
         TypeParser parser = TypeParser.newBuilder()
-                .registerTypeParserForTypesAssignableTo(MyBaseClass.class, typeParser)
+                .registerParserForTypesAssignableTo(MyBaseClass.class, typeParser)
                 .build();
 
         // THEN

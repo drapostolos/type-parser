@@ -14,122 +14,122 @@ import java.util.Set;
  */
 public final class TypeParserBuilder {
 
-    TypeParsers typeParsers;
+    Parsers parsers;
     SplitStrategy splitStrategy = TypeParserUtility.defaultSplitStrategy();
     SplitStrategy keyValueSplitStrategy = TypeParserUtility.defaultKeyValueSplitStrategy();
     InputPreprocessor inputPreprocessor = TypeParserUtility.defaultInputPreprocessor();
 
     TypeParserBuilder() {
         // Initialize with the default typeParsers
-        typeParsers = TypeParsers.copyDefault();
+        parsers = Parsers.copyDefault();
     }
 
     /**
-     * Unregister the {@link StringToTypeParser} associated with the given {@code targetType}.
-     * {@code targetType} will be ignored if not associated with any {@link StringToTypeParser}.
+     * Unregister the {@link Parser} associated with the given {@code targetType}.
+     * {@code targetType} will be ignored if not associated with any {@link Parser}.
      * 
-     * @param targetType The type associated with {@link StringToTypeParser} to unregister.
+     * @param targetType The type associated with {@link Parser} to unregister.
      * @return {@link TypeParserBuilder}
      * @throws NullPointerException if given argument is null.
      */
-    public TypeParserBuilder unregisterTypeParser(Class<?> targetType) {
+    public TypeParserBuilder unregisterParser(Class<?> targetType) {
         if (targetType == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("targetType"));
         }
-        typeParsers.normalTypeParsers.remove(targetType);
+        parsers.parsers.remove(targetType);
         return this;
     }
 
     /**
-     * Unregister the {@link StringToTypeParser} associated with the given {@code targetType}.
-     * {@code targetType} will be ignored if not associated with any {@link StringToTypeParser}.
+     * Unregister the {@link Parser} associated with the given {@code targetType}.
+     * {@code targetType} will be ignored if not associated with any {@link Parser}.
      * 
-     * @param targetType The type associated with {@link StringToTypeParser} to unregister.
+     * @param targetType The type associated with {@link Parser} to unregister.
      * @return {@link TypeParserBuilder}
      * @throws NullPointerException if given argument is null.
      */
-    public <T> TypeParserBuilder unregisterTypeParser(GenericType<T> targetType) {
+    public <T> TypeParserBuilder unregisterParser(GenericType<T> targetType) {
         if (targetType == null) {
             throw new NullPointerException(TypeParserUtility.makeNullArgumentErrorMsg("targetType"));
         }
-        typeParsers.normalTypeParsers.remove(targetType.getType());
+        parsers.parsers.remove(targetType.getType());
         return this;
     }
 
     /**
-     * Unregister the {@link StringToTypeParser} associated with the given {@code targetType}.
-     * {@code targetType} will be ignored if not associated with any {@link StringToTypeParser}.
+     * Unregister the {@link Parser} associated with the given {@code targetType}.
+     * {@code targetType} will be ignored if not associated with any {@link Parser}.
      * 
-     * @param targetType The type associated with {@link StringToTypeParser} to unregister.
+     * @param targetType The type associated with {@link Parser} to unregister.
      * @return {@link TypeParserBuilder}
      * @throws NullPointerException if given argument is null.
      */
-    public TypeParserBuilder unregisterTypeParserForTypesAssignableTo(Class<?> targetType) {
+    public TypeParserBuilder unregisterParserForTypesAssignableTo(Class<?> targetType) {
         if (targetType == null) {
             throw new NullPointerException(TypeParserUtility.makeNullArgumentErrorMsg("targetType"));
         }
-        typeParsers.assignableTypeParsers.remove(targetType);
+        parsers.assignableParsers.remove(targetType);
         return this;
     }
 
     /**
-     * Register a custom made {@link StringToTypeParser} implementation, associated with
+     * Register a custom made {@link Parser} implementation, associated with
      * the given {@code targetType}.
      * 
-     * @param targetType associated with given {@code typeParser}.
-     * @param typeParser custom made {@link StringToTypeParser} implementation.
+     * @param targetType associated with given {@code parser}.
+     * @param parser custom made {@link Parser} implementation.
      * @return {@link TypeParserBuilder}
      * @throws NullPointerException if any given argument is null.
      */
-    public <T> TypeParserBuilder registerTypeParser(Class<T> targetType, StringToTypeParser<T> typeParser) {
-        if (typeParser == null) {
-            throw new NullPointerException(makeNullArgumentErrorMsg("typeParser"));
+    public <T> TypeParserBuilder registerParser(Class<T> targetType, Parser<T> parser) {
+        if (parser == null) {
+            throw new NullPointerException(makeNullArgumentErrorMsg("parser"));
         }
         if (targetType == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("targetType"));
         }
-        typeParsers.normalTypeParsers.put(targetType, typeParser);
+        parsers.parsers.put(targetType, parser);
         return this;
     }
 
     /**
-     * Register a custom made {@link StringToTypeParser} implementation, associated with
+     * Register a custom made {@link Parser} implementation, associated with
      * any type assignable to the given {@code targetType}.
      * 
-     * @param targetType associated with given {@code typeParser}.
-     * @param typeParser custom made {@link StringToTypeParser} implementation.
+     * @param targetType associated with given {@code parser}.
+     * @param parser custom made {@link Parser} implementation.
      * @return {@link TypeParserBuilder}
      * @throws NullPointerException if any given argument is null.
      */
-    public TypeParserBuilder registerTypeParserForTypesAssignableTo(Class<?> targetType,
-            StringToTypeParser<?> typeParser) {
-        if (typeParser == null) {
-            throw new NullPointerException(makeNullArgumentErrorMsg("typeParser"));
+    public TypeParserBuilder registerParserForTypesAssignableTo(Class<?> targetType,
+            Parser<?> parser) {
+        if (parser == null) {
+            throw new NullPointerException(makeNullArgumentErrorMsg("parser"));
         }
         if (targetType == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("targetType"));
         }
-        typeParsers.assignableTypeParsers.put(targetType, typeParser);
+        parsers.assignableParsers.put(targetType, parser);
         return this;
     }
 
     /**
-     * Register a custom made {@link StringToTypeParser} implementation, associated with
+     * Register a custom made {@link Parser} implementation, associated with
      * the given generic {@code targetType}.
      * 
-     * @param targetType generic type associated with given {@code typeParser}.
-     * @param typeParser custom made {@link StringToTypeParser} implementation.
+     * @param targetType generic type associated with given {@code parser}.
+     * @param parser custom made {@link Parser} implementation.
      * @return {@link TypeParserBuilder}
      * @throws NullPointerException if any given argument is null.
      */
-    public <T> TypeParserBuilder registerTypeParser(GenericType<T> targetType, StringToTypeParser<T> typeParser) {
-        if (typeParser == null) {
-            throw new NullPointerException(makeNullArgumentErrorMsg("typeParser"));
+    public <T> TypeParserBuilder registerParser(GenericType<T> targetType, Parser<T> parser) {
+        if (parser == null) {
+            throw new NullPointerException(makeNullArgumentErrorMsg("parser"));
         }
         if (targetType == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("targetType"));
         }
-        typeParsers.normalTypeParsers.put(targetType.getType(), typeParser);
+        parsers.parsers.put(targetType.getType(), parser);
         return this;
     }
 

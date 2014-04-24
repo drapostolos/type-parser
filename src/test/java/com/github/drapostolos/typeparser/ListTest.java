@@ -15,10 +15,10 @@ public class ListTest extends AbstractTest {
     public void canRegisterListTypeParserThatOverridesDefaultArrayListTypeParser() throws Exception {
         // GIVEN
         TypeParser parser = TypeParser.newBuilder()
-                .registerTypeParserForTypesAssignableTo(List.class, new StringToTypeParser<List<String>>() {
+                .registerParserForTypesAssignableTo(List.class, new Parser<List<String>>() {
 
                     @Override
-                    public List<String> parse(String input, StringToTypeParserHelper helper) {
+                    public List<String> parse(String input, ParserHelper helper) {
                         return Arrays.asList("my-string");
                     }
                 })

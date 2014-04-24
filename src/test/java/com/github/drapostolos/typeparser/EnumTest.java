@@ -19,7 +19,7 @@ public class EnumTest extends AbstractTest {
     public void
             shouldThrowExceptionWhenStringIsNotParsableToEnum() throws Exception {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("TypeParserEnumTest$MyEnum.valueOf('DDD')'. See underlying exception for additional information.");
+        thrown.expectMessage("EnumTest$MyEnum.valueOf('DDD')'. See underlying exception for additional information.");
         parser.parse("DDD", MyEnum.class);
     }
 

@@ -30,7 +30,7 @@ public final class SplitStrategyHelper {
     }
 
     /**
-     * @return the Type to parse to. Example: Integers.class.
+     * @return the Type to parse to. Example: Integer.class.
      */
     public Type getTargetType() {
         return targetType;

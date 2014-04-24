@@ -6,7 +6,7 @@ import static com.github.drapostolos.typeparser.TypeParserUtility.makeParseError
 import java.lang.reflect.Type;
 
 /**
- * The purpose of this class is to parse a string (read from a properties file
+ * The purpose of this class is to parse a simple string (read from a properties file
  * or system property for example) and convert it to a specific java object/Type.
  * For example converting "1" to an {@code Integer} type, or "1,2,3" to a {@code List<Integer>}
  * type.
@@ -15,7 +15,7 @@ import java.lang.reflect.Type;
  */
 public final class TypeParser {
 
-    final TypeParsers typeParsers;
+    final Parsers parsers;
     final SplitStrategy splitStrategy;
     final SplitStrategy keyValueSplitStrategy;
     final InputPreprocessor inputPreprocessor;
@@ -30,7 +30,7 @@ public final class TypeParser {
     }
 
     TypeParser(TypeParserBuilder builder) {
-        this.typeParsers = TypeParsers.unmodifiableCopy(builder.typeParsers);
+        this.parsers = Parsers.unmodifiableCopy(builder.parsers);
         this.splitStrategy = builder.splitStrategy;
         this.keyValueSplitStrategy = builder.keyValueSplitStrategy;
         this.inputPreprocessor = builder.inputPreprocessor;
@@ -50,10 +50,10 @@ public final class TypeParser {
      * @return an instance of {@code targetType} corresponding to the given {@code input}.
      * @throws NullPointerException if {@code targetType} argument is {@code null}.
      * @throws NullPointerException if {@code input} argument is {@code null}.
-     * @throws NoSuchRegisteredTypeParserException if there is no registered {@link StringToTypeParser}
+     * @throws NoSuchRegisteredTypeParserException if there is no registered {@link Parser}
      *         associated with the given {@code targetType}, or if {@code targetType} does not
      *         contain a static factory method with signature {@code valueOf(String)}.
-     * @throws IllegalArgumentException if the {@link StringToTypeParser} associated with the
+     * @throws IllegalArgumentException if the {@link Parser} associated with the
      *         given {@code targetType} throws exception while parsing the given {@code input}.
      * @throws IllegalArgumentException if the {@link InputPreprocessor} throws exception
      *         while preparing the given {@code input} for parsing.
@@ -89,9 +89,9 @@ public final class TypeParser {
      * @return an instance of {@code genericType} corresponding to the given {@code input}.
      * @throws NullPointerException if {@code genericType} argument is {@code null}.
      * @throws NullPointerException if {@code input} argument is {@code null}.
-     * @throws NoSuchRegisteredTypeParserException if there is no registered {@link StringToTypeParser}
+     * @throws NoSuchRegisteredTypeParserException if there is no registered {@link Parser}
      *         associated with the given {@code genericType}.
-     * @throws IllegalArgumentException if the {@link StringToTypeParser} associated with the
+     * @throws IllegalArgumentException if the {@link Parser} associated with the
      *         given {@code genericType} throws exception while parsing the given {@code input}.
      * @throws IllegalArgumentException if the {@link InputPreprocessor} throws exception
      *         while preparing the given {@code input} for parsing.
@@ -118,10 +118,10 @@ public final class TypeParser {
      * @return an instance of {@code targetType} corresponding to the given {@code input}.
      * @throws NullPointerException if {@code targetType} argument is {@code null}.
      * @throws NullPointerException if {@code input} argument is {@code null}.
-     * @throws NoSuchRegisteredTypeParserException if there is no registered {@link StringToTypeParser}
+     * @throws NoSuchRegisteredTypeParserException if there is no registered {@link Parser}
      *         associated with the given {@code targetType}, or if {@code targetType} does not
      *         contain a static factory method with signature {@code valueOf(String)}.
-     * @throws IllegalArgumentException if the {@link StringToTypeParser} associated with the
+     * @throws IllegalArgumentException if the {@link Parser} associated with the
      *         given {@code targetType} throws exception while parsing the given {@code input}.
      * @throws IllegalArgumentException if the {@link InputPreprocessor} throws exception
      *         while preparing the given {@code input} for parsing.
@@ -141,11 +141,11 @@ public final class TypeParser {
     }
 
     /**
-     * Checks if the given {@code genericType} corresponds to a registered {@link StringToTypeParser}.
+     * Checks if the given {@code genericType} corresponds to a registered {@link Parser}.
      * Returns true if it does, otherwise false.
      * 
      * @param genericType - Generic Type known at compile time.
-     * @return true if {@code genericType} corresponds to a {@link StringToTypeParser},
+     * @return true if {@code genericType} corresponds to a {@link Parser},
      *         otherwise false.
      */
     public boolean isTargetTypeParsable(GenericType<?> genericType) {
@@ -153,11 +153,11 @@ public final class TypeParser {
     }
 
     /**
-     * Checks if the given {@code targetType} corresponds to a registered {@link StringToTypeParser}.
+     * Checks if the given {@code targetType} corresponds to a registered {@link Parser}.
      * Returns true if it does, otherwise false.
      * 
      * @param targetType - the {@link Type} to check. Example Integer.class.
-     * @return true if {@code genericType} corresponds to a {@link StringToTypeParser},
+     * @return true if {@code genericType} corresponds to a {@link Parser},
      *         otherwise false.
      */
     public boolean isTargetTypeParsable(Type targetType) {
@@ -173,7 +173,7 @@ public final class TypeParser {
                 throw new IllegalArgumentException(String.format(message, targetType, input, preprocessedInput));
             }
         }
-        TypeParserInvoker invoker = new TypeParserInvoker(this, targetType, preprocessedInput);
+        ParserInvoker invoker = new ParserInvoker(this, targetType, preprocessedInput);
         return invoker.execute();
     }
 

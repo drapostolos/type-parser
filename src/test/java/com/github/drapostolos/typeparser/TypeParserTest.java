@@ -101,7 +101,7 @@ public class TypeParserTest extends AbstractTest {
 
         // when
         TypeParser parser = TypeParser.newBuilder()
-                .unregisterTypeParserForTypesAssignableTo(LinkedHashSet.class)
+                .unregisterParserForTypesAssignableTo(LinkedHashSet.class)
                 .build();
 
         // then 
@@ -115,7 +115,7 @@ public class TypeParserTest extends AbstractTest {
 
         // when
         TypeParser parser = TypeParser.newBuilder()
-                .unregisterTypeParser(int.class)
+                .unregisterParser(int.class)
                 .build();
 
         // then 
@@ -126,7 +126,7 @@ public class TypeParserTest extends AbstractTest {
     public void canRegisterTypeParserByClass() throws Exception {
         // given
         TypeParser parser = TypeParser.newBuilder()
-                .registerTypeParser(MyClass1.class, new MyClass1())
+                .registerParser(MyClass1.class, new MyClass1())
                 .build();
 
         // then
@@ -138,7 +138,7 @@ public class TypeParserTest extends AbstractTest {
     public void canRegisterTypeParserByGenericType() throws Exception {
         // given
         TypeParser parser = TypeParser.newBuilder()
-                .registerTypeParser(new GenericType<MyClass1>() {}, new MyClass1())
+                .registerParser(new GenericType<MyClass1>() {}, new MyClass1())
                 .build();
 
         // then
@@ -159,9 +159,9 @@ public class TypeParserTest extends AbstractTest {
         thrown.expectMessage(MyClass1.class.toString());
         thrown.expectMessage("must be a parameterized type when calling this method, but it is not.");
         parser = TypeParser.newBuilder()
-                .registerTypeParser(MyClass1.class, new StringToTypeParser<MyClass1>() {
+                .registerParser(MyClass1.class, new Parser<MyClass1>() {
 
-                    public MyClass1 parse(String input, StringToTypeParserHelper helper) {
+                    public MyClass1 parse(String input, ParserHelper helper) {
                         TypeParserUtility.getParameterizedTypeArguments(helper.getTargetType());
                         return null;
                     }
@@ -177,9 +177,9 @@ public class TypeParserTest extends AbstractTest {
         thrown.expectMessage(MyClass1.class.toString());
         thrown.expectMessage("is either not an array or the componet type is generic.");
         parser = TypeParser.newBuilder()
-                .registerTypeParser(MyClass1.class, new StringToTypeParser<MyClass1>() {
+                .registerParser(MyClass1.class, new Parser<MyClass1>() {
 
-                    public MyClass1 parse(String input, StringToTypeParserHelper helper) {
+                    public MyClass1 parse(String input, ParserHelper helper) {
                         TypeParserUtility.getComponentClass(helper.getTargetType());
                         return null;
                     }

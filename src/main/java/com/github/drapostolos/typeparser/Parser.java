@@ -7,7 +7,7 @@ package com.github.drapostolos.typeparser;
  * @param <T> the type to convert the parsed string to.
  * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>
  */
-public interface StringToTypeParser<T> {
+public interface Parser<T> {
 
     /**
      * Parses the given string and converts it to an instance of type T.
@@ -16,5 +16,5 @@ public interface StringToTypeParser<T> {
      * @param helper Helper class injected automatically by the {@link TypeParser}.
      * @return an instance of type T.
      */
-    T parse(String input, StringToTypeParserHelper helper);
+    T parse(String input, ParserHelper helper);
 }

@@ -13,37 +13,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-final class TypeParsers {
+final class Parsers {
 
     static final Type ANY_ARRAY = Array.class;
-    static final Type ANY_CLASS_WITH_STATIC_VALUEOF_METHOD = StaticFactoryMethodTypeParser.class;
+    static final Type ANY_CLASS_WITH_STATIC_VALUEOF_METHOD = StaticFactoryMethodParser.class;
     private static final Type ARRAY_OF_CLASS = new GenericType<Class<?>[]>() {}.getType();
     private static final String BOOLEAN_ERROR_MESSAGE = "\"%s\" is not parsable to a Boolean.";
     private static final String CLASS_ERROR_MESSAGE = "\"%s\" is not parsable to a Class object.";
     private static final String CHARACTER_ERROR_MESSAGE = "\"%s\" must only contain a single character.";
-    private static final Map<Type, StringToTypeParser<?>> DEFAULT_TYPE_PARSERS;
-    private static final Map<Class<?>, StringToTypeParser<?>> DEFAULT_ASSIGNABLE_TYPE_PARSERS;
-    private static final StringToTypeParser<?> CLASS_TYPE_PARSER = forClass();
-    final Map<Type, StringToTypeParser<?>> normalTypeParsers;
-    final Map<Class<?>, StringToTypeParser<?>> assignableTypeParsers;
+    private static final Map<Type, Parser<?>> DEFAULT_PARSERS;
+    private static final Map<Class<?>, Parser<?>> DEFAULT_ASSIGNABLE_PARSERS;
+    private static final Parser<?> CLASS_PARSER = forClass();
+    final Map<Type, Parser<?>> parsers;
+    final Map<Class<?>, Parser<?>> assignableParsers;
 
-    private TypeParsers(
-            Map<Type, StringToTypeParser<?>> typeParsers,
-            Map<Class<?>, StringToTypeParser<?>> assignableTypeParsers) {
-        this.normalTypeParsers = typeParsers;
-        this.assignableTypeParsers = assignableTypeParsers;
+    private Parsers(
+            Map<Type, Parser<?>> parsers,
+            Map<Class<?>, Parser<?>> assignableParsers) {
+        this.parsers = parsers;
+        this.assignableParsers = assignableParsers;
     }
 
-    static TypeParsers copyDefault() {
-        return new TypeParsers(
-                copyMap(DEFAULT_TYPE_PARSERS),
-                copyMap(DEFAULT_ASSIGNABLE_TYPE_PARSERS));
+    static Parsers copyDefault() {
+        return new Parsers(
+                copyMap(DEFAULT_PARSERS),
+                copyMap(DEFAULT_ASSIGNABLE_PARSERS));
     }
 
-    static TypeParsers unmodifiableCopy(TypeParsers tp) {
-        return new TypeParsers(
-                unmodifiableCopy(tp.normalTypeParsers),
-                unmodifiableReverseCopy(tp.assignableTypeParsers));
+    static Parsers unmodifiableCopy(Parsers tp) {
+        return new Parsers(
+                unmodifiableCopy(tp.parsers),
+                unmodifiableReverseCopy(tp.assignableParsers));
     }
 
     private static <K, V> Map<K, V> unmodifiableCopy(Map<K, V> map) {
@@ -66,8 +66,8 @@ final class TypeParsers {
     }
 
     static {
-        DEFAULT_ASSIGNABLE_TYPE_PARSERS = newLinkedHashMap();
-        DEFAULT_TYPE_PARSERS = newLinkedHashMap();
+        DEFAULT_ASSIGNABLE_PARSERS = newLinkedHashMap();
+        DEFAULT_PARSERS = newLinkedHashMap();
     }
 
     private static <K, V> LinkedHashMap<K, V> newLinkedHashMap() {
@@ -75,23 +75,20 @@ final class TypeParsers {
     }
 
     static {
-        DEFAULT_ASSIGNABLE_TYPE_PARSERS.put(LinkedHashMap.class, forLinkedHashMaps());
-        DEFAULT_ASSIGNABLE_TYPE_PARSERS.put(ArrayList.class, forArrayLists());
-        DEFAULT_ASSIGNABLE_TYPE_PARSERS.put(LinkedHashSet.class, forLinkedHashSets());
-        DEFAULT_ASSIGNABLE_TYPE_PARSERS.put(Class.class, CLASS_TYPE_PARSER);
+        DEFAULT_ASSIGNABLE_PARSERS.put(LinkedHashMap.class, forLinkedHashMaps());
+        DEFAULT_ASSIGNABLE_PARSERS.put(ArrayList.class, forArrayLists());
+        DEFAULT_ASSIGNABLE_PARSERS.put(LinkedHashSet.class, forLinkedHashSets());
+        DEFAULT_ASSIGNABLE_PARSERS.put(Class.class, CLASS_PARSER);
     }
 
-    /*
-     * Register all default normal TypeParsers.
-     */
     static {
-        registerTypeParser(ANY_ARRAY, TypeParsers.forArrays());
-        registerTypeParser(ANY_CLASS_WITH_STATIC_VALUEOF_METHOD, new StaticFactoryMethodTypeParser());
-        registerTypeParser(types(Class.class, new GenericType<Class<?>>() {}.getType()), CLASS_TYPE_PARSER);
-        registerTypeParser(types(Boolean.class, boolean.class), new StringToTypeParser<Boolean>() {
+        registerParser(ANY_ARRAY, Parsers.forArrays());
+        registerParser(ANY_CLASS_WITH_STATIC_VALUEOF_METHOD, new StaticFactoryMethodParser());
+        registerParser(types(Class.class, new GenericType<Class<?>>() {}.getType()), CLASS_PARSER);
+        registerParser(types(Boolean.class, boolean.class), new Parser<Boolean>() {
 
             @Override
-            public Boolean parse(final String value0, StringToTypeParserHelper helper) {
+            public Boolean parse(final String value0, ParserHelper helper) {
                 String value = value0.trim().toLowerCase();
                 if (value.equals("true")) {
                     return Boolean.TRUE;
@@ -101,20 +98,20 @@ final class TypeParsers {
                 throw new IllegalArgumentException(String.format(BOOLEAN_ERROR_MESSAGE, value0));
             }
         });
-        registerTypeParser(types(Character.class, char.class), new StringToTypeParser<Character>() {
+        registerParser(types(Character.class, char.class), new Parser<Character>() {
 
             @Override
-            public Character parse(String value, StringToTypeParserHelper helper) {
+            public Character parse(String value, ParserHelper helper) {
                 if (value.length() == 1) {
                     return Character.valueOf(value.charAt(0));
                 }
                 throw new IllegalArgumentException(String.format(CHARACTER_ERROR_MESSAGE, value));
             }
         });
-        registerTypeParser(BigDecimal.class, new StringToTypeParser<BigDecimal>() {
+        registerParser(BigDecimal.class, new Parser<BigDecimal>() {
 
             @Override
-            public BigDecimal parse(String value, StringToTypeParserHelper helper) {
+            public BigDecimal parse(String value, ParserHelper helper) {
                 try {
                     return new BigDecimal(value.trim());
                 } catch (NumberFormatException e) {
@@ -123,66 +120,66 @@ final class TypeParsers {
                 }
             }
         });
-        registerTypeParser(types(byte.class, Byte.class), new StringToTypeParser<Byte>() {
+        registerParser(types(byte.class, Byte.class), new Parser<Byte>() {
 
             @Override
-            public Byte parse(String value, StringToTypeParserHelper helper) {
+            public Byte parse(String value, ParserHelper helper) {
                 return Byte.valueOf(value.trim());
             }
         });
-        registerTypeParser(types(Integer.class, int.class), new StringToTypeParser<Integer>() {
+        registerParser(types(Integer.class, int.class), new Parser<Integer>() {
 
             @Override
-            public Integer parse(String value, StringToTypeParserHelper helper) {
+            public Integer parse(String value, ParserHelper helper) {
                 return Integer.valueOf(value.trim());
             }
         });
-        registerTypeParser(types(long.class, Long.class), new StringToTypeParser<Long>() {
+        registerParser(types(long.class, Long.class), new Parser<Long>() {
 
             @Override
-            public Long parse(String value, StringToTypeParserHelper helper) {
+            public Long parse(String value, ParserHelper helper) {
                 return Long.valueOf(value.trim());
             }
         });
-        registerTypeParser(types(Short.class, short.class), new StringToTypeParser<Short>() {
+        registerParser(types(Short.class, short.class), new Parser<Short>() {
 
             @Override
-            public Short parse(String value, StringToTypeParserHelper helper) {
+            public Short parse(String value, ParserHelper helper) {
                 return Short.valueOf(value.trim());
             }
         });
-        registerTypeParser(types(float.class, Float.class), new StringToTypeParser<Float>() {
+        registerParser(types(float.class, Float.class), new Parser<Float>() {
 
             @Override
-            public Float parse(String value, StringToTypeParserHelper helper) {
+            public Float parse(String value, ParserHelper helper) {
                 return Float.valueOf(value);
             }
         });
-        registerTypeParser(types(double.class, Double.class), new StringToTypeParser<Double>() {
+        registerParser(types(double.class, Double.class), new Parser<Double>() {
 
             @Override
-            public Double parse(String value, StringToTypeParserHelper helper) {
+            public Double parse(String value, ParserHelper helper) {
                 return Double.valueOf(value);
             }
         });
-        registerTypeParser(File.class, new StringToTypeParser<File>() {
+        registerParser(File.class, new Parser<File>() {
 
             @Override
-            public File parse(String value, StringToTypeParserHelper helper) {
+            public File parse(String value, ParserHelper helper) {
                 return new File(value.trim());
             }
         });
-        registerTypeParser(String.class, new StringToTypeParser<String>() {
+        registerParser(String.class, new Parser<String>() {
 
             @Override
-            public String parse(String value, StringToTypeParserHelper helper) {
+            public String parse(String value, ParserHelper helper) {
                 return value;
             }
         });
-        registerTypeParser(ARRAY_OF_CLASS, new StringToTypeParser<Class<?>[]>() {
+        registerParser(ARRAY_OF_CLASS, new Parser<Class<?>[]>() {
 
             @Override
-            public Class<?>[] parse(String input, StringToTypeParserHelper helper) {
+            public Class<?>[] parse(String input, ParserHelper helper) {
                 List<String> strList = helper.split(input);
                 Class<?>[] array = new Class<?>[strList.size()];
                 for (int i = 0; i < strList.size(); i++) {
@@ -198,21 +195,21 @@ final class TypeParsers {
         return Arrays.asList(types);
     }
 
-    private static void registerTypeParser(Type type, StringToTypeParser<?> typeParser) {
-        registerTypeParser(types(type), typeParser);
+    private static void registerParser(Type type, Parser<?> typeParser) {
+        registerParser(types(type), typeParser);
     }
 
-    private static void registerTypeParser(List<Type> types, StringToTypeParser<?> typeParser) {
+    private static void registerParser(List<Type> types, Parser<?> typeParser) {
         for (Type type : types) {
-            DEFAULT_TYPE_PARSERS.put(type, typeParser);
+            DEFAULT_PARSERS.put(type, typeParser);
         }
     }
 
-    private static StringToTypeParser<Class<?>> forClass() {
-        return new StringToTypeParser<Class<?>>() {
+    private static Parser<Class<?>> forClass() {
+        return new Parser<Class<?>>() {
 
             @Override
-            public Class<?> parse(String input, StringToTypeParserHelper helper) {
+            public Class<?> parse(String input, ParserHelper helper) {
                 try {
                     return Class.forName(input.trim());
                 } catch (ClassNotFoundException e) {
@@ -222,11 +219,11 @@ final class TypeParsers {
         };
     }
 
-    private static <T> StringToTypeParser<T> forArrays() {
-        return new StringToTypeParser<T>() {
+    private static <T> Parser<T> forArrays() {
+        return new Parser<T>() {
 
             @Override
-            public T parse(String input, StringToTypeParserHelper helper) {
+            public T parse(String input, ParserHelper helper) {
                 List<String> strList = helper.split(input);
                 Class<?> componentType = TypeParserUtility.getComponentClass(helper.getTargetType());
                 Object array = Array.newInstance(componentType, strList.size());
@@ -241,10 +238,10 @@ final class TypeParsers {
         };
     }
 
-    private static <T> StringToTypeParser<ArrayList<T>> forArrayLists() {
-        return new StringToTypeParser<ArrayList<T>>() {
+    private static <T> Parser<ArrayList<T>> forArrayLists() {
+        return new Parser<ArrayList<T>>() {
 
-            public ArrayList<T> parse(String input, StringToTypeParserHelper helper) {
+            public ArrayList<T> parse(String input, ParserHelper helper) {
                 @SuppressWarnings("unchecked")
                 Class<T> targetType = (Class<T>) helper.getParameterizedTypeArguments().get(0);
                 ArrayList<T> list = new ArrayList<T>();
@@ -256,10 +253,10 @@ final class TypeParsers {
         };
     }
 
-    private static <T> StringToTypeParser<Set<T>> forLinkedHashSets() {
-        return new StringToTypeParser<Set<T>>() {
+    private static <T> Parser<Set<T>> forLinkedHashSets() {
+        return new Parser<Set<T>>() {
 
-            public Set<T> parse(String input, StringToTypeParserHelper helper) {
+            public Set<T> parse(String input, ParserHelper helper) {
                 @SuppressWarnings("unchecked")
                 Class<T> targetType = (Class<T>) helper.getParameterizedTypeArguments().get(0);
                 Set<T> set = new LinkedHashSet<T>();
@@ -271,13 +268,13 @@ final class TypeParsers {
         };
     }
 
-    private static <K, V> StringToTypeParser<LinkedHashMap<K, V>> forLinkedHashMaps() {
-        return new StringToTypeParser<LinkedHashMap<K, V>>() {
+    private static <K, V> Parser<LinkedHashMap<K, V>> forLinkedHashMaps() {
+        return new Parser<LinkedHashMap<K, V>>() {
 
             private static final int KEY = 0;
             private static final int VALUE = 1;
 
-            public LinkedHashMap<K, V> parse(String input, StringToTypeParserHelper helper) {
+            public LinkedHashMap<K, V> parse(String input, ParserHelper helper) {
                 @SuppressWarnings("unchecked")
                 Class<K> keyType = (Class<K>) helper.getParameterizedTypeArguments().get(KEY);
                 @SuppressWarnings("unchecked")

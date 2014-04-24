@@ -57,10 +57,10 @@ public class ArrayTest extends AbstractTest {
     public void testCustomMadeArrayclassTypeParser() throws Exception {
         // given
         parser = TypeParser.newBuilder()
-                .registerTypeParser(int[].class, new StringToTypeParser<int[]>() {
+                .registerParser(int[].class, new Parser<int[]>() {
 
                     @Override
-                    public int[] parse(String input, StringToTypeParserHelper helper) {
+                    public int[] parse(String input, ParserHelper helper) {
                         return new int[] { 5, 4 };
                     }
                 })

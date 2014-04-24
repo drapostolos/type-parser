@@ -16,9 +16,9 @@ import java.lang.reflect.Type;
  * generic type known at compile time.
  * <p/>
  * Additionally, use a subclass of this class when you want to register or unregister a
- * {@link StringToTypeParser} for a generic type, by using these methods:
- * {@link TypeParserBuilder#registerTypeParser(GenericType, StringToTypeParser)},
- * {@link TypeParserBuilder#unregisterTypeParser(GenericType)}.
+ * {@link Parser} for a generic type, by using these methods:
+ * {@link TypeParserBuilder#registerParser(GenericType, Parser)},
+ * {@link TypeParserBuilder#unregisterParser(GenericType)}.
  * 
  * @param <T> a generic type, example: {@code List<String>}
  * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>

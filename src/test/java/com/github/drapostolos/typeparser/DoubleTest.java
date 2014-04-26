@@ -1,69 +1,56 @@
 package com.github.drapostolos.typeparser;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class DoubleTest extends AbstractTest {
+public class DoubleTest extends AbstractTypeTester<Double> {
+
+    @Override
+    Double make(String string) throws Exception {
+        return Double.valueOf(string.trim());
+    }
 
     @Test
-    public void
-            shouldThrowExceptionWhenStringIsNotParsableToDouble() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage(String.format(NUMBER_FORMAT_ERROR_MSG, "aa"));
-        parser.parse("aa", Double.class);
+    public void shouldThrowWhenStringIsNotParsableToDouble() throws Exception {
+        shouldThrowWhenParsing("aa")
+                .toTypeWithNumberFormatErrorMessage(Double.class)
+                .toTypeWithNumberFormatErrorMessage(double.class);
     }
 
     @Test
     public void canParseStringToDoubleType() throws Exception {
-        assertThat(parser.isTargetTypeParsable(Double.class)).isTrue();
-        assertThat(parser.isTargetTypeParsable(double.class)).isTrue();
-        assertThat(parser.parse("01.2", Double.class)).isEqualTo(1.2d);
-        assertThat(parser.parse("1", double.class)).isEqualTo(1d);
-        assertThat(parser.parse("1d", double.class)).isEqualTo(1d);
-        assertThat(parser.parse("\t1d ", double.class)).isEqualTo(1d);
-        assertThat(parser.parse(".1", double.class)).isEqualTo(0.1d);
+        canParse("01.2").toType(Double.class);
+        canParse("1").toType(double.class);
+        canParse("1d").toType(double.class);
+        canParse("\t1d").toType(double.class);
+        canParse(".1").toType(double.class);
     }
 
     @Test
     public void canParseToGenericDoubleArray() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Double[]>() {})).isTrue();
-        assertThat(parser.parse("1, 1.2, .1", new GenericType<Double[]>() {}))
-                .containsExactly(1d, 1.2d, 0.1d);
+        canParse("1, 1.2, .1").toGenericArray(new GenericType<Double[]>() {});
     }
 
     @Test
     public void canParseToCharacerArray() throws Exception {
-        assertThat(parser.isTargetTypeParsable(double[].class)).isTrue();
-        assertThat(parser.parse("1, 1.2, .1", double[].class))
-                .containsOnly(1d, 1.2d, 0.1d);
+        canParse("1, 1.2, .1").toArray(Double[].class);
     }
 
     @Test
     public void canParseToDoubleList() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<List<Double>>() {})).isTrue();
-        assertThat(parser.parse("1, 1.2, .1", new GenericType<List<Double>>() {}))
-                .containsExactly(1d, 1.2d, 0.1d);
+        canParse("1, 1.2, .1").toList(new GenericType<List<Double>>() {});
     }
 
     @Test
     public void canParseToDoubleSet() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Set<Double>>() {})).isTrue();
-        assertThat(parser.parse("1, 1.2, 1", new GenericType<Set<Double>>() {}))
-                .containsExactly(1d, 1.2d);
+        canParse("1, 1.2, 1").toSet(new GenericType<Set<Double>>() {});
     }
 
     @Test
     public void canParseToDoubleMap() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Map<Double, Double>>() {})).isTrue();
-        assertThat(parser.parse("1=.1, 2=.2", new GenericType<Map<Double, Double>>() {}))
-                .contains(MapEntry.entry(1d, .1d))
-                .contains(MapEntry.entry(2d, .2d))
-                .hasSize(2);
+        canParse("1=.1, 2=.2").toMap(new GenericType<Map<Double, Double>>() {});
     }
 }

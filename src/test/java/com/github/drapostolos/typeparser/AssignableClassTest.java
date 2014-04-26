@@ -4,7 +4,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-public class AssignableClassTest extends AbstractTest {
+public class AssignableClassTest extends TestBase {
 
     @Test
     public void canParseSubclassOfAssignableTypeParser() throws Exception {
@@ -27,6 +27,7 @@ public class AssignableClassTest extends AbstractTest {
         assertThat(parser.parse("1", MyClass1.class)).isInstanceOf(MyClass1.class);
         assertThat(parser.parse("2", MyClass2.class)).isInstanceOf(MyClass2.class);
         assertThat(parser.isTargetTypeParsable(MyClass1.class)).isTrue();
+        assertThat(parser.isTargetTypeParsable(MyBaseClass.class)).isTrue();
     }
 
 }

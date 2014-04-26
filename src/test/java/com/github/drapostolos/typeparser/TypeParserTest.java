@@ -14,7 +14,7 @@ import java.util.TreeSet;
 
 import org.junit.Test;
 
-public class TypeParserTest extends AbstractTest {
+public class TypeParserTest extends TestBase {
 
     @Test
     public void canNotParseTheseTypesByDefault() throws Exception {
@@ -157,7 +157,7 @@ public class TypeParserTest extends AbstractTest {
     public void shouldThrowExceptionWhenNonParameterizedTypeIsExpectedToBeParameterized() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage(MyClass1.class.toString());
-        thrown.expectMessage("must be a parameterized type when calling this method, but it is not.");
+        thrown.expectMessage("must be a parameterized type.");
         parser = TypeParser.newBuilder()
                 .registerParser(MyClass1.class, new Parser<MyClass1>() {
 

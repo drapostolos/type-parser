@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class ArrayTest extends AbstractTest {
+public class ArrayTest extends TestBase {
 
     @Test
     public void canParseStringToEmptyArray() throws Exception {

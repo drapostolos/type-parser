@@ -1,69 +1,55 @@
 package com.github.drapostolos.typeparser;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class LongTest extends AbstractTest {
+public class LongTest extends AbstractTypeTester<Long> {
+
+    @Override
+    Long make(String string) throws Exception {
+        return Long.valueOf(string.trim());
+    }
 
     @Test
-    public void
-            shouldThrowExceptionWhenStringIsNotParsableToLong() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage(String.format(NUMBER_FORMAT_ERROR_MSG, "a"));
-        parser.parse("a", Long.class);
+    public void shouldThrowWhenStringIsNotParsableToLong() throws Exception {
+        shouldThrowWhenParsing("a")
+                .toTypeWithErrorMessage(Long.class, String.format(NUMBER_FORMAT_ERROR_MSG, "a"));
     }
 
     @Test
     public void canParseStringToLong() throws Exception {
-        assertThat(parser.isTargetTypeParsable(long.class)).isTrue();
-        assertThat(parser.isTargetTypeParsable(Long.class)).isTrue();
-        assertThat(parser.parse("3", Long.class)).isEqualTo(3);
-        assertThat(parser.parse(" 3\t", Long.class)).isEqualTo(3);
-        assertThat(parser.parse("3", long.class)).isEqualTo(3);
-        assertThat(parser.parse(" 3\t", long.class)).isEqualTo(3);
+        canParse("3").toType(Long.class);
+        canParse("3").toType(long.class);
+        canParse(" 3\t").toType(Long.class);
+        canParse(" 3\t").toType(long.class);
     }
 
     @Test
     public void canParseToGenericLongArray() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Long[]>() {})).isTrue();
-        assertThat(parser.parse("1, 2, 3", new GenericType<Long[]>() {}))
-                .containsExactly(1l, 2l, 3l);
+        canParse("1, 2, 3").toGenericArray(new GenericType<Long[]>() {});
     }
 
     @Test
     public void canParseToLongArray() throws Exception {
-        assertThat(parser.isTargetTypeParsable(Long[].class)).isTrue();
-        assertThat(parser.parse("1, 2, 3", Long[].class))
-                .containsOnly(1l, 2l, 3l);
+        canParse("1, 2, 3").toArray(Long[].class);
     }
 
     @Test
     public void canParseToLongList() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<List<Long>>() {})).isTrue();
-        assertThat(parser.parse("1, 2, 3", new GenericType<List<Long>>() {}))
-                .containsExactly(1l, 2l, 3l);
+        canParse("1, 2, 3").toList(new GenericType<List<Long>>() {});
     }
 
     @Test
     public void canParseToLongSet() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Set<Long>>() {})).isTrue();
-        assertThat(parser.parse("1, 2, 1", new GenericType<Set<Long>>() {}))
-                .containsExactly(1l, 2l);
+        canParse("1, 2, 1").toSet(new GenericType<Set<Long>>() {});
     }
 
     @Test
     public void canParseToLongMap() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Map<Long, Long>>() {})).isTrue();
-        assertThat(parser.parse("1=11, 2=22", new GenericType<Map<Long, Long>>() {}))
-                .contains(MapEntry.entry(1l, 11l))
-                .contains(MapEntry.entry(2l, 22l))
-                .hasSize(2);
+        canParse("1=11, 2=22").toMap(new GenericType<Map<Long, Long>>() {});
     }
 
 }

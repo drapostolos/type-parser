@@ -8,7 +8,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class NullParameterCheckTest extends AbstractTest {
+public class NullParameterCheckTest extends TestBase {
 
     private TypeParserBuilder builder = TypeParser.newBuilder();
 

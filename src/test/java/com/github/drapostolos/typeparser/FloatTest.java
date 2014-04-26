@@ -1,71 +1,57 @@
 package com.github.drapostolos.typeparser;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class FloatTest extends AbstractTest {
+public class FloatTest extends AbstractTypeTester<Float> {
+
+    @Override
+    Float make(String string) throws Exception {
+        return Float.valueOf(string.trim());
+    }
 
     @Test
-    public void
-            shouldThrowExceptionWhenStringIsNotParsableToFloat() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage(String.format(NUMBER_FORMAT_ERROR_MSG, "aa"));
-        parser.parse("aa", Float.class);
+    public void shouldThrowWhenStringIsNotParsableToFloat() throws Exception {
+        shouldThrowWhenParsing("aa");
+        toTypeWithErrorMessage(Float.class, String.format(NUMBER_FORMAT_ERROR_MSG, "aa"));
     }
 
     @Test
     public void canParseStringToFloat() throws Exception {
-        assertThat(parser.isTargetTypeParsable(Float.class)).isTrue();
-        assertThat(parser.isTargetTypeParsable(float.class)).isTrue();
-        assertThat(parser.parse("01.2", float.class)).isEqualTo(1.2f);
-        assertThat(parser.parse("1", Float.class)).isEqualTo(1f);
-        assertThat(parser.parse("1d", Float.class)).isEqualTo(1f);
-        assertThat(parser.parse("\t1f", Float.class)).isEqualTo(1f);
-        assertThat(parser.parse(".1", Float.class)).isEqualTo(0.1f);
+        canParse("01.2").toType(float.class);
+        canParse("1").toType(Float.class);
+        canParse("1d").toType(Float.class);
+        canParse("1").toType(Float.class);
+        canParse("\t1f").toType(Float.class);
+        canParse(".1").toType(Float.class);
     }
 
     @Test
     public void canParseToGenericFloatArray() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Float[]>() {})).isTrue();
-        assertThat(parser.parse("1d, .1f, 23f", new GenericType<Float[]>() {}))
-                .containsExactly(1f, 0.1f, 23f);
+        canParse("1d, .1f, 23f").toGenericArray(new GenericType<Float[]>() {});
     }
 
     @Test
     public void canParseToFloatArray() throws Exception {
-        assertThat(parser.isTargetTypeParsable(Float[].class)).isTrue();
-        assertThat(parser.parse("1d, .1f, 23f", Float[].class))
-                .containsOnly(1f, 0.1f, 23f);
+        canParse("1d, .1f, 23f").toArray(Float[].class);
     }
 
     @Test
     public void canParseToFloatList() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<List<Float>>() {})).isTrue();
-        assertThat(parser.parse("1d, .1f, 23f", new GenericType<List<Float>>() {}))
-                .containsExactly(1f, 0.1f, 23f);
+        canParse("1d, .1f, 23f").toList(new GenericType<List<Float>>() {});
     }
 
     @Test
     public void canParseToFloatSet() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Set<Float>>() {})).isTrue();
-        assertThat(parser.parse("1d, .1f, 23f", new GenericType<Set<Float>>() {}))
-                .containsExactly(1f, 0.1f, 23f);
+        canParse("1d, .1f, 1d").toSet(new GenericType<Set<Float>>() {});
     }
 
     @Test
     public void canParseToFloatMap() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Map<Float, Float>>() {})).isTrue();
-        assertThat(parser.parse("1=11, 2=22, 3=33", new GenericType<Map<Float, Float>>() {}))
-                .contains(MapEntry.entry(1f, 11f))
-                .contains(MapEntry.entry(2f, 22f))
-                .contains(MapEntry.entry(3f, 33f))
-                .hasSize(3);
+        canParse("1=11, 2=22").toMap(new GenericType<Map<Float, Float>>() {});
     }
 
 }

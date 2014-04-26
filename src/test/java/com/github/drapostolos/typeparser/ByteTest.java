@@ -1,79 +1,61 @@
 package com.github.drapostolos.typeparser;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class ByteTest extends AbstractTest {
+public class ByteTest extends AbstractTypeTester<Byte> {
+
+    @Override
+    Byte make(String string) throws Exception {
+        return Byte.valueOf(string.trim());
+    }
 
     @Test
     public void canParseStringToByteType() throws Exception {
-        assertThat(parser.isTargetTypeParsable(Byte.class)).isTrue();
-        assertThat(parser.isTargetTypeParsable(byte.class)).isTrue();
-        assertThat(parser.parse("55", byte.class)).isEqualTo((byte) 55);
-        assertThat(parser.parse("\t55 ", Byte.class)).isEqualTo((byte) 55);
+        canParse("55").toType(byte.class);
+        canParse("\t55").toType(Byte.class);
     }
 
     @Test
-    public void shouldThrowExceptionWhenStringIsOutOfRangeFor_byteType() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Value out of range. Value:\"1234\" Radix:10.");
-        parser.parse("1234", byte.class);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenStringIsOutOfRangeForByteType() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Value out of range. Value:\"1234\" Radix:10.");
-        parser.parse("1234", Byte.class);
+    public void shouldThrowWhenStringIsOutOfRangeFor_byteType() throws Exception {
+        String errorMessage = "Value out of range. Value:\"1234\" Radix:10.";
+        shouldThrowWhenParsing("1234")
+                .toTypeWithErrorMessage(byte.class, errorMessage)
+                .toTypeWithErrorMessage(Byte.class, errorMessage);
     }
 
     @Test
     public void shouldThrowExceptionWhenStringIsNotAByte() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage(String.format(NUMBER_FORMAT_ERROR_MSG, "aaa"));
-        parser.parse("aaa", byte.class);
+        shouldThrowWhenParsing("aaa");
+        toTypeWithNumberFormatErrorMessage(byte.class);
+        toTypeWithNumberFormatErrorMessage(Byte.class);
     }
 
     @Test
     public void canParseToGenericByteArray() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Byte[]>() {})).isTrue();
-        assertThat(parser.parse("55, 45, 35", new GenericType<Byte[]>() {}))
-                .containsExactly((byte) 55, (byte) 45, (byte) 35);
+        canParse("55, 45, 35").toGenericArray(new GenericType<Byte[]>() {});
     }
 
     @Test
     public void canParseToByteArray() throws Exception {
-        assertThat(parser.isTargetTypeParsable(Byte[].class)).isTrue();
-        assertThat(parser.parse("55, 45, 35", Byte[].class))
-                .containsExactly((byte) 55, (byte) 45, (byte) 35);
+        canParse("55, 45, 35").toArray(Byte[].class);
     }
 
     @Test
     public void canParseToByteList() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<List<Byte>>() {})).isTrue();
-        assertThat(parser.parse("55, 45, 35", new GenericType<List<Byte>>() {}))
-                .containsExactly((byte) 55, (byte) 45, (byte) 35);
+        canParse("55, 45, 35").toList(new GenericType<List<Byte>>() {});
     }
 
     @Test
     public void canParseToByteSet() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Set<Byte>>() {})).isTrue();
-        assertThat(parser.parse("55, 45, 35", new GenericType<Set<Byte>>() {}))
-                .containsExactly((byte) 55, (byte) 45, (byte) 35);
+        canParse("55, 45, 55").toSet(new GenericType<Set<Byte>>() {});
     }
 
     @Test
     public void canParseToBooleanMap() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Map<Byte, Byte>>() {})).isTrue();
-        assertThat(parser.parse("55=56, 57=58", new GenericType<Map<Byte, Byte>>() {}))
-                .contains(MapEntry.entry((byte) 55, (byte) 56))
-                .contains(MapEntry.entry((byte) 57, (byte) 58))
-                .hasSize(2);
+        canParse("55=56, 57=58").toMap(new GenericType<Map<Byte, Byte>>() {});
     }
 }

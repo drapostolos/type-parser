@@ -1,76 +1,64 @@
 package com.github.drapostolos.typeparser;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class BooleanTest extends AbstractTest {
+public class BooleanTest extends AbstractTypeTester<Boolean> {
+
+    @Override
+    Boolean make(String string) throws Exception {
+        return Boolean.valueOf(string.trim());
+    }
 
     @Test
     public void canParseStringToTrue() throws Exception {
-        assertThat(parser.isTargetTypeParsable(Boolean.class)).isTrue();
-        assertThat(parser.isTargetTypeParsable(boolean.class)).isTrue();
-        assertThat(parser.parse("true", Boolean.class)).isEqualTo(Boolean.TRUE);
-        assertThat(parser.parse(" true\t", Boolean.class)).isEqualTo(Boolean.TRUE);
-        assertThat(parser.parse("true", boolean.class)).isEqualTo(true);
-        assertThat(parser.parse(" true\t", boolean.class)).isEqualTo(true);
+        canParse("true").toType(Boolean.class);
+        canParse("true").toType(boolean.class);
+        canParse(" true\t").toType(Boolean.class);
+        canParse(" true\t").toType(boolean.class);
     }
 
     @Test
     public void canParseStringToFalse() throws Exception {
-        assertThat(parser.parse("false", Boolean.class)).isEqualTo(Boolean.FALSE);
-        assertThat(parser.parse(" false ", Boolean.class)).isEqualTo(Boolean.FALSE);
-        assertThat(parser.parse("false", boolean.class)).isEqualTo(false);
-        assertThat(parser.parse(" false ", boolean.class)).isEqualTo(false);
+        canParse("false").toType(Boolean.class);
+        canParse("false").toType(boolean.class);
+        canParse(" false\t").toType(Boolean.class);
+        canParse(" false\t").toType(boolean.class);
     }
 
     @Test
     public void shouldThrowExceptionWhenNotParsableToBoolean() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("is not parsable to a Boolean");
-        parser.parse("1234", Boolean.class);
+        shouldThrowWhenParsing("1234");
+        toTypeWithErrorMessage(Boolean.class, "is not parsable to a Boolean");
+        toTypeWithErrorMessage(boolean.class, "is not parsable to a Boolean");
     }
 
     @Test
     public void canParseToGenericBooleanArray() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Boolean[]>() {})).isTrue();
-        assertThat(parser.parse("true, false, true", new GenericType<Boolean[]>() {}))
-                .containsExactly(true, false, true);
+        canParse("true, false, true").toGenericArray(new GenericType<Boolean[]>() {});
     }
 
     @Test
     public void canParseToBooleanArray() throws Exception {
-        assertThat(parser.isTargetTypeParsable(Boolean[].class)).isTrue();
-        assertThat(parser.parse("true, false, true", Boolean[].class))
-                .containsExactly(true, false, true);
+        canParse("true, false, true").toArray(Boolean[].class);
     }
 
     @Test
     public void canParseToBooleanList() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<List<Boolean>>() {})).isTrue();
-        assertThat(parser.parse("true, false, true", new GenericType<List<Boolean>>() {}))
-                .containsExactly(true, false, true);
+        canParse("true, false, true").toList(new GenericType<List<Boolean>>() {});
     }
 
     @Test
     public void canParseToBooleanSet() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Set<Boolean>>() {})).isTrue();
-        assertThat(parser.parse("true, false, true", new GenericType<Set<Boolean>>() {}))
-                .containsExactly(true, false);
+        canParse("true, false, true").toSet(new GenericType<Set<Boolean>>() {});
     }
 
     @Test
     public void canParseToBooleanMap() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Map<Boolean, Boolean>>() {})).isTrue();
-        assertThat(parser.parse("false=true, true=false", new GenericType<Map<Boolean, Boolean>>() {}))
-                .contains(MapEntry.entry(Boolean.FALSE, Boolean.TRUE))
-                .contains(MapEntry.entry(Boolean.TRUE, Boolean.FALSE))
-                .hasSize(2);
+        canParse("false=true, true=false").toMap(new GenericType<Map<Boolean, Boolean>>() {});
     }
 
 }

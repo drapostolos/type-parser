@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class ReflectionTest extends AbstractTest {
+public class ReflectionTest extends TestBase {
 
     @Test
     public void canParseTypeArgumentsAndCallMethodThroughReflection() throws Exception {

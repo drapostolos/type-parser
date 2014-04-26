@@ -1,57 +1,51 @@
 package com.github.drapostolos.typeparser;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class FileTest extends AbstractTest {
+public class FileTest extends AbstractTypeTester<File> {
+
+    @Override
+    File make(String string) throws Exception {
+        return new File(string.trim());
+    }
 
     @Test
     public void canParseStringToFile() throws Exception {
-        assertThat(parser.isTargetTypeParsable(File.class)).isTrue();
-        assertThat(parser.parse("/path/to", File.class)).isEqualTo(new File("/path/to"));
+        canParse("/path/to").toType(File.class);
     }
 
     @Test
     public void canParseToGenericFileArray() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<File[]>() {})).isTrue();
-        assertThat(parser.parse("/path/a, /path/b, /path/c", new GenericType<File[]>() {}))
-                .containsExactly(new File("/path/a"), new File("/path/b"), new File("/path/c"));
+        canParse("/path/a, /path/b, /path/c")
+                .toGenericArray(new GenericType<File[]>() {});
     }
 
     @Test
     public void canParseToFileArray() throws Exception {
-        assertThat(parser.isTargetTypeParsable(File[].class)).isTrue();
-        assertThat(parser.parse("/path/a, /path/b, /path/c", File[].class))
-                .containsOnly(new File("/path/a"), new File("/path/b"), new File("/path/c"));
+        canParse("/path/a, /path/b, /path/c")
+                .toArray(File[].class);
     }
 
     @Test
     public void canParseToFileList() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<List<File>>() {})).isTrue();
-        assertThat(parser.parse("/path/a, /path/b, /path/c", new GenericType<List<File>>() {}))
-                .containsExactly(new File("/path/a"), new File("/path/b"), new File("/path/c"));
+        canParse("/path/a, /path/b, /path/c")
+                .toList(new GenericType<List<File>>() {});
     }
 
     @Test
     public void canParseToFileSet() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Set<File>>() {})).isTrue();
-        assertThat(parser.parse("/path/a, /path/b, /path/a", new GenericType<Set<File>>() {}))
-                .containsExactly(new File("/path/a"), new File("/path/b"));
+        canParse("/path/a, /path/b, /path/b")
+                .toSet(new GenericType<Set<File>>() {});
     }
 
     @Test
     public void canParseToFileMap() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Map<File, File>>() {})).isTrue();
-        assertThat(parser.parse("/path/a=/path/A, /path/b=/path/B", new GenericType<Map<File, File>>() {}))
-                .contains(MapEntry.entry(new File("/path/a"), new File("/path/A")))
-                .contains(MapEntry.entry(new File("/path/b"), new File("/path/B")))
-                .hasSize(2);
+        canParse("/path/a=/path/A,/path/b=/path/B");
+        toMap(new GenericType<Map<File, File>>() {});
     }
 }

@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class MapTest extends AbstractTest {
+public class MapTest extends TestBase {
 
     @Test
     public void canParseStringToEmptyMap() throws Exception {

@@ -6,24 +6,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 
-public class ClassTest extends AbstractTest {
+public class ClassTest extends AbstractTypeTester<Class<?>> {
 
     Class<?> cls = ClassTest.class;
-    String stringToParse = String.format("%s,  %s", cls.getName(), cls.getName());
+    String stringToParse = String.format("%s, java.lang.Long, %s", cls.getName(), cls.getName());
+
+    @Override
+    Class<?> make(String string) throws Exception {
+        return Class.forName(string.trim());
+    }
 
     @Test
     public void canParseToGenericType() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Class<?>>() {}))
-                .isTrue();
-        assertThat(parser.isTargetTypeParsable(new GenericType<Class<Long>>() {}))
-                .isTrue();
-        assertThat(parser.parse(cls.getName(), new GenericType<Class<?>>() {}))
-                .hasSameClassAs(cls);
-        assertThat(parser.parse("java.lang.Long", new GenericType<Class<Long>>() {}))
-                .hasSameClassAs(Long.class);
+        canParse(cls.getName());
+        toGenericType(new GenericType<Class<?>>() {});
+    }
+
+    @Test
+    public void canParseToGenericLongType() throws Exception {
+        canParse("java.lang.Long");
+        toGenericType(new GenericType<Class<Long>>() {});
     }
 
     @Test
@@ -33,8 +37,7 @@ public class ClassTest extends AbstractTest {
     }
 
     @Test
-    public void
-            shouldThrowExceptionWhenStringIsNotParsableToClass() throws Exception {
+    public void shouldThrowWhenStringIsNotParsableToClass() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("\"com.unknow.Type\" is not parsable to a Class object.");
         parser.parse("com.unknow.Type", Class.class);
@@ -42,39 +45,29 @@ public class ClassTest extends AbstractTest {
 
     @Test
     public void canParseToGenericClassArray() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Class<?>[]>() {})).isTrue();
-        assertThat(parser.parse(stringToParse, new GenericType<Class<?>[]>() {}))
-                .containsExactly(cls, cls);
+        canParse(stringToParse).toGenericArray(new GenericType<Class<?>[]>() {});
     }
 
     @Test
     public void canParseToArray() throws Exception {
         assertThat(parser.isTargetTypeParsable(Class[].class)).isTrue();
         assertThat(parser.parse(stringToParse, Class[].class))
-                .containsOnly(cls, cls);
+                .containsOnly(cls, Long.class, cls);
     }
 
     @Test
     public void canParseToList() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<List<Class<?>>>() {})).isTrue();
-        assertThat(parser.parse(stringToParse, new GenericType<List<Class<?>>>() {}))
-                .containsExactly(cls, cls);
+        canParse(stringToParse).toList(new GenericType<List<Class<?>>>() {});
     }
 
     @Test
     public void canParseToSet() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Set<Class<?>>>() {})).isTrue();
-        assertThat(parser.parse(stringToParse, new GenericType<Set<Class<?>>>() {}))
-                .containsExactly(cls);
+        canParse(stringToParse).toSet(new GenericType<Set<Class<?>>>() {});
     }
 
     @Test
     public void canParseToMap() throws Exception {
-        assertThat(parser.isTargetTypeParsable(new GenericType<Map<Class<?>, Class<?>>>() {})).isTrue();
-        String str = String.format("%s=%s", cls.getName(), cls.getName());
-        assertThat(parser.parse(str, new GenericType<Map<Class<?>, Class<?>>>() {}))
-                .contains(MapEntry.entry(cls, cls))
-                .hasSize(1);
+        String str = String.format("%s=%s,java.lang.Long=java.lang.Short", cls.getName(), cls.getName());
+        canParse(str).toMap(new GenericType<Map<Class<?>, Class<?>>>() {});
     }
-
 }

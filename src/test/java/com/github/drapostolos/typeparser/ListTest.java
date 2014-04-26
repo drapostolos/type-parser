@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class ListTest extends AbstractTest {
+public class ListTest extends TestBase {
 
     @Test
     public void canRegisterListTypeParserThatOverridesDefaultArrayListTypeParser() throws Exception {

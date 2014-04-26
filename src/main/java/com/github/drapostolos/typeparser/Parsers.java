@@ -4,6 +4,11 @@ import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -108,6 +113,18 @@ final class Parsers {
                 throw new IllegalArgumentException(String.format(CHARACTER_ERROR_MESSAGE, value));
             }
         });
+        registerParser(BigInteger.class, new Parser<BigInteger>() {
+
+            @Override
+            public BigInteger parse(String value, ParserHelper helper) {
+                try {
+                    return new BigInteger(value.trim());
+                } catch (NumberFormatException e) {
+                    String message = String.format("For input string: \"%s\"", value.trim());
+                    throw new NumberFormatException(message);
+                }
+            }
+        });
         registerParser(BigDecimal.class, new Parser<BigDecimal>() {
 
             @Override
@@ -117,6 +134,32 @@ final class Parsers {
                 } catch (NumberFormatException e) {
                     String message = String.format("For input string: \"%s\"", value.trim());
                     throw new NumberFormatException(message);
+                }
+            }
+        });
+        registerParser(URL.class, new Parser<URL>() {
+
+            @Override
+            public URL parse(String value, ParserHelper helper) {
+                try {
+                    return new URL(value.trim());
+                } catch (MalformedURLException e) {
+                    String message = "Can not parse input string: \"%s\" "
+                            + "to an URL due to underlying exception.";
+                    throw new RuntimeException(String.format(message, value.trim()));
+                }
+            }
+        });
+        registerParser(URI.class, new Parser<URI>() {
+
+            @Override
+            public URI parse(String value, ParserHelper helper) {
+                try {
+                    return new URI(value.trim());
+                } catch (URISyntaxException e) {
+                    String message = "Can not parse input string: \"%s\" "
+                            + "to an URI due to underlying exception.";
+                    throw new RuntimeException(String.format(message, value.trim()));
                 }
             }
         });

@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-public class SetTest extends AbstractTest {
+public class SetTest extends TestBase {
 
     @Test
     public void canParseStringToEmptySet() throws Exception {

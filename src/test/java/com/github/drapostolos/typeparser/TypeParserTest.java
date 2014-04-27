@@ -4,6 +4,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
 
@@ -94,7 +96,7 @@ public class TypeParserTest extends TestBase {
     }
 
     @Test(expected = NoSuchRegisteredTypeParserException.class)
-    public void canUnregisterTypeParserForTypesAssignableToSets() throws Exception {
+    public void canUnregisterParserForTypesAssignableToSets() throws Exception {
         // given
         GenericType<Set<Integer>> type = new GenericType<Set<Integer>>() {};
         assertThat(parser.parse("1,2", type)).containsExactly(1, 2);
@@ -106,6 +108,21 @@ public class TypeParserTest extends TestBase {
 
         // then 
         parser.parse("1,2", type);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void canUnregisterGenericTypeParser() throws Exception {
+        // given
+        assertThat(parser.parse("java.lang.Long", new GenericType<Class<?>[]>() {}))
+                .containsExactly(Long.class);
+
+        // when
+        TypeParser parser = TypeParser.newBuilder()
+                .unregisterParser(new GenericType<Class<?>[]>() {})
+                .build();
+
+        // then 
+        parser.parse("java.lang.Long", new GenericType<Class<?>[]>() {});
     }
 
     @Test(expected = NoSuchRegisteredTypeParserException.class)
@@ -169,6 +186,41 @@ public class TypeParserTest extends TestBase {
                 .build();
 
         parser.parse("aaa", MyClass1.class);
+    }
+
+    @Test
+    public void canGetTargetClassFromHelperWithoutCasting() throws Exception {
+        parser = TypeParser.newBuilder()
+                .registerParser(MyClass1.class, new Parser<MyClass1>() {
+
+                    public MyClass1 parse(String input, ParserHelper helper) {
+                        Class<MyClass1> c = helper.getTargetClass();
+                        assertThat(c).hasSameClassAs(MyClass1.class);
+                        return null;
+                    }
+                })
+                .build();
+
+        parser.parse("aaa", MyClass1.class);
+    }
+
+    @Test
+    public void shouldThrowWhenParamerizedTypeCastedToClass() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("cannot be casted to java.lang.Class");
+        thrown.expectMessage("ParameterizedTypeImpl");
+        parser = TypeParser.newBuilder()
+                .registerParserForTypesAssignableTo(List.class, new Parser<MyClass1>() {
+
+                    @Override
+                    public MyClass1 parse(String input, ParserHelper helper) {
+                        helper.getTargetClass();
+                        return null;
+                    }
+                })
+                .build();
+
+        parser.parse("aaa", new GenericType<List<MyClass1>>() {});
     }
 
     @Test
@@ -260,6 +312,109 @@ public class TypeParserTest extends TestBase {
         // then
         parser.parse(DUMMY_STRING, String.class);
 
+    }
+
+    @Test
+    public void shouldThrowIllegalArgumentExceptionIfSplitStrategyThrows() throws Exception {
+        // given
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Exception thrown from SplitStrategy");
+        thrown.expectMessage("some-message");
+
+        // when
+        parser = TypeParser.newBuilder()
+                .setSplitStrategy(new SplitStrategy() {
+
+                    @Override
+                    public List<String> split(String input, SplitStrategyHelper helper) {
+                        throw new RuntimeException("some-message");
+                    }
+                })
+                .build();
+
+        // then
+        parser.parse(DUMMY_STRING, new GenericType<List<Integer>>() {});
+
+    }
+
+    @Test
+    public void canUseDefaultSplitStrategyFromCustomSplitStrategy() throws Exception {
+        // given
+        parser = TypeParser.newBuilder()
+                .setSplitStrategy(new SplitStrategy() {
+
+                    @Override
+                    public List<String> split(String input, SplitStrategyHelper helper) {
+                        return helper.splitWithDefaultSplitStrategy(input);
+                    }
+                })
+                .build();
+
+        // when
+        List<Integer> intList = parser.parse("1,2,3", new GenericType<List<Integer>>() {});
+
+        // then
+        assertThat(intList).containsExactly(1, 2, 3);
+
+    }
+
+    @Test
+    public void shouldThrowIllegalArgumentExceptionIfKeyValueSplitStrategyThrows() throws Exception {
+        // given
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Exception thrown from SplitStrategy");
+        thrown.expectMessage("some-message");
+
+        // when
+        parser = TypeParser.newBuilder()
+                .setKeyValueSplitStrategy(new SplitStrategy() {
+
+                    @Override
+                    public List<String> split(String input, SplitStrategyHelper helper) {
+                        throw new RuntimeException("some-message");
+                    }
+                })
+                .build();
+
+        // then
+        parser.parse("1=11,2=22", new GenericType<Map<Integer, Integer>>() {});
+
+    }
+
+    @Test
+    public void shouldReturnEmptyListAndSkipCustomSplitStrategyWhenInputStringIsNull() throws Exception {
+        // given
+        final CountDownLatch counter = new CountDownLatch(1);
+        parser = TypeParser.newBuilder()
+                .setSplitStrategy(new SplitStrategy() {
+
+                    @Override
+                    public List<String> split(String input, SplitStrategyHelper helper) {
+                        // Make sure this part of the code is never executed, since
+                        // input string will be null.
+                        counter.countDown();
+                        return Arrays.asList(input.split(","));
+                    }
+                })
+                .registerParserForTypesAssignableTo(List.class,
+                        new Parser<List<Integer>>() {
+
+                            @Override
+                            public List<Integer> parse(String input, ParserHelper helper) {
+                                /*
+                                 * assert helper.split(input) returns empty string without
+                                 * calling above registered SplitStrategy, since input is null.
+                                 */
+                                assertThat(helper.split(input)).isEmpty();
+                                return null;
+                            }
+                        })
+                .build();
+
+        // when
+        // This calls the above registered Parser
+        assertThat(counter.getCount()).isEqualTo(1);
+        parser.parse("null", new GenericType<List<String>>() {});
     }
 
 }

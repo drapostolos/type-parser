@@ -285,8 +285,7 @@ final class Parsers {
         return new Parser<ArrayList<T>>() {
 
             public ArrayList<T> parse(String input, ParserHelper helper) {
-                @SuppressWarnings("unchecked")
-                Class<T> targetType = (Class<T>) helper.getParameterizedTypeArguments().get(0);
+                Class<T> targetType = helper.getParameterizedClassArgumentByIndex(0);
                 ArrayList<T> list = new ArrayList<T>();
                 for (String value : helper.split(input)) {
                     list.add(helper.parse(value, targetType));
@@ -300,8 +299,7 @@ final class Parsers {
         return new Parser<Set<T>>() {
 
             public Set<T> parse(String input, ParserHelper helper) {
-                @SuppressWarnings("unchecked")
-                Class<T> targetType = (Class<T>) helper.getParameterizedTypeArguments().get(0);
+                Class<T> targetType = helper.getParameterizedClassArgumentByIndex(0);
                 Set<T> set = new LinkedHashSet<T>();
                 for (String value : helper.split(input)) {
                     set.add(helper.parse(value, targetType));
@@ -318,10 +316,8 @@ final class Parsers {
             private static final int VALUE = 1;
 
             public LinkedHashMap<K, V> parse(String input, ParserHelper helper) {
-                @SuppressWarnings("unchecked")
-                Class<K> keyType = (Class<K>) helper.getParameterizedTypeArguments().get(KEY);
-                @SuppressWarnings("unchecked")
-                Class<V> valueType = (Class<V>) helper.getParameterizedTypeArguments().get(VALUE);
+                Class<K> keyType = helper.getParameterizedClassArgumentByIndex(KEY);
+                Class<V> valueType = helper.getParameterizedClassArgumentByIndex(VALUE);
                 LinkedHashMap<K, V> map = newLinkedHashMap();
                 for (String entryString : helper.split(input)) {
                     List<String> entry = helper.splitKeyValue(entryString);

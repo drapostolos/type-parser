@@ -1,5 +1,8 @@
 package com.github.drapostolos.typeparser;
 
+import static com.github.drapostolos.typeparser.TypeParserUtility.defaultSplitStrategy;
+import static com.github.drapostolos.typeparser.TypeParserUtility.makeNullArgumentErrorMsg;
+
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -21,12 +24,18 @@ public final class SplitStrategyHelper {
     /**
      * Gives access to the default split strategy, which splits
      * the {@code input} String by using a comma (,).
+     * <p>
      * 
      * @param input String to split.
      * @return List of substrings of the input string
+     * @throws NullPointerException if {@code input} argument is null.
      */
     public List<String> splitWithDefaultSplitStrategy(String input) {
-        return TypeParserUtility.defaultSplitStrategy().split(input, IGNORED);
+        if (input == null) {
+            String message = makeNullArgumentErrorMsg("input");
+            throw new NullPointerException(message);
+        }
+        return defaultSplitStrategy().split(input, IGNORED);
     }
 
     /**

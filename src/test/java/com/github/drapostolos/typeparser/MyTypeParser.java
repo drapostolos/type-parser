@@ -7,7 +7,6 @@ public class MyTypeParser implements Parser<List<?>> {
 
     @Override
     public List<?> parse(String input, ParserHelper helper) {
-        // TODO Auto-generated method stub
         return new ArrayList<String>();
     }
 

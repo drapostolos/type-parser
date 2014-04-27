@@ -90,5 +90,4 @@ public class ListTest extends TestBase {
         // then
         assertThat(strList).containsExactly("aaa", "bbb");
     }
-
 }

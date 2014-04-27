@@ -6,7 +6,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 final class TypeParserUtility {
@@ -18,10 +17,6 @@ final class TypeParserUtility {
 
     private TypeParserUtility() {
         throw new AssertionError("Not meant for instantiation");
-    }
-
-    static <K, V> LinkedHashMap<K, V> newLinkedHashMap() {
-        return new LinkedHashMap<K, V>();
     }
 
     static InputPreprocessor defaultInputPreprocessor() {
@@ -87,17 +82,22 @@ final class TypeParserUtility {
      * @throws IllegalStateException if any of the parameterized type arguments is of a
      *         parameterized type (with exception of {@link Class}).
      */
-    static List<Class<?>> getParameterizedTypeArguments(Type targetType) {
+    static <T> List<Class<T>> getParameterizedTypeArguments(Type targetType) {
         if (!(targetType instanceof ParameterizedType)) {
             String message = "TargetType: '%s' [%s] must be a parameterized type.";
             throw new IllegalStateException(String.format(message, targetType, targetType.getClass()));
         }
 
         ParameterizedType pt = (ParameterizedType) targetType;
-        List<Class<?>> result = new ArrayList<Class<?>>();
+        List<Class<T>> result = new ArrayList<Class<T>>();
         for (Type typeArgument : pt.getActualTypeArguments()) {
             if (typeArgument instanceof Class) {
-                result.add((Class<?>) typeArgument);
+                /*
+                 * This cast is correct since we check typeArgument is instance of Class
+                 */
+                @SuppressWarnings("unchecked")
+                Class<T> cls = (Class<T>) typeArgument;
+                result.add(cls);
                 continue;
             }
             if (typeArgument instanceof ParameterizedType) {
@@ -105,8 +105,10 @@ final class TypeParserUtility {
                 if (rawType instanceof Class) {
                     /*
                      * Special case to handle Class<?>
+                     * This cast is correct since we check rawType is instance of Class
                      */
-                    Class<?> cls = (Class<?>) rawType;
+                    @SuppressWarnings("unchecked")
+                    Class<T> cls = (Class<T>) rawType;
                     result.add(cls);
                     continue;
                 }

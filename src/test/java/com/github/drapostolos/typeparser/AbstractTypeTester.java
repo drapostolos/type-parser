@@ -83,7 +83,6 @@ public abstract class AbstractTypeTester<T> extends TestBase {
     }
 
     final public void toGenericArray(GenericType<T[]> type) throws Exception {
-        System.out.println("p: " + stringToParse);
         assertThat(parser.isTargetTypeParsable(type)).isTrue();
         assertThat(parser.parse(stringToParse, type)).containsExactly(allElements());
     }

@@ -25,7 +25,7 @@ public interface InputPreprocessor {
      * Any exceptions thrown by this method will be caught in the {@link TypeParser} and re-thrown
      * converted to a {@link IllegalArgumentException}.
      * 
-     * @param input String to prepare for parsing.
+     * @param input String to prepare for parsing. The initial value will never be null.
      * @param helper Helper class injected automatically by the {@link TypeParser}.
      * @return a prepared string to be parsed
      */

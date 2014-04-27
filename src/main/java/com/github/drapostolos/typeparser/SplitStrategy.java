@@ -11,10 +11,12 @@ import java.util.List;
 public interface SplitStrategy {
 
     /**
-     * Splits {@code input} string and returns a list of substrings. If {@code input} is null an
-     * empty list must be returned.
+     * Splits {@code input} string and returns a list of substrings.
+     * <p/>
+     * Any exceptions thrown by this method will be caught in the {@link TypeParser} and re-thrown
+     * converted to a {@link IllegalStateException}.
      * 
-     * @param input String to split.
+     * @param input String to split. The initial value will never be null.
      * @param helper Helper class injected automatically by the {@link TypeParser}.
      * @return A list of string computed by splitting the {@code input} string using this
      *         {@link SplitStrategy}.

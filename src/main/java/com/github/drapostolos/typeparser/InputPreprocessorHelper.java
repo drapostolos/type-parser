@@ -1,5 +1,8 @@
 package com.github.drapostolos.typeparser;
 
+import static com.github.drapostolos.typeparser.TypeParserUtility.defaultInputPreprocessor;
+import static com.github.drapostolos.typeparser.TypeParserUtility.makeNullArgumentErrorMsg;
+
 import java.lang.reflect.Type;
 
 /**
@@ -30,9 +33,13 @@ public final class InputPreprocessorHelper {
      * 
      * @param input String to prepare for parsing
      * @return pre-processed String to be parsed.
+     * @throws NullPointerException if input argument ins null.
      */
     public String prepareWithDefaultInputPreprocessor(String input) {
-        return TypeParserUtility.defaultInputPreprocessor().prepare(input, this);
+        if (input == null) {
+            throw new NullPointerException(makeNullArgumentErrorMsg("input"));
+        }
+        return defaultInputPreprocessor().prepare(input, this);
     }
 
 }

@@ -8,12 +8,50 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class NullParameterCheckTest extends TestBase {
+public class ParameterCheckTest extends TestBase {
 
     private TypeParserBuilder builder = TypeParser.newBuilder();
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
+
+    @Test
+    public void shouldThrowWhenCallingPrepareWithDefaultInputPreprocessorWithNull() throws Exception {
+        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("input");
+        new InputPreprocessorHelper(null).prepareWithDefaultInputPreprocessor(null);
+    }
+
+    @Test
+    public void shouldThrowWhenDefaultSplitStrategyIsCalledWithNull() throws Exception {
+        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("input");
+        new SplitStrategyHelper(null).splitWithDefaultSplitStrategy(null);
+    }
+
+    @Test
+    public void shouldThrowWhenDefaultKeyValueSplitStrategyIsCalledWithNull() throws Exception {
+        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("keyValue");
+        TypeParser typeParser = TypeParser.newBuilder().build();
+        new ParserHelper(typeParser, null).splitKeyValue(null);
+    }
+
+    @Test
+    public void shouldThrowWhenRetrievingParameterizedClassArgumentsByNegativeIndex() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Argument named 'index' is illegally "
+                + "set to negative value: -1. Must be positive.");
+        TypeParser typeParser = TypeParser.newBuilder().build();
+        new ParserHelper(typeParser, null).getParameterizedClassArgumentByIndex(-1);
+    }
+
+    @Test
+    public void shouldThrowWhenRetrievingParameterizedClassArgumentsByTooHighIndex() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Argument named 'index' is illegally "
+                + "set to value: 1. List size is: 1.");
+        TypeParser typeParser = TypeParser.newBuilder().build();
+        Type type = new GenericType<List<Integer>>() {}.getType();
+        new ParserHelper(typeParser, type).getParameterizedClassArgumentByIndex(1);
+    }
 
     @Test
     public void shouldThrowWhenRegisteringTypeParser_Null_TypeParser() throws Exception {

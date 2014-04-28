@@ -13,6 +13,11 @@ public interface SplitStrategy {
     /**
      * Splits {@code input} string and returns a list of substrings.
      * <p/>
+     * Type-Parser library will internally call this method with a non-null {@code input} value. If
+     * {@code input} is null (as returned from
+     * {@link InputPreprocessor#prepare(String, InputPreprocessorHelper)}) the {@link SplitStrategy}
+     * will be skipped and an empty {@link List} will be used.
+     * <p/>
      * Any exceptions thrown by this method will be caught in the {@link TypeParser} and re-thrown
      * converted to a {@link IllegalStateException}.
      * 

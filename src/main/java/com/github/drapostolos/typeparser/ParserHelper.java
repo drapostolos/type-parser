@@ -127,7 +127,7 @@ public final class ParserHelper {
      * returns a list with the type arguments.
      * <p/>
      * All type arguments must be none parameterized types (i.e. nested parameterized types are not
-     * allowed), with one exception: {@link Class<?>}. <br/>
+     * allowed), with one exception: {@link Class}. <br/>
      * 
      * @return List of {@link Class} types.
      * @throws IllegalStateException if the {@code targetType} is not a parameterized type.

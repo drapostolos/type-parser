@@ -1,6 +1,6 @@
 package com.github.drapostolos.typeparser;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.fest.assertions.data.MapEntry;
+import org.assertj.core.data.MapEntry;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
@@ -79,7 +79,7 @@ public abstract class AbstractTypeTester<T> extends TestBase {
     final public void toGenericType(GenericType<?> type) throws Exception {
         assertThat(parser.isTargetTypeParsable(type)).isTrue();
         assertThat(parser.parse(stringToParse, type))
-                .hasSameClassAs(make(element(0)));
+                .isSameAs(make(element(0)));
     }
 
     final public void toGenericArray(GenericType<T[]> type) throws Exception {

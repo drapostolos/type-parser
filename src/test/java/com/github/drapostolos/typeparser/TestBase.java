@@ -1,5 +1,7 @@
 package com.github.drapostolos.typeparser;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
@@ -11,5 +13,9 @@ public abstract class TestBase {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
+
+    void f() {
+        assertThat("");
+    }
 
 }

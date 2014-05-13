@@ -1,6 +1,6 @@
 package com.github.drapostolos.typeparser;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.lang.reflect.Type;
@@ -195,7 +195,7 @@ public class TypeParserTest extends TestBase {
 
                     public MyClass1 parse(String input, ParserHelper helper) {
                         Class<MyClass1> c = helper.getTargetClass();
-                        assertThat(c).hasSameClassAs(MyClass1.class);
+                        assertThat(c).isSameAs(MyClass1.class);
                         return null;
                     }
                 })

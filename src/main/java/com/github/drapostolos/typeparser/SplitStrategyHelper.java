@@ -12,13 +12,12 @@ import java.util.List;
  * 
  * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>
  */
-public final class SplitStrategyHelper {
+public final class SplitStrategyHelper extends Helper {
 
     private static final SplitStrategyHelper IGNORED = null;
-    private final Type targetType;
 
     SplitStrategyHelper(Type targetType) {
-        this.targetType = targetType;
+        super(targetType);
     }
 
     /**
@@ -38,10 +37,4 @@ public final class SplitStrategyHelper {
         return defaultSplitStrategy().split(input, IGNORED);
     }
 
-    /**
-     * @return the Type to parse to. Example: Integer.class.
-     */
-    public Type getTargetType() {
-        return targetType;
-    }
 }

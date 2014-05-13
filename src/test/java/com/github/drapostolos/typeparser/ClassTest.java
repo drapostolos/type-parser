@@ -1,6 +1,6 @@
 package com.github.drapostolos.typeparser;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class ClassTest extends AbstractTypeTester<Class<?>> {
     @Test
     public void canParseToClass() throws Exception {
         assertThat(parser.isTargetTypeParsable(Class.class)).isTrue();
-        assertThat(parser.parse(cls.getName(), Class.class)).hasSameClassAs(cls);
+        assertThat(parser.parse(cls.getName(), Class.class)).isSameAs(cls);
     }
 
     @Test

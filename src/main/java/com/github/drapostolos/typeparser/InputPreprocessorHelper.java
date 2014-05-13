@@ -11,21 +11,10 @@ import java.lang.reflect.Type;
  * 
  * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>
  */
-public final class InputPreprocessorHelper {
-
-    private final Type targetType;
+public final class InputPreprocessorHelper extends Helper {
 
     InputPreprocessorHelper(Type targetType) {
-        this.targetType = targetType;
-    }
-
-    /**
-     * Returns the type to parse the input string to.
-     * 
-     * @return the {@link Type} to parse to.
-     */
-    public Type getTargetType() {
-        return targetType;
+        super(targetType);
     }
 
     /**
@@ -33,7 +22,7 @@ public final class InputPreprocessorHelper {
      * 
      * @param input String to prepare for parsing
      * @return pre-processed String to be parsed.
-     * @throws NullPointerException if input argument ins null.
+     * @throws NullPointerException if {@code input} is null.
      */
     public String prepareWithDefaultInputPreprocessor(String input) {
         if (input == null) {

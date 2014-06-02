@@ -15,8 +15,10 @@ public class FloatTest extends AbstractTypeTester<Float> {
 
     @Test
     public void shouldThrowWhenStringIsNotParsableToFloat() throws Exception {
-        shouldThrowWhenParsing("aa");
-        toTypeWithErrorMessage(Float.class, String.format(NUMBER_FORMAT_ERROR_MSG, "aa"));
+        shouldThrowParseException()
+                .withNumberFormatErrorMessage()
+                .whenParsing("aa")
+                .to(Float.class, float.class);
     }
 
     @Test
@@ -41,17 +43,17 @@ public class FloatTest extends AbstractTypeTester<Float> {
 
     @Test
     public void canParseToFloatList() throws Exception {
-        canParse("1d, .1f, 23f").toList(new GenericType<List<Float>>() {});
+        canParse("1d, .1f, 23f").toArrayList(new GenericType<List<Float>>() {});
     }
 
     @Test
     public void canParseToFloatSet() throws Exception {
-        canParse("1d, .1f, 1d").toSet(new GenericType<Set<Float>>() {});
+        canParse("1d, .1f, 1d").toLinkedHashSet(new GenericType<Set<Float>>() {});
     }
 
     @Test
     public void canParseToFloatMap() throws Exception {
-        canParse("1=11, 2=22").toMap(new GenericType<Map<Float, Float>>() {});
+        canParse("1=11, 2=22").toLinkedHashMap(new GenericType<Map<Float, Float>>() {});
     }
 
 }

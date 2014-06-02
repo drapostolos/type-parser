@@ -21,9 +21,10 @@ public class EnumTest extends AbstractTypeTester<MyEnum> {
 
     @Test
     public void shouldThrowWhenStringIsNotParsableToEnum() throws Exception {
-        shouldThrowWhenParsing("DDD");
-        toTypeWithErrorMessage(MyEnum.class,
-                "EnumTest$MyEnum.valueOf('DDD')'. See underlying exception for additional information.");
+        shouldThrowParseException()
+                .withErrorMessage("EnumTest$MyEnum.valueOf(java.lang.String)")
+                .whenParsing("DDD")
+                .to(MyEnum.class);
     }
 
     @Test
@@ -45,17 +46,17 @@ public class EnumTest extends AbstractTypeTester<MyEnum> {
 
     @Test
     public void canParseToMyEnumList() throws Exception {
-        canParse("AAA, BBB, CCC").toList(new GenericType<List<MyEnum>>() {});
+        canParse("AAA, BBB, CCC").toArrayList(new GenericType<List<MyEnum>>() {});
     }
 
     @Test
     public void canParseToMyEnumSet() throws Exception {
-        canParse("AAA, BBB, AAA").toSet(new GenericType<Set<MyEnum>>() {});
+        canParse("AAA, BBB, AAA").toLinkedHashSet(new GenericType<Set<MyEnum>>() {});
     }
 
     @Test
     public void canParseToMyEnumMap() throws Exception {
-        canParse("AAA=BBB, BBB=CCC").toMap(new GenericType<Map<MyEnum, MyEnum>>() {});
+        canParse("AAA=BBB, BBB=CCC").toLinkedHashMap(new GenericType<Map<MyEnum, MyEnum>>() {});
     }
 
 }

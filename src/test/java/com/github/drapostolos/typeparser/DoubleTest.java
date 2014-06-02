@@ -15,9 +15,10 @@ public class DoubleTest extends AbstractTypeTester<Double> {
 
     @Test
     public void shouldThrowWhenStringIsNotParsableToDouble() throws Exception {
-        shouldThrowWhenParsing("aa")
-                .toTypeWithNumberFormatErrorMessage(Double.class)
-                .toTypeWithNumberFormatErrorMessage(double.class);
+        shouldThrowParseException()
+                .withNumberFormatErrorMessage()
+                .whenParsing("aa")
+                .to(Double.class, double.class);
     }
 
     @Test
@@ -41,16 +42,16 @@ public class DoubleTest extends AbstractTypeTester<Double> {
 
     @Test
     public void canParseToDoubleList() throws Exception {
-        canParse("1, 1.2, .1").toList(new GenericType<List<Double>>() {});
+        canParse("1, 1.2, .1").toArrayList(new GenericType<List<Double>>() {});
     }
 
     @Test
     public void canParseToDoubleSet() throws Exception {
-        canParse("1, 1.2, 1").toSet(new GenericType<Set<Double>>() {});
+        canParse("1, 1.2, 1").toLinkedHashSet(new GenericType<Set<Double>>() {});
     }
 
     @Test
     public void canParseToDoubleMap() throws Exception {
-        canParse("1=.1, 2=.2").toMap(new GenericType<Map<Double, Double>>() {});
+        canParse("1=.1, 2=.2").toLinkedHashMap(new GenericType<Map<Double, Double>>() {});
     }
 }

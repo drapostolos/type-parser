@@ -15,12 +15,16 @@ public class ListTest extends TestBase {
     public void canRegisterListTypeParserThatOverridesDefaultArrayListTypeParser() throws Exception {
         // GIVEN
         TypeParser parser = TypeParser.newBuilder()
-                .registerParserForTypesAssignableTo(List.class, new Parser<List<String>>() {
+                .registerDynamicParser(new DynamicParser() {
 
                     @Override
-                    public List<String> parse(String input, ParserHelper helper) {
-                        return Arrays.asList("my-string");
+                    public Object parse(String input, ParserHelper helper) {
+                        if (!helper.isTargetTypeAssignableTo(List.class)) {
+                            return TRY_NEXT;
+                        }
+                        return new ArrayList<String>(Arrays.asList("my-string"));
                     }
+
                 })
                 .build();
 
@@ -28,7 +32,9 @@ public class ListTest extends TestBase {
         List<String> s = parser.parse("something", new GenericType<List<String>>() {});
 
         // THEN
-        assertThat(s).containsExactly("my-string");
+        assertThat(s)
+                .hasSameClassAs(new ArrayList<String>())
+                .containsExactly("my-string");
     }
 
     @Test
@@ -50,13 +56,6 @@ public class ListTest extends TestBase {
     }
 
     @Test
-    public void canParseStringToIterable() throws Exception {
-        GenericType<Iterable<Integer>> type = new GenericType<Iterable<Integer>>() {};
-        Iterable<Integer> collection = parser.parse("1,2,3", type);
-        assertThat(collection).containsExactly(1, 2, 3);
-    }
-
-    @Test
     public void canParseStringToCollection() throws Exception {
         GenericType<Collection<Integer>> type = new GenericType<Collection<Integer>>() {};
         Collection<Integer> collection = parser.parse("1,2,3", type);
@@ -65,10 +64,10 @@ public class ListTest extends TestBase {
 
     @Test
     public void shouldThrowExceptionWhenParsingListOfWildcardType() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Can not parse \"dummy-string\" to type");
-        thrown.expectMessage("contains the following illegal type argument: '?' ");
-        parser.parse(DUMMY_STRING, new GenericType<List<?>>() {});
+        shouldThrowParseException()
+                .withErrorMessage("contains illegal type argument: '?' ")
+                .whenParsing(DUMMY_STRING)
+                .to(new GenericType<List<?>>() {});
     }
 
     @Test

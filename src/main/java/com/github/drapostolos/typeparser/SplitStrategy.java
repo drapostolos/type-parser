@@ -6,7 +6,8 @@ import java.util.List;
  * Interface for allowing clients to register their own split strategies.
  * Any implementation of this interface is expected to be immutable.
  * 
- * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
+ *      target="_blank">User-Guide</a>
  */
 public interface SplitStrategy {
 
@@ -16,15 +17,19 @@ public interface SplitStrategy {
      * Type-Parser library will internally call this method with a non-null {@code input} value. If
      * {@code input} is null (as returned from
      * {@link InputPreprocessor#prepare(String, InputPreprocessorHelper)}) the {@link SplitStrategy}
-     * will be skipped and an empty {@link List} will be used.
+     * will not be called, instead and an empty {@link List} will be returned.
      * <p/>
      * Any exceptions thrown by this method will be caught in the {@link TypeParser} and re-thrown
-     * converted to a {@link IllegalStateException}.
+     * converted to either {@link SplitStrategyException} or {@link KeyValueSplitStrategyException}.
      * 
      * @param input String to split. The initial value will never be null.
      * @param helper Helper class injected automatically by the {@link TypeParser}.
      * @return A list of string computed by splitting the {@code input} string using this
      *         {@link SplitStrategy}.
+     * @throws SplitStrategyException
+     * @throws KeyValueSplitStrategyException
+     * @see ParserHelper#split(String)
+     * @see ParserHelper#splitKeyValue(String)
      */
     List<String> split(String input, SplitStrategyHelper helper);
 

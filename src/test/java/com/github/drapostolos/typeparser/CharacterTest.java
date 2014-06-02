@@ -21,10 +21,10 @@ public class CharacterTest extends AbstractTypeTester<Character> {
 
     @Test
     public void shouldThrowExceptionWhenStringHasMoreThanOneCharacter() throws Exception {
-        String errorMessage = String.format("\"%s\" must only contain a single character.", "aa");
-        shouldThrowWhenParsing("aa");
-        toTypeWithErrorMessage(Character.class, errorMessage);
-        toTypeWithErrorMessage(char.class, errorMessage);
+        shouldThrowParseException()
+                .withErrorMessage("\"%s\" must only contain a single character.", "aa")
+                .whenParsing("aa")
+                .to(Character.class, char.class);
     }
 
     @Test
@@ -39,17 +39,17 @@ public class CharacterTest extends AbstractTypeTester<Character> {
 
     @Test
     public void canParseToCharacterList() throws Exception {
-        canParse("a,b,c").toList(new GenericType<List<Character>>() {});
+        canParse("a,b,c").toArrayList(new GenericType<List<Character>>() {});
     }
 
     @Test
     public void canParseToCharacterSet() throws Exception {
-        canParse("a,b,a").toSet(new GenericType<Set<Character>>() {});
+        canParse("a,b,a").toLinkedHashSet(new GenericType<Set<Character>>() {});
     }
 
     @Test
     public void canParseToCharacterMap() throws Exception {
-        canParse("a=A,b=B").toMap(new GenericType<Map<Character, Character>>() {});
+        canParse("a=A,b=B").toLinkedHashMap(new GenericType<Map<Character, Character>>() {});
     }
 
 }

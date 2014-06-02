@@ -1,7 +1,6 @@
 package com.github.drapostolos.typeparser;
 
-import static com.github.drapostolos.typeparser.TypeParserUtility.makeNullArgumentErrorMsg;
-import static com.github.drapostolos.typeparser.TypeParserUtility.makeParseErrorMsg;
+import static com.github.drapostolos.typeparser.Util.makeNullArgumentErrorMsg;
 
 import java.lang.reflect.Type;
 
@@ -11,7 +10,8 @@ import java.lang.reflect.Type;
  * For example converting "1" to an {@code Integer} type, or "1,2,3" to a {@code List<Integer>}
  * type.
  * 
- * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
+ *      target="_blank">User-Guide</a>
  */
 public final class TypeParser {
 
@@ -48,17 +48,15 @@ public final class TypeParser {
      * @param input - string value to parse
      * @param targetType - the expected type to convert {@code input} to.
      * @return an instance of {@code targetType} corresponding to the given {@code input}.
-     * @throws NullPointerException if {@code targetType} argument is {@code null}.
-     * @throws NullPointerException if {@code input} argument is {@code null}.
-     * @throws NoSuchRegisteredTypeParserException if there is no registered {@link Parser}
-     *         associated with the given {@code targetType}, or if {@code targetType} does not
-     *         contain a static factory method with signature {@code valueOf(String)}.
-     * @throws IllegalArgumentException if the {@link Parser} associated with the
+     * @throws NullPointerException if any given argument is {@code null}.
+     * @throws ParseException if the {@link Parser} associated with the
      *         given {@code targetType} throws exception while parsing the given {@code input}.
-     * @throws IllegalArgumentException if the {@link InputPreprocessor} throws exception
-     *         while preparing the given {@code input} for parsing.
-     * @throws IllegalArgumentException if the {@link InputPreprocessor} decides to return
-     *         a null object while {@code targetType} is of a primitive type.
+     * @throws InputPreprocessorException if the registered {@link InputPreprocessor} throws
+     *         exception while preparing the given {@code input} for parsing.
+     * @throws IllegalPrimitiveValueException if the registered {@link InputPreprocessor} decides to
+     *         return a null object while {@code targetType} is of a primitive type.
+     * @throws NoSuchRegisteredParserException if there is no registered {@link Parser} for the
+     *         given {@code targetType}.
      */
     public <T> T parse(String input, Class<T> targetType) {
         if (input == null) {
@@ -87,14 +85,15 @@ public final class TypeParser {
      * @param input - string value to parse.
      * @param genericType - the expected generic type to convert {@code input} to.
      * @return an instance of {@code genericType} corresponding to the given {@code input}.
-     * @throws NullPointerException if {@code genericType} argument is {@code null}.
-     * @throws NullPointerException if {@code input} argument is {@code null}.
-     * @throws NoSuchRegisteredTypeParserException if there is no registered {@link Parser}
-     *         associated with the given {@code genericType}.
-     * @throws IllegalArgumentException if the {@link Parser} associated with the
-     *         given {@code genericType} throws exception while parsing the given {@code input}.
-     * @throws IllegalArgumentException if the {@link InputPreprocessor} throws exception
-     *         while preparing the given {@code input} for parsing.
+     * @throws NullPointerException if any given argument is {@code null}.
+     * @throws ParseException if the {@link Parser} associated with the
+     *         given {@code targetType} throws exception while parsing the given {@code input}.
+     * @throws InputPreprocessorException if the registered {@link InputPreprocessor} throws
+     *         exception while preparing the given {@code input} for parsing.
+     * @throws IllegalPrimitiveValueException if the registered {@link InputPreprocessor} decides to
+     *         return a null object while {@code targetType} is of a primitive type.
+     * @throws NoSuchRegisteredParserException if there is no registered {@link Parser} for the
+     *         given {@code targetType}.
      */
     public <T> T parse(String input, GenericType<T> genericType) {
         if (input == null) {
@@ -116,17 +115,15 @@ public final class TypeParser {
      * @param input - string value to parse.
      * @param targetType - the expected type to convert {@code input} to.
      * @return an instance of {@code targetType} corresponding to the given {@code input}.
-     * @throws NullPointerException if {@code targetType} argument is {@code null}.
-     * @throws NullPointerException if {@code input} argument is {@code null}.
-     * @throws NoSuchRegisteredTypeParserException if there is no registered {@link Parser}
-     *         associated with the given {@code targetType}, or if {@code targetType} does not
-     *         contain a static factory method with signature {@code valueOf(String)}.
-     * @throws IllegalArgumentException if the {@link Parser} associated with the
+     * @throws NullPointerException if any given argument is {@code null}.
+     * @throws ParseException if the {@link Parser} associated with the
      *         given {@code targetType} throws exception while parsing the given {@code input}.
-     * @throws IllegalArgumentException if the {@link InputPreprocessor} throws exception
-     *         while preparing the given {@code input} for parsing.
-     * @throws IllegalArgumentException if the {@link InputPreprocessor} decides to return
-     *         a null object while {@code targetType} is of a primitive type.
+     * @throws InputPreprocessorException if the registered {@link InputPreprocessor} throws
+     *         exception while preparing the given {@code input} for parsing.
+     * @throws IllegalPrimitiveValueException if the registered {@link InputPreprocessor} decides to
+     *         return a null object while {@code targetType} is of a primitive type.
+     * @throws NoSuchRegisteredParserException if there is no registered {@link Parser} for the
+     *         given {@code targetType}.
      */
     public Object parseType(String input, Type targetType) {
         if (input == null) {
@@ -140,53 +137,32 @@ public final class TypeParser {
 
     }
 
-    /**
-     * Checks if the given {@code genericType} corresponds to a registered {@link Parser}.
-     * Returns true if it does, otherwise false.
-     * 
-     * @param genericType - Generic Type known at compile time.
-     * @return true if {@code genericType} corresponds to a {@link Parser},
-     *         otherwise false.
-     */
-    public boolean isTargetTypeParsable(GenericType<?> genericType) {
-        return isTargetTypeParsable(genericType.getType());
-    }
+    private Object parseType2(final String input, final Type targetType) {
+        String preprocessedInput = null;
+        try {
+            preprocessedInput = preProcessInputString(input, targetType);
+            throwIfNullAndPrimitive(preprocessedInput, targetType, input);
 
-    /**
-     * Checks if the given {@code targetType} corresponds to a registered {@link Parser}.
-     * Returns true if it does, otherwise false.
-     * 
-     * @param targetType - the {@link Type} to check. Example Integer.class.
-     * @return true if {@code genericType} corresponds to a {@link Parser},
-     *         otherwise false.
-     */
-    public boolean isTargetTypeParsable(Type targetType) {
-        TargetTypeChecker isTargetTypeParsable = new TargetTypeChecker(this, targetType);
-        return isTargetTypeParsable.execute();
-    }
-
-    private Object parseType2(final String input, Type targetType) {
-        String preprocessedInput = preProcessInputString(input, targetType);
-        if (preprocessedInput == null) {
-            if (isPrimitive(targetType)) {
-                String message = "'%s' primitive can not be set to null. Input: \"%s\"; Preprocessed input: \"%s\"";
-                throw new IllegalArgumentException(String.format(message, targetType, input, preprocessedInput));
-            }
+            ParserInvoker invoker = new ParserInvoker(this, targetType, preprocessedInput);
+            return invoker.invoke();
+        } catch (TypeParserException e) {
+            throw e.withPrependedErrorMessage(input, preprocessedInput, targetType);
         }
-        ParserInvoker invoker = new ParserInvoker(this, targetType, preprocessedInput);
-        return invoker.execute();
     }
 
     private String preProcessInputString(String input, Type targetType) {
         try {
             return inputPreprocessor.prepare(input, new InputPreprocessorHelper(targetType));
-        } catch (Exception e) {
-            String message = "Exception thrown from InputPreprocessor: %s [%s] with message:  "
-                    + "%s. See underlying exception for more information.";
-            message = String.format(message,
-                    inputPreprocessor, inputPreprocessor.getClass(), e.getMessage());
-            message = makeParseErrorMsg(input, targetType, message);
-            throw new IllegalArgumentException(message, e);
+        } catch (Throwable t) {
+            throw new InputPreprocessorException(inputPreprocessor, t);
+        }
+    }
+
+    private void throwIfNullAndPrimitive(String preprocessedInput, Type targetType, String input) {
+        if (preprocessedInput == null) {
+            if (isPrimitive(targetType)) {
+                throw new IllegalPrimitiveValueException("Primitive can not be set to null");
+            }
         }
     }
 

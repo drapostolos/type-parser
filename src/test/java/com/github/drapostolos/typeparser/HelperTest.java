@@ -2,6 +2,7 @@ package com.github.drapostolos.typeparser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URL;
@@ -12,6 +13,45 @@ import java.util.Set;
 import org.junit.Test;
 
 public class HelperTest extends TestBase {
+
+    @Test
+    public void canDecideIfRawTargetClassIsWithinAListOfRawTargetClassesWhenItIs() throws Exception {
+        // given
+        Class<?> type = Integer.class;
+        Helper helper = new Helper(type) {};
+
+        // when
+        assertThat(helper.isRawTargetClassAnyOf(Integer.class, String.class)).isTrue();
+    }
+
+    @Test
+    public void canDecideIfRawTargetClassIsWithinAListOfRawTargetClassesWhenItIsNot() throws Exception {
+        // given
+        Class<?> type = Integer.class;
+        Helper helper = new Helper(type) {};
+
+        // when
+        assertThat(helper.isRawTargetClassAnyOf(File.class, String.class)).isFalse();
+    }
+
+    @Test
+    public void toStringPrintsSameAsTypeToString() throws Exception {
+        // given
+        final GenericType<?> genType = new GenericType<String>() {};
+
+        parser = TypeParser.newBuilder()
+                .setInputPreprocessor(new InputPreprocessor() {
+
+                    @Override
+                    public String prepare(String input, InputPreprocessorHelper helper) {
+                        helper.toString().equals(genType.toString());
+                        return null;
+                    }
+                })
+                .build();
+
+        parser.parse(DUMMY_STRING, genType);
+    }
 
     @Test
     public void canDecideTargetTypeIsInstanceOfMapWhenTargetTypeIsMap() throws Exception {

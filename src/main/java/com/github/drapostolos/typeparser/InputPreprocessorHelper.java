@@ -1,7 +1,7 @@
 package com.github.drapostolos.typeparser;
 
-import static com.github.drapostolos.typeparser.TypeParserUtility.defaultInputPreprocessor;
-import static com.github.drapostolos.typeparser.TypeParserUtility.makeNullArgumentErrorMsg;
+import static com.github.drapostolos.typeparser.Util.defaultInputPreprocessor;
+import static com.github.drapostolos.typeparser.Util.makeNullArgumentErrorMsg;
 
 import java.lang.reflect.Type;
 
@@ -9,7 +9,8 @@ import java.lang.reflect.Type;
  * Helper class providing helper methods to implementations of {@link InputPreprocessor} when
  * preparing an input string for parsing.
  * 
- * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
+ *      target="_blank">User-Guide</a>
  */
 public final class InputPreprocessorHelper extends Helper {
 

@@ -1,82 +1,51 @@
 package com.github.drapostolos.typeparser;
 
-import static com.github.drapostolos.typeparser.TypeParserUtility.makeParseErrorMsg;
-
 import java.lang.reflect.Type;
 
-class ParserInvoker extends ParseTemplate<Object> {
+final class ParserInvoker {
 
-    private final TypeParser parser;
     private final String preprocessedInput;
+    private final Parsers parsers;
+    private final ParserHelper helper;
+    private final Type targetType;
 
-    public ParserInvoker(TypeParser parser, Type targetType, String preprocessedInput) {
-        super(parser.parsers, targetType);
+    ParserInvoker(TypeParser typeParser, Type targetType, String preprocessedInput) {
+        this.targetType = targetType;
         this.preprocessedInput = preprocessedInput;
-        this.parser = parser;
+        this.parsers = typeParser.parsers;
+        this.helper = new ParserHelper(typeParser, targetType);
     }
 
-    @Override
-    Object actionWhenTargetTypeHasNormalTypeParser() {
-        if (preprocessedInput == null) {
-            return null;
+    Object invoke() {
+        if (parsers.containsStaticParser(targetType)) {
+            if (preprocessedInput == null) {
+                return null;
+            }
+            return invokeStaticParser();
         }
-        return invokeTypeParser(typeParsers.parsers.get(targetType));
-    }
-
-    @Override
-    Object actionWhenTaretTypeIsGeneric(Class<?> cls) {
-        Parser<?> tp = typeParsers.assignableParsers.get(cls);
-        return invokeTypeParser(tp);
-    }
-
-    @Override
-    Object actionWhenTargetTypeIsAssignalbleTo(Class<?> superClass) {
-        Parser<?> tp = typeParsers.assignableParsers.get(superClass);
-        return invokeTypeParser(tp);
-    }
-
-    @Override
-    Object actionWhenTargetTypeIsArrayClass() {
-        Parser<?> tp = typeParsers.parsers.get(Parsers.ANY_ARRAY);
-        return invokeTypeParser(tp);
-    }
-
-    @Override
-    Object actionWhenTargetTypeHasStaticFactoryMethod() {
-        if (preprocessedInput == null) {
-            return null;
+        for (DynamicParser dynamicParser : parsers.dynamicParsers()) {
+            Object result = invokeDynamicParser(dynamicParser, helper);
+            if (result != DynamicParser.TRY_NEXT) {
+                return result;
+            }
         }
-        Parser<?> tp = typeParsers.parsers.get(Parsers.ANY_CLASS_WITH_STATIC_VALUEOF_METHOD);
-        return invokeTypeParser(tp);
+        throw new NoSuchRegisteredParserException("There is no registered 'Parser' for that type.");
     }
 
-    @Override
-    Object actionWhenTargetTypeIsGenericArrayType() {
-        Parser<?> tp = typeParsers.parsers.get(Parsers.ANY_ARRAY);
-        return invokeTypeParser(tp);
-    }
-
-    /*
-     * If execution reaches here, it means there is no TypeParser for
-     * the given targetType. What remains is to make a descriptive error
-     * message and throw exception.
-     */
-    @Override
-    Object lastAction() {
-        throw new NoSuchRegisteredTypeParserException(preprocessedInput, targetType);
-    }
-
-    private Object invokeTypeParser(Parser<?> typeParser) {
+    private Object invokeStaticParser() {
+        Parser<?> parser = parsers.getStaticParser(targetType);
         try {
-            ParserHelper parseHelper = new ParserHelper(parser, targetType);
-            return typeParser.parse(preprocessedInput, parseHelper);
-        } catch (NumberFormatException e) {
-            String message = String.format("Number format exception %s.", e.getMessage());
-            message = makeParseErrorMsg(preprocessedInput, targetType, message);
-            throw new IllegalArgumentException(message, e);
-        } catch (Throwable e) {
-            String message = makeParseErrorMsg(preprocessedInput, targetType, e.getMessage());
-            throw new IllegalArgumentException(message, e);
+            return parser.parse(preprocessedInput, helper);
+        } catch (Throwable t) {
+            throw new ParseException("Parser.parse", parser, t);
+        }
+    }
+
+    private Object invokeDynamicParser(DynamicParser dynamicParser, ParserHelper helper) {
+        try {
+            return dynamicParser.parse(preprocessedInput, helper);
+        } catch (Throwable t) {
+            throw new ParseException("DynamicParser.parse", dynamicParser, t);
         }
     }
 }

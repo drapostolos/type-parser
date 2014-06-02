@@ -34,18 +34,18 @@ public class FileTest extends AbstractTypeTester<File> {
     @Test
     public void canParseToFileList() throws Exception {
         canParse("/path/a, /path/b, /path/c")
-                .toList(new GenericType<List<File>>() {});
+                .toArrayList(new GenericType<List<File>>() {});
     }
 
     @Test
     public void canParseToFileSet() throws Exception {
         canParse("/path/a, /path/b, /path/b")
-                .toSet(new GenericType<Set<File>>() {});
+                .toLinkedHashSet(new GenericType<Set<File>>() {});
     }
 
     @Test
     public void canParseToFileMap() throws Exception {
         canParse("/path/a=/path/A,/path/b=/path/B");
-        toMap(new GenericType<Map<File, File>>() {});
+        toLinkedHashMap(new GenericType<Map<File, File>>() {});
     }
 }

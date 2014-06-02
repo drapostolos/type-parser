@@ -18,9 +18,11 @@ public class UrlTest extends AbstractTypeTester<URL> {
 
     @Test
     public void shouldThrowWhenStringIsMalformedUrl() throws Exception {
-        shouldThrowWhenParsing("strange-URL");
-        toTypeWithErrorMessage(URL.class, "Can not parse input string:");
-        toTypeWithErrorMessage(URL.class, "to an URI due to underlying exception.");
+        shouldThrowParseException()
+                .withErrorMessage("IllegalArgumentException thrown in method 'Parser.parse(...)'")
+                .withErrorMessage("no protocol: strange URL.")
+                .whenParsing("strange URL")
+                .to(URL.class);
     }
 
     @Test
@@ -41,19 +43,19 @@ public class UrlTest extends AbstractTypeTester<URL> {
 
     @Test
     public void canParseToUriList() throws Exception {
-        canParse(STRING).toList(new GenericType<List<URL>>() {});
+        canParse(STRING).toArrayList(new GenericType<List<URL>>() {});
     }
 
     @Test
     public void canParseToUriSet() throws Exception {
         canParse("http://host1.com/, http://host2.com/, http://host1.com/");
-        toSet(new GenericType<Set<URL>>() {});
+        toLinkedHashSet(new GenericType<Set<URL>>() {});
     }
 
     @Test
     public void canParseToUriMap() throws Exception {
         canParse("http://host1.com/=http://host11.com/, http://host2.com/=http://host22.com/");
-        toMap(new GenericType<Map<URL, URL>>() {});
+        toLinkedHashMap(new GenericType<Map<URL, URL>>() {});
     }
 
 }

@@ -18,9 +18,11 @@ public class UriTest extends AbstractTypeTester<URI> {
 
     @Test
     public void shouldThrowWhenStringIsIncorrectUri() throws Exception {
-        shouldThrowWhenParsing("strange URI");
-        toTypeWithErrorMessage(URI.class, "Can not parse input string:");
-        toTypeWithErrorMessage(URI.class, "to an URI due to underlying exception.");
+        shouldThrowParseException()
+                .withErrorMessage("IllegalArgumentException thrown in method 'Parser.parse(...)'")
+                .withErrorMessage("Illegal character in path at index 7: strange URI.")
+                .whenParsing("strange URI")
+                .to(URI.class);
     }
 
     @Test
@@ -41,19 +43,19 @@ public class UriTest extends AbstractTypeTester<URI> {
 
     @Test
     public void canParseToUriList() throws Exception {
-        canParse(STRING).toList(new GenericType<List<URI>>() {});
+        canParse(STRING).toArrayList(new GenericType<List<URI>>() {});
     }
 
     @Test
     public void canParseToUriSet() throws Exception {
         canParse("http://host1.com/, http://host2.com/, http://host1.com/");
-        toSet(new GenericType<Set<URI>>() {});
+        toLinkedHashSet(new GenericType<Set<URI>>() {});
     }
 
     @Test
     public void canParseToUriMap() throws Exception {
         canParse("http://host1.com/=http://host11.com/, http://host2.com/=http://host22.com/");
-        toMap(new GenericType<Map<URI, URI>>() {});
+        toLinkedHashMap(new GenericType<Map<URI, URI>>() {});
     }
 
 }

@@ -32,15 +32,18 @@ public class ClassTest extends AbstractTypeTester<Class<?>> {
 
     @Test
     public void canParseToClass() throws Exception {
-        assertThat(parser.isTargetTypeParsable(Class.class)).isTrue();
         assertThat(parser.parse(cls.getName(), Class.class)).isSameAs(cls);
     }
 
     @Test
     public void shouldThrowWhenStringIsNotParsableToClass() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("\"com.unknow.Type\" is not parsable to a Class object.");
-        parser.parse("com.unknow.Type", Class.class);
+        shouldThrowParseException()
+                .withErrorMessage("Can not parse \"com.unknown.Type\"")
+                .withErrorMessage("{preprocessed: \"com.unknown.Type\"}")
+                .withErrorMessage("class java.lang.Class")
+                .withErrorMessage("ClassNotFound: com.unknown.Type")
+                .whenParsing("com.unknown.Type")
+                .to(Class.class);
     }
 
     @Test
@@ -50,24 +53,23 @@ public class ClassTest extends AbstractTypeTester<Class<?>> {
 
     @Test
     public void canParseToArray() throws Exception {
-        assertThat(parser.isTargetTypeParsable(Class[].class)).isTrue();
         assertThat(parser.parse(stringToParse, Class[].class))
                 .containsOnly(cls, Long.class, cls);
     }
 
     @Test
     public void canParseToList() throws Exception {
-        canParse(stringToParse).toList(new GenericType<List<Class<?>>>() {});
+        canParse(stringToParse).toArrayList(new GenericType<List<Class<?>>>() {});
     }
 
     @Test
     public void canParseToSet() throws Exception {
-        canParse(stringToParse).toSet(new GenericType<Set<Class<?>>>() {});
+        canParse(stringToParse).toLinkedHashSet(new GenericType<Set<Class<?>>>() {});
     }
 
     @Test
     public void canParseToMap() throws Exception {
         String str = String.format("%s=%s,java.lang.Long=java.lang.Short", cls.getName(), cls.getName());
-        canParse(str).toMap(new GenericType<Map<Class<?>, Class<?>>>() {});
+        canParse(str).toLinkedHashMap(new GenericType<Map<Class<?>, Class<?>>>() {});
     }
 }

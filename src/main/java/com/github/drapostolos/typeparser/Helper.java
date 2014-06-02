@@ -1,19 +1,48 @@
 package com.github.drapostolos.typeparser;
 
-import static com.github.drapostolos.typeparser.TypeParserUtility.getParameterizedTypeArguments;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 abstract class Helper {
 
-    final protected Type targetType;
+    final Type targetType;
+    final Class<?> rawTargetType;
 
     Helper(Type targetType) {
         this.targetType = targetType;
+        this.rawTargetType = extractRawTargetType();
+    }
+
+    private Class<?> extractRawTargetType() {
+        if (targetType instanceof Class) {
+            return (Class<?>) targetType;
+        }
+        if (targetType instanceof ParameterizedType) {
+            ParameterizedType type = (ParameterizedType) targetType;
+            return (Class<?>) type.getRawType();
+        }
+        if (targetType instanceof GenericArrayType) {
+            GenericArrayType array = (GenericArrayType) targetType;
+            Type componentType = array.getGenericComponentType();
+            if (componentType instanceof Class) {
+                return (Class<?>) Array.newInstance((Class<?>) componentType, 0).getClass();
+            }
+            if (componentType instanceof ParameterizedType) {
+                ParameterizedType parameterizedType = (ParameterizedType) componentType;
+                Class<?> rawType = (Class<?>) parameterizedType.getRawType();
+                return (Class<?>) Array.newInstance(rawType, 0).getClass();
+            }
+        }
+        return targetType.getClass();
+    }
+
+    @Override
+    public String toString() {
+        return Util.toString(targetType);
     }
 
     /**
@@ -33,12 +62,66 @@ abstract class Helper {
      * allowed), with one exception: {@link Class}. <br/>
      * 
      * @return List of {@link Class} types.
-     * @throws IllegalStateException if the {@code targetType} is not a parameterized type.
-     * @throws IllegalStateException if any of the parameterized type arguments is of a
+     * @throws UnsupportedOperationException if the {@code targetType} is not a parameterized type.
+     * @throws UnsupportedOperationException if any of the parameterized type arguments is of a
      *         parameterized type (with exception of {@link Class}).
      */
     final public <T> List<Class<T>> getParameterizedClassArguments() {
-        return getParameterizedTypeArguments(targetType);
+        if (!(targetType instanceof ParameterizedType)) {
+            String message = "type must be parameterized: \"%s\" {instance of: %s}.";
+            throw new UnsupportedOperationException(String.format(message, targetType, targetType.getClass()));
+        }
+
+        ParameterizedType pt = (ParameterizedType) targetType;
+        List<Class<T>> result = new ArrayList<Class<T>>();
+        for (Type typeArgument : pt.getActualTypeArguments()) {
+            if (typeArgument instanceof Class) {
+                /*
+                 * This cast is correct since we check typeArgument is instance of Class
+                 */
+                @SuppressWarnings("unchecked")
+                Class<T> cls = (Class<T>) typeArgument;
+                result.add(cls);
+                continue;
+            }
+            if (typeArgument instanceof ParameterizedType) {
+                Type rawType = ((ParameterizedType) typeArgument).getRawType();
+                if (rawType instanceof Class) {
+                    /*
+                     * Special case to handle Class<?>
+                     * This cast is correct since we check rawType is instance of Class
+                     */
+                    @SuppressWarnings("unchecked")
+                    Class<T> cls = (Class<T>) rawType;
+                    result.add(cls);
+                    continue;
+                }
+            }
+            //            String message = "TargetType: '%s' [%s] contains the following illegal type argument: '%s' [%s]";
+            String message = "contains illegal type argument: '%s' [%s]";
+            message = String.format(message, typeArgument, typeArgument.getClass());
+            throw new UnsupportedOperationException(message);
+        }
+        return result;
+    }
+
+    /**
+     * When the {@code targetType} is an array, this method
+     * returns the component type.
+     * <p/>
+     * The component type must be of a non-parameterized type, with one exception: {@link Class<?>}.
+     * <br/>
+     * 
+     * @return the component type of the array.
+     * @throws UnsupportedOperationException if the {@code targetType} is not of array type.
+     * @throws UnsupportedOperationException if the component type is of parameterized type
+     *         (with exception of {@link Class}).
+     */
+    Class<?> getComponentClass() {
+        if (rawTargetType.isArray()) {
+            return rawTargetType.getComponentType();
+        }
+        throw new UnsupportedOperationException("type is not an array.");
     }
 
     /**
@@ -49,6 +132,9 @@ abstract class Helper {
      * @return Type argument.
      * @throws IllegalArgumentException when {@code index} is negative or larger
      *         tan number of elements in list.
+     * @throws UnsupportedOperationException if the {@code targetType} is not a parameterized type.
+     * @throws UnsupportedOperationException if any of the parameterized type arguments is of a
+     *         parameterized type (with exception of {@link Class}).
      */
     final public <T> Class<T> getParameterizedClassArgumentByIndex(int index) {
         if (index < 0) {
@@ -71,7 +157,7 @@ abstract class Helper {
      * otherwise throws an {@link IllegalStateException}.
      * 
      * @return {@link Class} object of the targetType.
-     * @throws IllegalStateException if targetType is not an instance of {@link Class}.
+     * @throws UnsupportedOperationException if targetType is not an instance of {@link Class}.
      */
     final public <T> Class<T> getTargetClass() {
         if (targetType instanceof Class) {
@@ -81,15 +167,16 @@ abstract class Helper {
         }
         String message = "%s [%s] cannot be casted to java.lang.Class";
         message = String.format(message, targetType, targetType.getClass());
-        throw new IllegalStateException(message);
+        throw new UnsupportedOperationException(message);
     }
 
     /**
-     * Checks if {@code targetType} is assignable to the given {@code type}.
+     * Checks if the raw format of {@code targetType} is assignable to the given {@code type}.
      * <p/>
      * Examples: <br \>
-     * <code>isTargetTypeAssignableTo(Number.class); // true<code> if targetType is Integer.class<br \> 
-     * <code>isTargetTypeAssignableTo(List.class); // true if<code> targetType is {@code List<Long>} <br \>
+     * <code>isTargetTypeAssignableTo(Number.class); // true</code> if targetType is Integer.class<br \>
+     * <code>isTargetTypeAssignableTo(List.class); // true</code> if targetType is
+     * {@code List<Long>} <br \>
      * 
      * @param type check if {@code targetType} is assignable to this type.
      * @return true if {@code targetType} is assignable to the given {@code type}, otherwise false.
@@ -121,6 +208,23 @@ abstract class Helper {
     }
 
     /**
+     * Checks if at least one of the given {@code types} is equal to
+     * the raw {@code targetType} (as returned from {@link #getRawTargetClass()}).
+     * 
+     * @param types to check equality with the raw {@code targetType}
+     * @return true if at least one of the given {@code types} is equal to the raw
+     *         {@code targetType}.
+     */
+    public boolean isRawTargetClassAnyOf(Class<?>... types) {
+        for (Class<?> type : types) {
+            if (type.equals(getRawTargetClass())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns the raw format of {@code targetType}.
      * <p \>
      * Example <br \>
@@ -131,37 +235,8 @@ abstract class Helper {
      * 
      * @return the raw format of {@code targetType}
      */
+    @SuppressWarnings("unchecked")
     final public <T> Class<T> getRawTargetClass() {
-        if (targetType instanceof Class) {
-            @SuppressWarnings("unchecked")
-            Class<T> temp = (Class<T>) targetType;
-            return temp;
-        }
-        if (targetType instanceof ParameterizedType) {
-            ParameterizedType type = (ParameterizedType) targetType;
-            @SuppressWarnings("unchecked")
-            Class<T> temp = (Class<T>) type.getRawType();
-            return temp;
-        }
-        if (targetType instanceof GenericArrayType) {
-            GenericArrayType array = (GenericArrayType) targetType;
-            Type componentType = array.getGenericComponentType();
-            if (componentType instanceof Class) {
-                @SuppressWarnings("unchecked")
-                Class<T> temp = (Class<T>) Array.newInstance((Class<T>) componentType, 0).getClass();
-                return temp;
-            }
-            if (componentType instanceof ParameterizedType) {
-                ParameterizedType parameterizedType = (ParameterizedType) componentType;
-                @SuppressWarnings("unchecked")
-                Class<T> rawType = (Class<T>) parameterizedType.getRawType();
-                @SuppressWarnings("unchecked")
-                Class<T> temp = (Class<T>) Array.newInstance(rawType, 0).getClass();
-                return temp;
-            }
-        }
-        String message = "Cannot extract raw type from: %s [%s].";
-        message = String.format(message, targetType, targetType.getClass());
-        throw new IllegalStateException(message);
+        return (Class<T>) rawTargetType;
     }
 }

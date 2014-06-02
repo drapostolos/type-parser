@@ -10,6 +10,7 @@ import org.junit.rules.ExpectedException;
 
 public class ParameterCheckTest extends TestBase {
 
+    private static final Type SOME_TYPE = TestBase.class;
     private TypeParserBuilder builder = TypeParser.newBuilder();
 
     @Rule
@@ -18,20 +19,20 @@ public class ParameterCheckTest extends TestBase {
     @Test
     public void shouldThrowWhenCallingPrepareWithDefaultInputPreprocessorWithNull() throws Exception {
         prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("input");
-        new InputPreprocessorHelper(null).prepareWithDefaultInputPreprocessor(null);
+        new InputPreprocessorHelper(SOME_TYPE).prepareWithDefaultInputPreprocessor(null);
     }
 
     @Test
     public void shouldThrowWhenDefaultSplitStrategyIsCalledWithNull() throws Exception {
         prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("input");
-        new SplitStrategyHelper(null).splitWithDefaultSplitStrategy(null);
+        new SplitStrategyHelper(SOME_TYPE).splitWithDefaultSplitStrategy(null);
     }
 
     @Test
     public void shouldThrowWhenDefaultKeyValueSplitStrategyIsCalledWithNull() throws Exception {
         prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("keyValue");
         TypeParser typeParser = TypeParser.newBuilder().build();
-        new ParserHelper(typeParser, null).splitKeyValue(null);
+        new ParserHelper(typeParser, SOME_TYPE).splitKeyValue(null);
     }
 
     @Test
@@ -40,7 +41,7 @@ public class ParameterCheckTest extends TestBase {
         thrown.expectMessage("Argument named 'index' is illegally "
                 + "set to negative value: -1. Must be positive.");
         TypeParser typeParser = TypeParser.newBuilder().build();
-        new ParserHelper(typeParser, null).getParameterizedClassArgumentByIndex(-1);
+        new ParserHelper(typeParser, SOME_TYPE).getParameterizedClassArgumentByIndex(-1);
     }
 
     @Test
@@ -54,15 +55,9 @@ public class ParameterCheckTest extends TestBase {
     }
 
     @Test
-    public void shouldThrowWhenRegisteringTypeParser_Null_TypeParser() throws Exception {
-        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("targetType");
-        builder.registerParserForTypesAssignableTo(null, new MyClass1());
-    }
-
-    @Test
-    public void shouldThrowWhenRegisteringTypeParser_Class_Null() throws Exception {
+    public void shouldThrowWhenRegisteringDynamicParserWithValueNull() throws Exception {
         prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("parser");
-        builder.registerParserForTypesAssignableTo(List.class, null);
+        builder.registerDynamicParser(null);
     }
 
     @Test
@@ -92,23 +87,9 @@ public class ParameterCheckTest extends TestBase {
     }
 
     @Test
-    public void shouldThrowWhenUnregisteringNullAssignableTypeParser() throws Exception {
-        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("targetType");
-        Class<?> c = null;
-        builder.unregisterParserForTypesAssignableTo(c);
-    }
-
-    @Test
     public void shouldThrowExceptionWhenUnregisteringNullClass() throws Exception {
         prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("targetType");
         Class<?> c = null;
-        builder.unregisterParser(c);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenUnregisteringNullGenericType() throws Exception {
-        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("targetType");
-        GenericType<?> c = null;
         builder.unregisterParser(c);
     }
 

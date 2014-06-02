@@ -15,8 +15,9 @@ public class LongTest extends AbstractTypeTester<Long> {
 
     @Test
     public void shouldThrowWhenStringIsNotParsableToLong() throws Exception {
-        shouldThrowWhenParsing("a")
-                .toTypeWithErrorMessage(Long.class, String.format(NUMBER_FORMAT_ERROR_MSG, "a"));
+        shouldThrowParseException()
+                .withNumberFormatErrorMessage()
+                .whenParsing("a").to(Long.class);
     }
 
     @Test
@@ -39,17 +40,17 @@ public class LongTest extends AbstractTypeTester<Long> {
 
     @Test
     public void canParseToLongList() throws Exception {
-        canParse("1, 2, 3").toList(new GenericType<List<Long>>() {});
+        canParse("1, 2, 3").toArrayList(new GenericType<List<Long>>() {});
     }
 
     @Test
     public void canParseToLongSet() throws Exception {
-        canParse("1, 2, 1").toSet(new GenericType<Set<Long>>() {});
+        canParse("1, 2, 1").toLinkedHashSet(new GenericType<Set<Long>>() {});
     }
 
     @Test
     public void canParseToLongMap() throws Exception {
-        canParse("1=11, 2=22").toMap(new GenericType<Map<Long, Long>>() {});
+        canParse("1=11, 2=22").toLinkedHashMap(new GenericType<Map<Long, Long>>() {});
     }
 
 }

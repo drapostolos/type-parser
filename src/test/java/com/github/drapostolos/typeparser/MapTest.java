@@ -6,10 +6,43 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
+import org.assertj.core.data.MapEntry;
 import org.junit.Test;
 
 public class MapTest extends TestBase {
+
+    @Test
+    public void canParseToConcurrentNavigableMap() throws Exception {
+        assertThat(parser.parse("a=A", new GenericType<ConcurrentNavigableMap<String, String>>() {}))
+                .contains(MapEntry.entry("a", "A"))
+                .isInstanceOf(ConcurrentNavigableMap.class);
+    }
+
+    @Test
+    public void canParseToConcurrentSkipListMap() throws Exception {
+        assertThat(parser.parse("a=A", new GenericType<ConcurrentSkipListMap<String, String>>() {}))
+                .contains(MapEntry.entry("a", "A"))
+                .isInstanceOf(ConcurrentSkipListMap.class);
+    }
+
+    @Test
+    public void canParseToConcurrentMap() throws Exception {
+        assertThat(parser.parse("a=A", new GenericType<ConcurrentMap<String, String>>() {}))
+                .contains(MapEntry.entry("a", "A"))
+                .isInstanceOf(ConcurrentMap.class);
+    }
+
+    @Test
+    public void canParseToSortedMap() throws Exception {
+        assertThat(parser.parse("a=A", new GenericType<SortedMap<String, String>>() {}))
+                .contains(MapEntry.entry("a", "A"))
+                .isInstanceOf(SortedMap.class);
+    }
 
     @Test
     public void canParseStringToEmptyMap() throws Exception {
@@ -18,19 +51,28 @@ public class MapTest extends TestBase {
     }
 
     @Test
+    public void shouldThrowWhenMapImplementationHasNoDefaultconstructor() throws Exception {
+        shouldThrowParseException()
+                .withErrorMessage("Cannot instantiate map of type '")
+                .withErrorMessage(MyMap.class.getName())
+                .whenParsing(DUMMY_STRING)
+                .to(new GenericType<MyMap<String, String>>() {});
+    }
+
+    @Test
     public void shouldThrowExceptionWhenParsingMapWithWildcardKey() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Can not parse \"dummy-string\" to type");
-        thrown.expectMessage("contains the following illegal type argument: '?' ");
-        parser.parse(DUMMY_STRING, new GenericType<Map<?, String>>() {});
+        shouldThrowParseException()
+                .withErrorMessage("contains illegal type argument: '?' ")
+                .whenParsing(DUMMY_STRING)
+                .to(new GenericType<Map<?, String>>() {});
     }
 
     @Test
     public void shouldThrowExceptionWhenParsingMapWithWildcardValue() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Can not parse \"dummy-string\" to type");
-        thrown.expectMessage("contains the following illegal type argument: '?' ");
-        parser.parse(DUMMY_STRING, new GenericType<Map<String, ?>>() {});
+        shouldThrowParseException()
+                .withErrorMessage("contains illegal type argument: '?' ")
+                .whenParsing(DUMMY_STRING)
+                .to(new GenericType<Map<String, ?>>() {});
     }
 
     @Test
@@ -56,8 +98,9 @@ public class MapTest extends TestBase {
     }
 
     @Test
-    public void canParseStringToLinkedHashMapList() throws Exception {
+    public void canParseStringToLinkedHashMap() throws Exception {
         GenericType<LinkedHashMap<Long, String>> type = new GenericType<LinkedHashMap<Long, String>>() {};
+
         assertThat(parser.parse("1=one", type)).containsKey(1l);
         assertThat(parser.parse("1=one", type)).containsValue("one");
     }

@@ -22,7 +22,10 @@ public class BigDecimalTest extends AbstractTypeTester<BigDecimal> {
 
     @Test
     public void shouldThrowExceptionWhenStringIsNotABigDecimalType() throws Exception {
-        shouldThrowWhenParsing("aaa").toTypeWithNumberFormatErrorMessage(BigDecimal.class);
+        shouldThrowParseException()
+                .withErrorMessage("NumberFormatException thrown in method 'Parser.parse(...)'")
+                .whenParsing(DUMMY_STRING)
+                .to(BigDecimal.class);
     }
 
     @Test
@@ -37,17 +40,17 @@ public class BigDecimalTest extends AbstractTypeTester<BigDecimal> {
 
     @Test
     public void canParseToBigDecimalList() throws Exception {
-        canParse("55, 45,35").toList(new GenericType<List<BigDecimal>>() {});
+        canParse("55, 45,35").toArrayList(new GenericType<List<BigDecimal>>() {});
     }
 
     @Test
     public void canParseToBigDecimalSet() throws Exception {
-        canParse("55, 45, 55").toSet(new GenericType<Set<BigDecimal>>() {});
+        canParse("55, 45, 55").toLinkedHashSet(new GenericType<Set<BigDecimal>>() {});
     }
 
     @Test
     public void canParseToBigDecimalMap() throws Exception {
-        canParse("5=55, 6=66").toMap(new GenericType<Map<BigDecimal, BigDecimal>>() {});
+        canParse("5=55, 6=66").toLinkedHashMap(new GenericType<Map<BigDecimal, BigDecimal>>() {});
     }
 
 }

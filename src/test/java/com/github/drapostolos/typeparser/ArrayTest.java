@@ -16,11 +16,12 @@ public class ArrayTest extends TestBase {
 
     @Test
     public <T> void shouldThrowExceptionWhenParsingGenericArrayOfUnknownType() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Can not parse \"dummy-string\" to type \"T[]\"");
-        thrown.expectMessage("due to: TargetType: 'T[]'");
-        thrown.expectMessage("is either not an array or the componet type is generic.");
-        parser.parse(DUMMY_STRING, new GenericType<T[]>() {});
+        shouldThrow(NoSuchRegisteredParserException.class)
+                .withErrorMessage("Can not parse \"dummy-string\"")
+                .withErrorMessage("to type \"T[]\"")
+                .withErrorMessage("due to: There is no registered 'Parser' for that type.")
+                .whenParsing(DUMMY_STRING)
+                .to(new GenericType<T[]>() {});
     }
 
     @Test

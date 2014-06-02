@@ -31,9 +31,10 @@ public class BooleanTest extends AbstractTypeTester<Boolean> {
 
     @Test
     public void shouldThrowExceptionWhenNotParsableToBoolean() throws Exception {
-        shouldThrowWhenParsing("1234");
-        toTypeWithErrorMessage(Boolean.class, "is not parsable to a Boolean");
-        toTypeWithErrorMessage(boolean.class, "is not parsable to a Boolean");
+        shouldThrowParseException()
+                .withErrorMessage("is not parsable to a Boolean")
+                .whenParsing("1234")
+                .to(Boolean.class, boolean.class);
     }
 
     @Test
@@ -48,17 +49,17 @@ public class BooleanTest extends AbstractTypeTester<Boolean> {
 
     @Test
     public void canParseToBooleanList() throws Exception {
-        canParse("true, false, true").toList(new GenericType<List<Boolean>>() {});
+        canParse("true, false, true").toArrayList(new GenericType<List<Boolean>>() {});
     }
 
     @Test
     public void canParseToBooleanSet() throws Exception {
-        canParse("true, false, true").toSet(new GenericType<Set<Boolean>>() {});
+        canParse("true, false, true").toLinkedHashSet(new GenericType<Set<Boolean>>() {});
     }
 
     @Test
     public void canParseToBooleanMap() throws Exception {
-        canParse("false=true, true=false").toMap(new GenericType<Map<Boolean, Boolean>>() {});
+        canParse("false=true, true=false").toLinkedHashMap(new GenericType<Map<Boolean, Boolean>>() {});
     }
 
 }

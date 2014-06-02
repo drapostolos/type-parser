@@ -1,6 +1,6 @@
 package com.github.drapostolos.typeparser;
 
-import static com.github.drapostolos.typeparser.TypeParserUtility.makeNullArgumentErrorMsg;
+import static com.github.drapostolos.typeparser.Util.makeNullArgumentErrorMsg;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -13,19 +13,26 @@ import java.util.List;
  * The {@link TypeParser} will automatically inject an instance of this class into the
  * {@link Parser} implementation.
  * 
- * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide">User-Guide</a>
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
+ *      target="_blank">User-Guide</a>
  */
 public final class ParserHelper extends Helper {
 
     private final TypeParser typeParser;
     private final SplitStrategy splitStrategy;
     private final SplitStrategy keyValueSplitStrategy;
+    private final Parsers parsers;
 
     ParserHelper(TypeParser typeParser, Type targetType) {
         super(targetType);
+        this.parsers = typeParser.parsers;
         this.typeParser = typeParser;
         this.splitStrategy = typeParser.splitStrategy;
         this.keyValueSplitStrategy = typeParser.keyValueSplitStrategy;
+    }
+
+    boolean containsStaticParser(Type type) {
+        return parsers.containsStaticParser(type);
     }
 
     /**
@@ -63,7 +70,7 @@ public final class ParserHelper extends Helper {
      * 
      * @param input String to parse. For example "THIS, THAT, OTHER"
      * @return List of strings.
-     * @throws IllegalStateException if registered {@link SplitStrategy} implementation
+     * @throws SplitStrategyException if registered {@link SplitStrategy} implementation
      *         throws exception.
      */
     public List<String> split(String input) {
@@ -73,10 +80,7 @@ public final class ParserHelper extends Helper {
         try {
             return splitStrategy.split(input, new SplitStrategyHelper(targetType));
         } catch (Throwable t) {
-            String message = "Exception thrown from SplitStrategy: %s [%s] with message:  "
-                    + "%s. See underlying exception for more information.";
-            message = String.format(message, splitStrategy, splitStrategy.getClass(), t.getMessage());
-            throw new IllegalStateException(message, t);
+            throw new SplitStrategyException(splitStrategy, t);
         }
 
     }
@@ -93,7 +97,7 @@ public final class ParserHelper extends Helper {
      * @param keyValue
      * @return A list of string computed by splitting the {@code keyValue} string using the KeyValue
      *         SplitStrategy.
-     * @throws IllegalStateException if registered {@link SplitStrategy} implementation
+     * @throws KeyValueSplitStrategyException if registered {@link SplitStrategy} implementation
      *         throws exception.
      */
     public List<String> splitKeyValue(String keyValue) {
@@ -103,12 +107,7 @@ public final class ParserHelper extends Helper {
         try {
             return keyValueSplitStrategy.split(keyValue, new SplitStrategyHelper(targetType));
         } catch (Throwable t) {
-            String message = "Exception thrown from SplitStrategy: %s [%s] with message:  "
-                    + "%s. See underlying exception for more information.";
-            message = String.format(message,
-                    keyValueSplitStrategy, keyValueSplitStrategy.getClass(), t.getMessage());
-            throw new IllegalStateException(message, t);
+            throw new KeyValueSplitStrategyException(keyValueSplitStrategy, t);
         }
     }
-
 }

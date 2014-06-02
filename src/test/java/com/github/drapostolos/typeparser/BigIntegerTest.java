@@ -22,7 +22,10 @@ public class BigIntegerTest extends AbstractTypeTester<BigInteger> {
 
     @Test
     public void shouldThrowExceptionWhenStringIsNotABigIntegerType() throws Exception {
-        shouldThrowWhenParsing("aaa").toTypeWithNumberFormatErrorMessage(BigInteger.class);
+        shouldThrowParseException()
+                .withNumberFormatErrorMessage()
+                .whenParsing("aaa")
+                .to(BigInteger.class);
     }
 
     @Test
@@ -37,17 +40,17 @@ public class BigIntegerTest extends AbstractTypeTester<BigInteger> {
 
     @Test
     public void canParseToBigIntegerList() throws Exception {
-        canParse("55, 45,35").toList(new GenericType<List<BigInteger>>() {});
+        canParse("55, 45,35").toArrayList(new GenericType<List<BigInteger>>() {});
     }
 
     @Test
     public void canParseToBigIntegerSet() throws Exception {
-        canParse("55, 45, 55").toSet(new GenericType<Set<BigInteger>>() {});
+        canParse("55, 45, 55").toLinkedHashSet(new GenericType<Set<BigInteger>>() {});
     }
 
     @Test
     public void canParseToBigIntegerMap() throws Exception {
-        canParse("5=55, 6=66").toMap(new GenericType<Map<BigInteger, BigInteger>>() {});
+        canParse("5=55, 6=66").toLinkedHashMap(new GenericType<Map<BigInteger, BigInteger>>() {});
     }
 
 }

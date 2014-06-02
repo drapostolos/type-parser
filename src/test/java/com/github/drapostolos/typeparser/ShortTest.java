@@ -15,8 +15,10 @@ public class ShortTest extends AbstractTypeTester<Short> {
 
     @Test
     public void shouldThrowWhenStringIsNotParsableToShort() throws Exception {
-        shouldThrowWhenParsing("a")
-                .toTypeWithErrorMessage(Short.class, String.format(NUMBER_FORMAT_ERROR_MSG, "a"));
+        shouldThrowParseException()
+                .withNumberFormatErrorMessage()
+                .whenParsing("a")
+                .to(Short.class);
     }
 
     @Test
@@ -39,16 +41,16 @@ public class ShortTest extends AbstractTypeTester<Short> {
 
     @Test
     public void canParseToShortList() throws Exception {
-        canParse("1, 2, 3").toList(new GenericType<List<Short>>() {});
+        canParse("1, 2, 3").toArrayList(new GenericType<List<Short>>() {});
     }
 
     @Test
     public void canParseToShortSet() throws Exception {
-        canParse("1, 2, 1").toSet(new GenericType<Set<Short>>() {});
+        canParse("1, 2, 1").toLinkedHashSet(new GenericType<Set<Short>>() {});
     }
 
     @Test
     public void canParseToShortMap() throws Exception {
-        canParse("1=11, 2=22").toMap(new GenericType<Map<Short, Short>>() {});
+        canParse("1=11, 2=22").toLinkedHashMap(new GenericType<Map<Short, Short>>() {});
     }
 }

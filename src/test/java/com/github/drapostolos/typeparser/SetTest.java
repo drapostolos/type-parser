@@ -19,15 +19,16 @@ public class SetTest extends TestBase {
 
     @Test
     public void shouldThrowExceptionWhenParsingSetOfWildcard() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Can not parse \"dummy-string\" to type \"java.util.Set<?>");
-        thrown.expectMessage("due to: TargetType: 'java.util.Set<?>'");
-        thrown.expectMessage("contains the following illegal type argument: '?'");
-        parser.parse(DUMMY_STRING, new GenericType<Set<?>>() {});
+        shouldThrowParseException()
+                .withErrorMessage("to type \"java.util.Set<?>")
+                .withErrorMessage("UnsupportedOperationException thrown in method 'DynamicParser.parse(...)'")
+                .withErrorMessage("contains illegal type argument: '?'")
+                .whenParsing(DUMMY_STRING)
+                .to(new GenericType<Set<?>>() {});
     }
 
     @Test
-    public void canChangeSplitStrategyr() throws Exception {
+    public void canChangeSplitStrategy() throws Exception {
         // given
         TypeParser parser = TypeParser.newBuilder()
                 .setSplitStrategy(new SplitStrategy() {
@@ -52,8 +53,9 @@ public class SetTest extends TestBase {
         LinkedHashSet<String> strSet = parser.parse("aaa,bbb", new GenericType<LinkedHashSet<String>>() {});
 
         // then
-        assertThat(strSet).containsExactly("aaa", "bbb");
-        assertThat(parser.isTargetTypeParsable(new GenericType<LinkedHashSet<String>>() {})).isTrue();
+        assertThat(strSet)
+                .hasSameClassAs(new LinkedHashSet<String>())
+                .containsExactly("aaa", "bbb");
     }
 
 }

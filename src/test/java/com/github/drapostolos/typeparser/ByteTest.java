@@ -21,17 +21,18 @@ public class ByteTest extends AbstractTypeTester<Byte> {
 
     @Test
     public void shouldThrowWhenStringIsOutOfRangeFor_byteType() throws Exception {
-        String errorMessage = "Value out of range. Value:\"1234\" Radix:10.";
-        shouldThrowWhenParsing("1234")
-                .toTypeWithErrorMessage(byte.class, errorMessage)
-                .toTypeWithErrorMessage(Byte.class, errorMessage);
+        shouldThrowParseException()
+                .withErrorMessage("Value out of range. Value:\"1234\" Radix:10.")
+                .whenParsing("1234")
+                .to(byte.class, Byte.class);
     }
 
     @Test
     public void shouldThrowExceptionWhenStringIsNotAByte() throws Exception {
-        shouldThrowWhenParsing("aaa");
-        toTypeWithNumberFormatErrorMessage(byte.class);
-        toTypeWithNumberFormatErrorMessage(Byte.class);
+        shouldThrowParseException()
+                .withNumberFormatErrorMessage()
+                .whenParsing("aaa")
+                .to(byte.class, Byte.class);
     }
 
     @Test
@@ -46,16 +47,16 @@ public class ByteTest extends AbstractTypeTester<Byte> {
 
     @Test
     public void canParseToByteList() throws Exception {
-        canParse("55, 45, 35").toList(new GenericType<List<Byte>>() {});
+        canParse("55, 45, 35").toArrayList(new GenericType<List<Byte>>() {});
     }
 
     @Test
     public void canParseToByteSet() throws Exception {
-        canParse("55, 45, 55").toSet(new GenericType<Set<Byte>>() {});
+        canParse("55, 45, 55").toLinkedHashSet(new GenericType<Set<Byte>>() {});
     }
 
     @Test
     public void canParseToBooleanMap() throws Exception {
-        canParse("55=56, 57=58").toMap(new GenericType<Map<Byte, Byte>>() {});
+        canParse("55=56, 57=58").toLinkedHashMap(new GenericType<Map<Byte, Byte>>() {});
     }
 }

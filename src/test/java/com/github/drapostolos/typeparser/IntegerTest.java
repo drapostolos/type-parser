@@ -15,8 +15,10 @@ public class IntegerTest extends AbstractTypeTester<Integer> {
 
     @Test
     public void shouldThrowWhenStringIsNotParsableToInteger() throws Exception {
-        shouldThrowWhenParsing("a")
-                .toTypeWithErrorMessage(Integer.class, String.format(NUMBER_FORMAT_ERROR_MSG, "a"));
+        shouldThrowParseException()
+                .withNumberFormatErrorMessage()
+                .whenParsing("a")
+                .to(Integer.class);
     }
 
     @Test
@@ -39,17 +41,17 @@ public class IntegerTest extends AbstractTypeTester<Integer> {
 
     @Test
     public void canParseToIntegerList() throws Exception {
-        canParse("1, 2, 3").toList(new GenericType<List<Integer>>() {});
+        canParse("1, 2, 3").toArrayList(new GenericType<List<Integer>>() {});
     }
 
     @Test
     public void canParseToIntegerSet() throws Exception {
-        canParse("1, 2, 1").toSet(new GenericType<Set<Integer>>() {});
+        canParse("1, 2, 1").toLinkedHashSet(new GenericType<Set<Integer>>() {});
     }
 
     @Test
     public void canParseToIntegerMap() throws Exception {
-        canParse("1=11, 2=22").toMap(new GenericType<Map<Integer, Integer>>() {});
+        canParse("1=11, 2=22").toLinkedHashMap(new GenericType<Map<Integer, Integer>>() {});
     }
 
 }

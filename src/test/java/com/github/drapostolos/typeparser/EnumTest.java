@@ -15,15 +15,16 @@ public class EnumTest extends AbstractTypeTester<MyEnum> {
         return MyEnum.valueOf(string.trim());
     }
 
-    public enum MyEnum {
+    enum MyEnum {
         AAA, BBB, CCC
     };
 
     @Test
     public void shouldThrowWhenStringIsNotParsableToEnum() throws Exception {
         shouldThrowTypeParserException()
-                .containingErrorMessage("No enum const class")
-                .containingErrorMessage("com.github.drapostolos.typeparser.EnumTest$MyEnum.DDD")
+                .causedBy(IllegalArgumentException.class)
+                .containingErrorMessage("No enum const")
+                .containingErrorMessage("MyEnum.DDD")
                 .whenParsing("DDD")
                 .to(MyEnum.class);
     }

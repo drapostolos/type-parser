@@ -102,14 +102,14 @@ public class CollectionTest extends TestBase {
                 .to(new GenericType<MyCollection<String>>() {});
     }
 
-    enum TestEnum {
+    enum MyEnum {
         AAA, BBB, CCC, DDD
     }
 
     @Test
     public void canParseToEnumSet() throws Exception {
-        assertThat(parser.parse("AAA, CCC", new GenericType<EnumSet<TestEnum>>() {}))
-                .containsExactly(TestEnum.AAA, TestEnum.CCC)
+        assertThat(parser.parse("AAA, CCC", new GenericType<EnumSet<MyEnum>>() {}))
+                .containsExactly(MyEnum.AAA, MyEnum.CCC)
                 .isInstanceOf(EnumSet.class);
     }
 

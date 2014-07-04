@@ -17,11 +17,32 @@ public class ArrayTest extends TestBase {
     @Test
     public <T> void shouldThrowExceptionWhenParsingGenericArrayOfUnknownType() throws Exception {
         shouldThrow(NoSuchRegisteredParserException.class)
-                .withErrorMessage("Can not parse \"dummy-string\"")
-                .withErrorMessage("to type \"T[]\"")
-                .withErrorMessage("due to: There is no registered 'Parser' for that type.")
+                .containingErrorMessage("Can not parse \"dummy-string\"")
+                .containingErrorMessage("to type \"T[]\"")
+                .containingErrorMessage("due to: There is no registered 'Parser' for that type.")
                 .whenParsing(DUMMY_STRING)
                 .to(new GenericType<T[]>() {});
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenParsingIntArrayContainingNonInt() throws Exception {
+        shouldThrow(TypeParserException.class)
+                .containingErrorMessage("Can not parse \" a\" {preprocessed: \" a\"} ")
+                .containingErrorMessage("to type \"int\" {instance of: java.lang.Class}")
+                .containingErrorMessage("due to: NumberFormatException")
+                .containingNumberFormatErrorMessage()
+                .whenParsing("1, a")
+                .to(int[].class);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenParsingIntegerArrayContainingNonInteger() throws Exception {
+        shouldThrow(TypeParserException.class)
+                .containingErrorMessage("Can not parse \" a\" {preprocessed: \" a\"} ")
+                .containingErrorMessage("to type \"java.lang.Integer\" {instance of: java.lang.Class}")
+                .containingErrorMessage("due to: NumberFormatException")
+                .whenParsing("1, a")
+                .to(Integer[].class);
     }
 
     @Test
@@ -52,26 +73,6 @@ public class ArrayTest extends TestBase {
     public void canParseToClassArray() throws Exception {
         Class<?>[] intArray = parser.parse("java.lang.Integer", Class[].class);
         assertThat(intArray).containsExactly(Integer.class);
-    }
-
-    @Test
-    public void testCustomMadeArrayclassTypeParser() throws Exception {
-        // given
-        parser = TypeParser.newBuilder()
-                .registerParser(int[].class, new Parser<int[]>() {
-
-                    @Override
-                    public int[] parse(String input, ParserHelper helper) {
-                        return new int[] { 5, 4 };
-                    }
-                })
-                .build();
-
-        // when
-        int[] intArray = parser.parse("2", int[].class);
-
-        // then
-        assertThat(intArray).containsOnly(5, 4);
     }
 
     @Test

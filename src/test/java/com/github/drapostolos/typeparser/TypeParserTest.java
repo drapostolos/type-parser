@@ -21,7 +21,7 @@ public class TypeParserTest extends TestBase {
             try {
                 parser.parse("null", c);
                 fail(String.format("Primitive type '%s' is set to null, when it should not be possible"));
-            } catch (IllegalPrimitiveValueException e) {
+            } catch (TypeParserException e) {
                 assertThat(e.getMessage()).contains("Primitive can not be set to null");
             }
         }
@@ -50,9 +50,9 @@ public class TypeParserTest extends TestBase {
 
         // then
         shouldThrow(NoSuchRegisteredParserException.class)
-                .withErrorMessage("to type \"K\" ", DUMMY_STRING)
-                .withErrorMessage("{instance of: sun.reflect.generics.reflectiveObjects.TypeVariableImpl}")
-                .withErrorMessage("due to: There is no registered 'Parser' for that type.")
+                .containingErrorMessage("to type \"K\" ", DUMMY_STRING)
+                .containingErrorMessage("{instance of: sun.reflect.generics.reflectiveObjects.TypeVariableImpl}")
+                .containingErrorMessage("due to: There is no registered 'Parser' for that type.")
                 .whenParsing(DUMMY_STRING)
                 .to(type);
     }
@@ -107,9 +107,9 @@ public class TypeParserTest extends TestBase {
         });
 
         // then
-        shouldThrowParseException()
-                .withErrorMessage(MyClass1.class.toString())
-                .withErrorMessage("type must be parameterized: ")
+        shouldThrowTypeParserException()
+                .containingErrorMessage(MyClass1.class.toString())
+                .containingErrorMessage("type must be parameterized: ")
                 .whenParsing(DUMMY_STRING)
                 .to(MyClass1.class);
 
@@ -144,11 +144,15 @@ public class TypeParserTest extends TestBase {
         });
 
         // then
-        shouldThrowParseException()
-                .withErrorMessage("cannot be casted to java.lang.Class")
-                .withErrorMessage("ParameterizedTypeImpl")
+        shouldThrowTypeParserException()
+                .containingErrorMessage("cannot be casted to java.lang.Class")
+                .containingErrorMessage("ParameterizedTypeImpl")
                 .whenParsing(DUMMY_STRING)
-                .to(new GenericType<List<MyClass1>>() {});
+                .to(new GenericType<MyGenericType<MyClass1>>() {});
+    }
+
+    static class MyGenericType<T> {
+
     }
 
     @Test
@@ -164,9 +168,9 @@ public class TypeParserTest extends TestBase {
         });
 
         // then
-        shouldThrowParseException()
-                .withErrorMessage(MyClass1.class)
-                .withErrorMessage("type is not an array.")
+        shouldThrowTypeParserException()
+                .containingErrorMessage(MyClass1.class.getName())
+                .containingErrorMessage("type is not an array.")
                 .whenParsing(DUMMY_STRING)
                 .to(MyClass1.class);
     }
@@ -232,43 +236,36 @@ public class TypeParserTest extends TestBase {
     @Test
     public void shouldThrowIllegalArgumentExceptionIfInputPreprocessorThrows() throws Exception {
         // given
-        thrown.expect(InputPreprocessorException.class);
-        thrown.expectMessage("RuntimeException thrown in method 'InputPreprocessor.prepare(...)'");
-        thrown.expectMessage("some-message");
+        parserBuilder.setInputPreprocessor(new InputPreprocessor() {
 
-        // when
-        parser = TypeParser.newBuilder()
-                .setInputPreprocessor(new InputPreprocessor() {
-
-                    @Override
-                    public String prepare(String input, InputPreprocessorHelper helper) {
-                        throw new RuntimeException("some-message");
-                    }
-                })
-                .build();
+            @Override
+            public String prepare(String input, InputPreprocessorHelper helper) {
+                throw new RuntimeException("some-message");
+            }
+        });
 
         // then
-        parser.parse(DUMMY_STRING, String.class);
-
+        shouldThrowTypeParserException()
+                .containingErrorMessage("some-message")
+                .whenParsing(DUMMY_STRING)
+                .to(String.class);
     }
 
     @Test
-    public void shouldThrowDynamicParserExceptionIfSplitStrategyThrows() throws Exception {
+    public void shouldThrowExceptionWhenSplitStrategyThrows() throws Exception {
         // given
         setSplitStrategy(new SplitStrategy() {
 
             @Override
             public List<String> split(String input, SplitStrategyHelper helper) {
-                throw new RuntimeException(ERROR_MSG);
+                throw new IllegalArgumentException(ERROR_MSG);
             }
         });
 
         // then
-        shouldThrowParseException()
-                .causedBy(SplitStrategyException.class)
-                .withErrorMessage("SplitStrategyException thrown in method 'DynamicParser.parse(...)'")
-                .withErrorMessage("RuntimeException thrown in method 'SplitStrategy.split(...)'")
-                .withErrorMessage(ERROR_MSG)
+        shouldThrowTypeParserException()
+                .causedBy(IllegalArgumentException.class)
+                .containingErrorMessage(ERROR_MSG)
                 .whenParsing(DUMMY_STRING)
                 .to(new GenericType<List<Integer>>() {});
     }
@@ -307,9 +304,8 @@ public class TypeParserTest extends TestBase {
         });
 
         // then
-        shouldThrowParseException()
-                .withErrorMessage("KeyValueSplitStrategyException thrown in method 'DynamicParser.parse(...)'")
-                .withErrorMessage(ERROR_MSG)
+        shouldThrowTypeParserException()
+                .containingErrorMessage(ERROR_MSG)
                 .whenParsing("1=11,2=22")
                 .to(new GenericType<Map<Integer, Integer>>() {});
 
@@ -337,5 +333,4 @@ public class TypeParserTest extends TestBase {
         assertThat(counter.getCount()).isEqualTo(1);
         assertThat(parser.parse("null", new GenericType<List<String>>() {})).isEmpty();
     }
-
 }

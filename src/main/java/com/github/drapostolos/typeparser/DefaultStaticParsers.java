@@ -111,7 +111,18 @@ final class DefaultStaticParsers {
 
             @Override
             public BigDecimal parse(String input, ParserHelper helper) {
-                return new BigDecimal(input.trim());
+                try {
+                    return new BigDecimal(input.trim());
+                } catch (NumberFormatException e) {
+                    /*
+                     * The NumberFormatException thrown by BigDecimal contains
+                     * an empty error message. The below is done to address that.
+                     */
+                    String message = "NumberFormatException For input string: \"" + input + "\"";
+                    NumberFormatException e2 = new NumberFormatException(message);
+                    e2.setStackTrace(e.getStackTrace());
+                    throw e2;
+                }
             }
         });
         addStaticParser(map, URL.class, new Parser<URL>() {
@@ -121,7 +132,7 @@ final class DefaultStaticParsers {
                 try {
                     return new URL(input.trim());
                 } catch (MalformedURLException e) {
-                    throw new IllegalArgumentException(e.getMessage(), e);
+                    throw new IllegalArgumentException("MalformedURLException: " + e.getMessage(), e);
                 }
             }
         });

@@ -1,5 +1,6 @@
 package com.github.drapostolos.typeparser;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,8 +51,8 @@ public abstract class TestBase {
         return this;
     }
 
-    final TestBase shouldThrowParseException() {
-        expectedThrowable = ParseException.class;
+    final TestBase shouldThrowTypeParserException() {
+        expectedThrowable = TypeParserException.class;
         thrown.expect(expectedThrowable);
         return this;
     }
@@ -79,12 +80,12 @@ public abstract class TestBase {
         return this;
     }
 
-    final public TestBase withErrorMessage(Object message, Object... args) throws Exception {
+    final public TestBase containingErrorMessage(Object message, Object... args) throws Exception {
         thrown.expectMessage(String.format(message.toString(), args));
         return this;
     }
 
-    final public TestBase withNumberFormatErrorMessage() throws Exception {
+    final public TestBase containingNumberFormatErrorMessage() throws Exception {
         thrown.expectMessage("NumberFormatException");
         thrown.expectMessage("For input string: ");
         return this;
@@ -121,4 +122,9 @@ public abstract class TestBase {
         }
         throw throwThis;
     }
+
+    final Class<?> toRawType(GenericType<?> t) {
+        return (Class<?>) ((ParameterizedType) t.getType()).getRawType();
+    }
+
 }

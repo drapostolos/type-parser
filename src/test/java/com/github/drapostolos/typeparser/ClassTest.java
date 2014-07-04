@@ -37,11 +37,11 @@ public class ClassTest extends AbstractTypeTester<Class<?>> {
 
     @Test
     public void shouldThrowWhenStringIsNotParsableToClass() throws Exception {
-        shouldThrowParseException()
-                .withErrorMessage("Can not parse \"com.unknown.Type\"")
-                .withErrorMessage("{preprocessed: \"com.unknown.Type\"}")
-                .withErrorMessage("class java.lang.Class")
-                .withErrorMessage("ClassNotFound: com.unknown.Type")
+        shouldThrowTypeParserException()
+                .containingErrorMessage("Can not parse \"com.unknown.Type\"")
+                .containingErrorMessage("{preprocessed: \"com.unknown.Type\"}")
+                .containingErrorMessage("java.lang.Class")
+                .containingErrorMessage("ClassNotFound: com.unknown.Type")
                 .whenParsing("com.unknown.Type")
                 .to(Class.class);
     }

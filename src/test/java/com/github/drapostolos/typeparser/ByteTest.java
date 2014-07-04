@@ -21,16 +21,16 @@ public class ByteTest extends AbstractTypeTester<Byte> {
 
     @Test
     public void shouldThrowWhenStringIsOutOfRangeFor_byteType() throws Exception {
-        shouldThrowParseException()
-                .withErrorMessage("Value out of range. Value:\"1234\" Radix:10.")
+        shouldThrowTypeParserException()
+                .containingErrorMessage("Value out of range. Value:\"1234\" Radix:10")
                 .whenParsing("1234")
                 .to(byte.class, Byte.class);
     }
 
     @Test
     public void shouldThrowExceptionWhenStringIsNotAByte() throws Exception {
-        shouldThrowParseException()
-                .withNumberFormatErrorMessage()
+        shouldThrowTypeParserException()
+                .containingNumberFormatErrorMessage()
                 .whenParsing("aaa")
                 .to(byte.class, Byte.class);
     }

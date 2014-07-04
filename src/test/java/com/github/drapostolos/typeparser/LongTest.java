@@ -15,8 +15,8 @@ public class LongTest extends AbstractTypeTester<Long> {
 
     @Test
     public void shouldThrowWhenStringIsNotParsableToLong() throws Exception {
-        shouldThrowParseException()
-                .withNumberFormatErrorMessage()
+        shouldThrowTypeParserException()
+                .containingNumberFormatErrorMessage()
                 .whenParsing("a").to(Long.class);
     }
 

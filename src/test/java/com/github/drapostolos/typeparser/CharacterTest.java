@@ -21,8 +21,8 @@ public class CharacterTest extends AbstractTypeTester<Character> {
 
     @Test
     public void shouldThrowExceptionWhenStringHasMoreThanOneCharacter() throws Exception {
-        shouldThrowParseException()
-                .withErrorMessage("\"%s\" must only contain a single character.", "aa")
+        shouldThrowTypeParserException()
+                .containingErrorMessage("\"%s\" must only contain a single character.", "aa")
                 .whenParsing("aa")
                 .to(Character.class, char.class);
     }

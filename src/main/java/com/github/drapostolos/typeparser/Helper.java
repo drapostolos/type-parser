@@ -21,7 +21,7 @@ abstract class Helper {
         if (targetType instanceof Class) {
             return (Class<?>) targetType;
         }
-        if (targetType instanceof ParameterizedType) {
+        if (isTargetTypeParameterized()) {
             ParameterizedType type = (ParameterizedType) targetType;
             return (Class<?>) type.getRawType();
         }
@@ -67,7 +67,7 @@ abstract class Helper {
      *         parameterized type (with exception of {@link Class}).
      */
     final public <T> List<Class<T>> getParameterizedClassArguments() {
-        if (!(targetType instanceof ParameterizedType)) {
+        if (!(isTargetTypeParameterized())) {
             String message = "type must be parameterized: \"%s\" {instance of: %s}.";
             throw new UnsupportedOperationException(String.format(message, targetType, targetType.getClass()));
         }
@@ -97,8 +97,7 @@ abstract class Helper {
                     continue;
                 }
             }
-            //            String message = "TargetType: '%s' [%s] contains the following illegal type argument: '%s' [%s]";
-            String message = "contains illegal type argument: '%s' [%s]";
+            String message = "That type contains illegal type argument: '%s' [%s]";
             message = String.format(message, typeArgument, typeArgument.getClass());
             throw new UnsupportedOperationException(message);
         }
@@ -154,7 +153,7 @@ abstract class Helper {
     /**
      * Returns the {@link Class} object of the targetType.
      * Assuming targeType is an instance of {@link Class},
-     * otherwise throws an {@link IllegalStateException}.
+     * otherwise throws an {@link UnsupportedOperationException}.
      * 
      * @return {@link Class} object of the targetType.
      * @throws UnsupportedOperationException if targetType is not an instance of {@link Class}.
@@ -171,6 +170,23 @@ abstract class Helper {
     }
 
     /**
+     * Checks if {@code targetType} is of Parameterized type, return true if it is,
+     * otherwise false.
+     * <p>
+     * Note!<br/>
+     * If {@code targetType} is of a raw collection type (e.g. java.lang.List.class), then false is
+     * returned.
+     * 
+     * @return
+     */
+    final public boolean isTargetTypeParameterized() {
+        if (targetType instanceof ParameterizedType) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Checks if the raw format of {@code targetType} is assignable to the given {@code type}.
      * <p/>
      * Examples: <br \>
@@ -182,7 +198,7 @@ abstract class Helper {
      * @return true if {@code targetType} is assignable to the given {@code type}, otherwise false.
      */
     final public boolean isTargetTypeAssignableTo(Class<?> type) {
-        return type.isAssignableFrom(getRawTargetClass());
+        return type.isAssignableFrom(rawTargetType);
     }
 
     /**
@@ -215,9 +231,9 @@ abstract class Helper {
      * @return true if at least one of the given {@code types} is equal to the raw
      *         {@code targetType}.
      */
-    public boolean isRawTargetClassAnyOf(Class<?>... types) {
+    final public boolean isRawTargetClassAnyOf(Class<?>... types) {
         for (Class<?> type : types) {
-            if (type.equals(getRawTargetClass())) {
+            if (type.equals(rawTargetType)) {
                 return true;
             }
         }

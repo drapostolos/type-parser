@@ -22,8 +22,8 @@ public class BigIntegerTest extends AbstractTypeTester<BigInteger> {
 
     @Test
     public void shouldThrowExceptionWhenStringIsNotABigIntegerType() throws Exception {
-        shouldThrowParseException()
-                .withNumberFormatErrorMessage()
+        shouldThrowTypeParserException()
+                .containingNumberFormatErrorMessage()
                 .whenParsing("aaa")
                 .to(BigInteger.class);
     }

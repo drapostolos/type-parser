@@ -19,15 +19,11 @@ public interface SplitStrategy {
      * {@link InputPreprocessor#prepare(String, InputPreprocessorHelper)}) the {@link SplitStrategy}
      * will not be called, instead and an empty {@link List} will be returned.
      * <p/>
-     * Any exceptions thrown by this method will be caught in the {@link TypeParser} and re-thrown
-     * converted to either {@link SplitStrategyException} or {@link KeyValueSplitStrategyException}.
      * 
      * @param input String to split. The initial value will never be null.
      * @param helper Helper class injected automatically by the {@link TypeParser}.
      * @return A list of string computed by splitting the {@code input} string using this
      *         {@link SplitStrategy}.
-     * @throws SplitStrategyException
-     * @throws KeyValueSplitStrategyException
      * @see ParserHelper#split(String)
      * @see ParserHelper#splitKeyValue(String)
      */

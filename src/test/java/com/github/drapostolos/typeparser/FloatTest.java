@@ -15,8 +15,8 @@ public class FloatTest extends AbstractTypeTester<Float> {
 
     @Test
     public void shouldThrowWhenStringIsNotParsableToFloat() throws Exception {
-        shouldThrowParseException()
-                .withNumberFormatErrorMessage()
+        shouldThrowTypeParserException()
+                .containingNumberFormatErrorMessage()
                 .whenParsing("aa")
                 .to(Float.class, float.class);
     }

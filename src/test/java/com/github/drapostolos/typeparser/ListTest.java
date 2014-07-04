@@ -12,32 +12,6 @@ import org.junit.Test;
 public class ListTest extends TestBase {
 
     @Test
-    public void canRegisterListTypeParserThatOverridesDefaultArrayListTypeParser() throws Exception {
-        // GIVEN
-        TypeParser parser = TypeParser.newBuilder()
-                .registerDynamicParser(new DynamicParser() {
-
-                    @Override
-                    public Object parse(String input, ParserHelper helper) {
-                        if (!helper.isTargetTypeAssignableTo(List.class)) {
-                            return TRY_NEXT;
-                        }
-                        return new ArrayList<String>(Arrays.asList("my-string"));
-                    }
-
-                })
-                .build();
-
-        // WHEN
-        List<String> s = parser.parse("something", new GenericType<List<String>>() {});
-
-        // THEN
-        assertThat(s)
-                .hasSameClassAs(new ArrayList<String>())
-                .containsExactly("my-string");
-    }
-
-    @Test
     public void canParseSpaceToSingleElementList() throws Exception {
         GenericType<List<String>> type = new GenericType<List<String>>() {};
         assertThat(parser.parse(" ", type)).containsExactly(" ");
@@ -64,8 +38,8 @@ public class ListTest extends TestBase {
 
     @Test
     public void shouldThrowExceptionWhenParsingListOfWildcardType() throws Exception {
-        shouldThrowParseException()
-                .withErrorMessage("contains illegal type argument: '?' ")
+        shouldThrowTypeParserException()
+                .containingErrorMessage("contains illegal type argument: '?' ")
                 .whenParsing(DUMMY_STRING)
                 .to(new GenericType<List<?>>() {});
     }

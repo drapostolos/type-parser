@@ -22,8 +22,9 @@ public class BigDecimalTest extends AbstractTypeTester<BigDecimal> {
 
     @Test
     public void shouldThrowExceptionWhenStringIsNotABigDecimalType() throws Exception {
-        shouldThrowParseException()
-                .withErrorMessage("NumberFormatException thrown in method 'Parser.parse(...)'")
+        shouldThrowTypeParserException()
+                .causedBy(NumberFormatException.class)
+                .containingNumberFormatErrorMessage()
                 .whenParsing(DUMMY_STRING)
                 .to(BigDecimal.class);
     }

@@ -23,9 +23,8 @@ public class SingleArgumentConstructorParserTest extends TestBase {
 
     @Test
     public void shouldThrowExceptionWhenConstructorFails() throws Exception {
-        shouldThrowParseException()
-                .withErrorMessage("InvocationTargetException thrown when calling constructor")
-                .withErrorMessage("$ThrowingConstructor(java.lang.String)")
+        shouldThrowTypeParserException()
+                .containingErrorMessage("Failed when calling constructor")
                 .whenParsing(DUMMY_STRING)
                 .to(ThrowingConstructor.class);
     }

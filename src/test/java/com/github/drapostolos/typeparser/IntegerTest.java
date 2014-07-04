@@ -15,8 +15,8 @@ public class IntegerTest extends AbstractTypeTester<Integer> {
 
     @Test
     public void shouldThrowWhenStringIsNotParsableToInteger() throws Exception {
-        shouldThrowParseException()
-                .withNumberFormatErrorMessage()
+        shouldThrowTypeParserException()
+                .containingNumberFormatErrorMessage()
                 .whenParsing("a")
                 .to(Integer.class);
     }

@@ -18,9 +18,8 @@ public class UriTest extends AbstractTypeTester<URI> {
 
     @Test
     public void shouldThrowWhenStringIsIncorrectUri() throws Exception {
-        shouldThrowParseException()
-                .withErrorMessage("IllegalArgumentException thrown in method 'Parser.parse(...)'")
-                .withErrorMessage("Illegal character in path at index 7: strange URI.")
+        shouldThrowTypeParserException()
+                .containingErrorMessage("Illegal character in path at index 7: strange URI")
                 .whenParsing("strange URI")
                 .to(URI.class);
     }

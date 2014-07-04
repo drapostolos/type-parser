@@ -70,19 +70,14 @@ public final class ParserHelper extends Helper {
      * 
      * @param input String to parse. For example "THIS, THAT, OTHER"
      * @return List of strings.
-     * @throws SplitStrategyException if registered {@link SplitStrategy} implementation
-     *         throws exception.
+     * @throws NullPointerException if given {@code input} is null.
+     * @throws RuntimeException.
      */
     public List<String> split(String input) {
         if (input == null) {
             return Collections.emptyList();
         }
-        try {
-            return splitStrategy.split(input, new SplitStrategyHelper(targetType));
-        } catch (Throwable t) {
-            throw new SplitStrategyException(splitStrategy, t);
-        }
-
+        return splitStrategy.split(input, new SplitStrategyHelper(targetType));
     }
 
     /**
@@ -97,17 +92,13 @@ public final class ParserHelper extends Helper {
      * @param keyValue
      * @return A list of string computed by splitting the {@code keyValue} string using the KeyValue
      *         SplitStrategy.
-     * @throws KeyValueSplitStrategyException if registered {@link SplitStrategy} implementation
-     *         throws exception.
+     * @throws NullPointerException if given {@code keyValue} is null.
+     * @throws RuntimeException.
      */
     public List<String> splitKeyValue(String keyValue) {
         if (keyValue == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("keyValue"));
         }
-        try {
-            return keyValueSplitStrategy.split(keyValue, new SplitStrategyHelper(targetType));
-        } catch (Throwable t) {
-            throw new KeyValueSplitStrategyException(keyValueSplitStrategy, t);
-        }
+        return keyValueSplitStrategy.split(keyValue, new SplitStrategyHelper(targetType));
     }
 }

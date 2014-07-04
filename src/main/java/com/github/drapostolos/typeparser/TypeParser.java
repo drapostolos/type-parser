@@ -49,12 +49,8 @@ public final class TypeParser {
      * @param targetType - the expected type to convert {@code input} to.
      * @return an instance of {@code targetType} corresponding to the given {@code input}.
      * @throws NullPointerException if any given argument is {@code null}.
-     * @throws ParseException if the {@link Parser} associated with the
-     *         given {@code targetType} throws exception while parsing the given {@code input}.
-     * @throws InputPreprocessorException if the registered {@link InputPreprocessor} throws
-     *         exception while preparing the given {@code input} for parsing.
-     * @throws IllegalPrimitiveValueException if the registered {@link InputPreprocessor} decides to
-     *         return a null object while {@code targetType} is of a primitive type.
+     * @throws TypeParserException if anything goes wrong while parsing {@code input} to the given
+     *         {@code targetType}.
      * @throws NoSuchRegisteredParserException if there is no registered {@link Parser} for the
      *         given {@code targetType}.
      */
@@ -86,12 +82,8 @@ public final class TypeParser {
      * @param genericType - the expected generic type to convert {@code input} to.
      * @return an instance of {@code genericType} corresponding to the given {@code input}.
      * @throws NullPointerException if any given argument is {@code null}.
-     * @throws ParseException if the {@link Parser} associated with the
-     *         given {@code targetType} throws exception while parsing the given {@code input}.
-     * @throws InputPreprocessorException if the registered {@link InputPreprocessor} throws
-     *         exception while preparing the given {@code input} for parsing.
-     * @throws IllegalPrimitiveValueException if the registered {@link InputPreprocessor} decides to
-     *         return a null object while {@code targetType} is of a primitive type.
+     * @throws TypeParserException if anything goes wrong while parsing {@code input} to the given
+     *         {@code targetType}.
      * @throws NoSuchRegisteredParserException if there is no registered {@link Parser} for the
      *         given {@code targetType}.
      */
@@ -116,12 +108,8 @@ public final class TypeParser {
      * @param targetType - the expected type to convert {@code input} to.
      * @return an instance of {@code targetType} corresponding to the given {@code input}.
      * @throws NullPointerException if any given argument is {@code null}.
-     * @throws ParseException if the {@link Parser} associated with the
-     *         given {@code targetType} throws exception while parsing the given {@code input}.
-     * @throws InputPreprocessorException if the registered {@link InputPreprocessor} throws
-     *         exception while preparing the given {@code input} for parsing.
-     * @throws IllegalPrimitiveValueException if the registered {@link InputPreprocessor} decides to
-     *         return a null object while {@code targetType} is of a primitive type.
+     * @throws TypeParserException if anything goes wrong while parsing {@code input} to the given
+     *         {@code targetType}.
      * @throws NoSuchRegisteredParserException if there is no registered {@link Parser} for the
      *         given {@code targetType}.
      */
@@ -146,22 +134,34 @@ public final class TypeParser {
             ParserInvoker invoker = new ParserInvoker(this, targetType, preprocessedInput);
             return invoker.invoke();
         } catch (TypeParserException e) {
-            throw e.withPrependedErrorMessage(input, preprocessedInput, targetType);
+            // Re-throw as is (already contains context message)
+            throw e;
+        } catch (NoSuchRegisteredParserException e) {
+            // prepend original error message with context (i.e. input and targetType)
+            String message = Util.formatErrorMessage(input, preprocessedInput, targetType, e.getMessage());
+            throw new NoSuchRegisteredParserException(message);
+        } catch (NumberFormatException e) {
+            // Improve NumberFormatException error message and wrap it in a TypeParserException.
+            // Also provide context (i.e. input and targetType)
+            String message = "NumberFormatException " + e.getMessage();
+            message = Util.formatErrorMessage(input, preprocessedInput, targetType, message);
+            throw new TypeParserException(message, e);
+        } catch (Throwable t) {
+            // Something unexpected happen. Wrap it in a TypeParserException
+            // and provide context (i.e. input and targetType)
+            String message = Util.formatErrorMessage(input, preprocessedInput, targetType, t.getMessage());
+            throw new TypeParserException(message, t);
         }
     }
 
     private String preProcessInputString(String input, Type targetType) {
-        try {
-            return inputPreprocessor.prepare(input, new InputPreprocessorHelper(targetType));
-        } catch (Throwable t) {
-            throw new InputPreprocessorException(inputPreprocessor, t);
-        }
+        return inputPreprocessor.prepare(input, new InputPreprocessorHelper(targetType));
     }
 
     private void throwIfNullAndPrimitive(String preprocessedInput, Type targetType, String input) {
         if (preprocessedInput == null) {
             if (isPrimitive(targetType)) {
-                throw new IllegalPrimitiveValueException("Primitive can not be set to null");
+                throw new UnsupportedOperationException("Primitive can not be set to null");
             }
         }
     }

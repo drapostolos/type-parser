@@ -23,14 +23,12 @@ public interface InputPreprocessor {
      * <li>A null object for types other than above.</li>
      * </ul>
      * <p/>
-     * Any exceptions thrown by this method will be caught in the {@link TypeParser} and re-thrown
-     * converted to a {@link InputPreprocessorException}.
      * 
      * @param input String to prepare for parsing. The initial value will never be null.
      * @param helper Helper class injected automatically by the {@link TypeParser}.
      * @return a prepared string to be parsed
-     * @throws InputPreprocessorException Any exception thrown by implementation is wrapped within a
-     *         {@link InputPreprocessorException}.
+     * @throws RuntimeException Any exception thrown within this method will be wrapped and
+     *         re-thrown as a {@link TypeParserException} to the client.
      */
     String prepare(String input, InputPreprocessorHelper helper);
 }

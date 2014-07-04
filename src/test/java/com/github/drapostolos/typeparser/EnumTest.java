@@ -21,8 +21,9 @@ public class EnumTest extends AbstractTypeTester<MyEnum> {
 
     @Test
     public void shouldThrowWhenStringIsNotParsableToEnum() throws Exception {
-        shouldThrowParseException()
-                .withErrorMessage("EnumTest$MyEnum.valueOf(java.lang.String)")
+        shouldThrowTypeParserException()
+                .containingErrorMessage("No enum const class")
+                .containingErrorMessage("com.github.drapostolos.typeparser.EnumTest$MyEnum.DDD")
                 .whenParsing("DDD")
                 .to(MyEnum.class);
     }

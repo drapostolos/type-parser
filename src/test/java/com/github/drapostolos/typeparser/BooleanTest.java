@@ -31,8 +31,8 @@ public class BooleanTest extends AbstractTypeTester<Boolean> {
 
     @Test
     public void shouldThrowExceptionWhenNotParsableToBoolean() throws Exception {
-        shouldThrowParseException()
-                .withErrorMessage("is not parsable to a Boolean")
+        shouldThrowTypeParserException()
+                .containingErrorMessage("is not parsable to a Boolean")
                 .whenParsing("1234")
                 .to(Boolean.class, boolean.class);
     }

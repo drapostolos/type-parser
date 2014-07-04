@@ -15,8 +15,8 @@ public class DoubleTest extends AbstractTypeTester<Double> {
 
     @Test
     public void shouldThrowWhenStringIsNotParsableToDouble() throws Exception {
-        shouldThrowParseException()
-                .withNumberFormatErrorMessage()
+        shouldThrowTypeParserException()
+                .containingNumberFormatErrorMessage()
                 .whenParsing("aa")
                 .to(Double.class, double.class);
     }

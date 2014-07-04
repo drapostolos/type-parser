@@ -19,8 +19,8 @@ public class StaticFactoryMethodParserTest extends TestBase {
 
     @Test
     public void shouldThrowExceptionWhenStaticFactoryMethodFails() throws Exception {
-        shouldThrowParseException()
-                .withErrorMessage("Exception thrown when calling static factory method ")
+        shouldThrowTypeParserException()
+                .containingErrorMessage("Failed when calling static factory method ")
                 .whenParsing(DUMMY_STRING)
                 .to(MyClass3.class);
     }

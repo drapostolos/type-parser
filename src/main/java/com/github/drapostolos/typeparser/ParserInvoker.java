@@ -1,6 +1,7 @@
 package com.github.drapostolos.typeparser;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
 
 final class ParserInvoker {
 
@@ -17,35 +18,44 @@ final class ParserInvoker {
     }
 
     Object invoke() {
+        Object result;
+
+        result = invokeDynamicParsers(parsers.dynamicParsers());
+        if (result != DynamicParser.TRY_NEXT) {
+            return result;
+        }
+
         if (parsers.containsStaticParser(targetType)) {
             if (preprocessedInput == null) {
                 return null;
             }
             return invokeStaticParser();
         }
-        for (DynamicParser dynamicParser : parsers.dynamicParsers()) {
-            Object result = invokeDynamicParser(dynamicParser, helper);
+
+        result = invokeDynamicParsers(DefaultDynamicParsers.forRegularTypes());
+        if (result != DynamicParser.TRY_NEXT) {
+            return result;
+        }
+
+        throw new NoSuchRegisteredParserException("There is no registered 'Parser' for that type.");
+    }
+
+    private Object invokeDynamicParsers(Collection<? extends DynamicParser> dynamicParsers) {
+        for (DynamicParser dynamicParser : dynamicParsers) {
+            Object result = invokeDynamicParser(dynamicParser);
             if (result != DynamicParser.TRY_NEXT) {
                 return result;
             }
         }
-        throw new NoSuchRegisteredParserException("There is no registered 'Parser' for that type.");
+        return DynamicParser.TRY_NEXT;
+    }
+
+    private Object invokeDynamicParser(DynamicParser dynamicParser) {
+        return dynamicParser.parse(preprocessedInput, helper);
     }
 
     private Object invokeStaticParser() {
         Parser<?> parser = parsers.getStaticParser(targetType);
-        try {
-            return parser.parse(preprocessedInput, helper);
-        } catch (Throwable t) {
-            throw new ParseException("Parser.parse", parser, t);
-        }
-    }
-
-    private Object invokeDynamicParser(DynamicParser dynamicParser, ParserHelper helper) {
-        try {
-            return dynamicParser.parse(preprocessedInput, helper);
-        } catch (Throwable t) {
-            throw new ParseException("DynamicParser.parse", dynamicParser, t);
-        }
+        return parser.parse(preprocessedInput, helper);
     }
 }

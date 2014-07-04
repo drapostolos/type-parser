@@ -21,7 +21,7 @@ public final class TypeParserBuilder {
     InputPreprocessor inputPreprocessor = Util.defaultInputPreprocessor();
 
     TypeParserBuilder() {
-        // Initialize with the default typeParsers
+        // Initialize with the default Parsers/DynamicParsers
         parsers = Parsers.copyDefault();
     }
 
@@ -57,6 +57,13 @@ public final class TypeParserBuilder {
         if (targetType == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("targetType"));
         }
+        if (targetType.isArray()) {
+            String message = "Cannot register Parser for array class. Register a Parser for "
+                    + "the component type '%s' instead, as arrays are handled automatically "
+                    + "internally in type-parser.";
+            Class<?> componentType = targetType.getComponentType();
+            throw new IllegalArgumentException(String.format(message, componentType.getName()));
+        }
         parsers.addStaticParser(targetType, parser);
         return this;
     }
@@ -84,7 +91,7 @@ public final class TypeParserBuilder {
     /**
      * Register a custom made {@link DynamicParser} implementation. The {@link TypeParser} will loop
      * through the registered {@link DynamicParser} and the first found (which does not return
-     * {@link DynamicParser#TRY_NEXT}) will be used. The last registered {@link DynamicParser} will
+     * {@link DynamicParser#TRY_NEXT}) will be used. The first registered {@link DynamicParser} will
      * be first in the loop.
      * 
      * @param parser custom made {@link DynamicParser} implementation.

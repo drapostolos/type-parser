@@ -15,8 +15,8 @@ public class ShortTest extends AbstractTypeTester<Short> {
 
     @Test
     public void shouldThrowWhenStringIsNotParsableToShort() throws Exception {
-        shouldThrowParseException()
-                .withNumberFormatErrorMessage()
+        shouldThrowTypeParserException()
+                .containingNumberFormatErrorMessage()
                 .whenParsing("a")
                 .to(Short.class);
     }

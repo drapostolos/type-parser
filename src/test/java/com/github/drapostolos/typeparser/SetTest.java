@@ -19,10 +19,9 @@ public class SetTest extends TestBase {
 
     @Test
     public void shouldThrowExceptionWhenParsingSetOfWildcard() throws Exception {
-        shouldThrowParseException()
-                .withErrorMessage("to type \"java.util.Set<?>")
-                .withErrorMessage("UnsupportedOperationException thrown in method 'DynamicParser.parse(...)'")
-                .withErrorMessage("contains illegal type argument: '?'")
+        shouldThrowTypeParserException()
+                .containingErrorMessage("to type \"java.util.Set<?>")
+                .containingErrorMessage("That type contains illegal type argument: '?'")
                 .whenParsing(DUMMY_STRING)
                 .to(new GenericType<Set<?>>() {});
     }

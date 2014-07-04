@@ -17,6 +17,22 @@ public class ParameterCheckTest extends TestBase {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
+    public void shouldThrowWhenRegesteringArrayClassParser() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Cannot register Parser for array class.");
+        thrown.expectMessage("Register a Parser for the component type 'int' instead");
+        thrown.expectMessage("as arrays are handled automatically internally in type-parser.");
+
+        builder.registerParser(int[].class, new Parser<int[]>() {
+
+            @Override
+            public int[] parse(String input, ParserHelper helper) {
+                return null;
+            }
+        });
+    }
+
+    @Test
     public void shouldThrowWhenCallingPrepareWithDefaultInputPreprocessorWithNull() throws Exception {
         prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("input");
         new InputPreprocessorHelper(SOME_TYPE).prepareWithDefaultInputPreprocessor(null);

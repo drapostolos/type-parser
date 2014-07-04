@@ -18,9 +18,8 @@ public class UrlTest extends AbstractTypeTester<URL> {
 
     @Test
     public void shouldThrowWhenStringIsMalformedUrl() throws Exception {
-        shouldThrowParseException()
-                .withErrorMessage("IllegalArgumentException thrown in method 'Parser.parse(...)'")
-                .withErrorMessage("no protocol: strange URL.")
+        shouldThrowTypeParserException()
+                .containingErrorMessage("MalformedURLException: no protocol: strange URL")
                 .whenParsing("strange URL")
                 .to(URL.class);
     }

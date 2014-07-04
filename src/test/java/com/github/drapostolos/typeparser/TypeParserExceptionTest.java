@@ -10,7 +10,7 @@ public class TypeParserExceptionTest extends TestBase {
     private static final String ERROR_MSG = "some-error-message";
 
     @Test
-    public void shouldThrowInputPreprocessorExceptionWhenInputPreprocessorImplementationThrows() throws Exception {
+    public void shouldThrowWhenInputPreprocessorImplementationThrows() throws Exception {
         // given
         setInputPreprocessor(new InputPreprocessor() {
 
@@ -21,38 +21,14 @@ public class TypeParserExceptionTest extends TestBase {
         });
 
         // then
-        shouldThrow(InputPreprocessorException.class)
-                .withErrorMessage("Exception thrown in method 'InputPreprocessor.prepare(...)'")
-                .withErrorMessage(ERROR_MSG)
-                .withErrorMessage("See underlying exception for more information")
+        shouldThrowTypeParserException()
+                .containingErrorMessage(ERROR_MSG)
                 .whenParsing(DUMMY_STRING)
                 .to(String.class);
     }
 
     @Test
-    public void shouldThrowSplitStrategyExceptionWhenSplitStrategyImplementationThrows() throws Exception {
-
-        // given
-        setSplitStrategy(new SplitStrategy() {
-
-            @Override
-            public List<String> split(String input, SplitStrategyHelper helper) {
-                throw new IllegalArgumentException(ERROR_MSG);
-            }
-        });
-
-        // when
-        shouldThrowParseException()
-                .causedBy(SplitStrategyException.class)
-                .withErrorMessage("IllegalArgumentException thrown in method 'SplitStrategy.split(...)'")
-                .withErrorMessage(ERROR_MSG)
-                .withErrorMessage("See underlying exception for more information.")
-                .whenParsing(DUMMY_STRING)
-                .to(String[].class);
-    }
-
-    @Test
-    public void shouldThrowKeyValueSplitStrategyExceptionWhenSplitStrategyImplementationThrows() throws Exception {
+    public void shouldThrowWhenSplitStrategyImplementationThrows() throws Exception {
         // given
         setKeyValueSplitStrategy(new SplitStrategy() {
 
@@ -63,17 +39,15 @@ public class TypeParserExceptionTest extends TestBase {
         });
 
         // then
-        shouldThrowParseException()
-                .causedBy(KeyValueSplitStrategyException.class)
-                .withErrorMessage("IllegalArgumentException thrown in method 'KeyValueSplitStrategy.split(...)'")
-                .withErrorMessage(ERROR_MSG)
-                .withErrorMessage("See underlying exception for more information")
+        shouldThrowTypeParserException()
+                .causedBy(IllegalArgumentException.class)
+                .containingErrorMessage(ERROR_MSG)
                 .whenParsing(DUMMY_STRING)
                 .to(new GenericType<Map<String, String>>() {});
     }
 
     @Test
-    public void shouldThrowStaticParserExceptionWhenParserImplementationThrows() throws Exception {
+    public void shouldThrowWhenParserImplementationThrows() throws Exception {
         // given
         registerParser(String.class, new Parser<String>() {
 
@@ -84,16 +58,14 @@ public class TypeParserExceptionTest extends TestBase {
         });
 
         // then
-        shouldThrowParseException()
-                .withErrorMessage("Exception thrown in method 'Parser.parse(...)'")
-                .withErrorMessage(ERROR_MSG)
-                .withErrorMessage("See underlying exception for more information")
+        shouldThrowTypeParserException()
+                .containingErrorMessage(ERROR_MSG)
                 .whenParsing(DUMMY_STRING)
                 .to(String.class);
     }
 
     @Test
-    public void shouldThrowDynamicParserExceptionWhenDynamicParserImplementationThrows() throws Exception {
+    public void shouldThrowWhenDynamicParserImplementationThrows() throws Exception {
         // given
         registerDynamicParser(new DynamicParser() {
 
@@ -104,22 +76,18 @@ public class TypeParserExceptionTest extends TestBase {
         });
 
         // then
-        shouldThrowParseException()
-                .withErrorMessage("Exception thrown in method 'DynamicParser.parse(...)'")
-                .withErrorMessage(ERROR_MSG)
-                .withErrorMessage("See underlying exception for more information")
+        shouldThrowTypeParserException()
+                .containingErrorMessage(ERROR_MSG)
                 .whenParsing(DUMMY_STRING)
-                .to(String[].class);
+                .to(String.class);
     }
 
     @Test
     public void shouldThrowWhenRecursiveParseCallThrows() throws Exception {
-        shouldThrowParseException()
-                .causedBy(ParseException.class)
-                .withErrorMessage("Can not parse \"1,2,3,a,4\" {preprocessed: \"1,2,3,a,4\"}")
-                .withErrorMessage("ParseException thrown in method 'DynamicParser.parse(...)'")
-                .withErrorMessage("Can not parse \"a\" {preprocessed: \"a\"}")
-                .withErrorMessage("NumberFormatException thrown in method 'Parser.parse(...)'")
+        shouldThrowTypeParserException()
+                .causedBy(NumberFormatException.class)
+                .containingErrorMessage("Can not parse \"a\" {preprocessed: \"a\"}")
+                .containingNumberFormatErrorMessage()
                 .whenParsing("1,2,3,a,4")
                 .to(Integer[].class);
     }

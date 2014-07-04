@@ -13,8 +13,13 @@ public class DefeatConstructorInstantiationTest {
     }
 
     @Test(expected = InvocationTargetException.class)
-    public void shouldThrowAssertionErrorWhenInstantiatingDefaultStaticParsers() throws Exception {
+    public void shouldThrowWhenInstantiatingDefaultStaticParsers() throws Exception {
         throwExceptionWhenInstantiating(DefaultStaticParsers.class);
+    }
+
+    @Test(expected = InvocationTargetException.class)
+    public void shouldThrowWhenInstantiatingDefaultDynamicParsers() throws Exception {
+        throwExceptionWhenInstantiating(DefaultDynamicParsers.class);
     }
 
     private void throwExceptionWhenInstantiating(Class<?> cls) throws Exception {

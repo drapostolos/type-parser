@@ -102,6 +102,10 @@ public class CollectionTest extends TestBase {
                 .to(new GenericType<MyCollection<String>>() {});
     }
 
+    enum TestEnum {
+        AAA, BBB, CCC, DDD
+    }
+
     @Test
     public void canParseToEnumSet() throws Exception {
         assertThat(parser.parse("AAA, CCC", new GenericType<EnumSet<TestEnum>>() {}))

@@ -177,7 +177,7 @@ abstract class Helper {
      * If {@code targetType} is of a raw collection type (e.g. java.lang.List.class), then false is
      * returned.
      * 
-     * @return
+     * @return true if {@code targetType} is of Parameterized type, otherwise false.
      */
     final public boolean isTargetTypeParameterized() {
         if (targetType instanceof ParameterizedType) {

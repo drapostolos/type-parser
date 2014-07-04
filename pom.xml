@@ -1,12 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<url>http://maven.apache.org</url>
 	<groupId>com.github.drapostolos</groupId>
 	<artifactId>type-parser</artifactId>
 	<name>type-parser</name>
-	<version>0.3.0-SNAPSHOT</version>
+	<version>0.3.0</version>
 	<packaging>jar</packaging>
 	<description>This is a lightweigth library that does nothing but parse a string to a given type. Supports most of the java classes, such as Integer, File, Enum, Float and also generic types as well, such as List&lt;Integer&gt;, Set&lt;File&gt; etc. Also possible to register your own parsers.</description>
 

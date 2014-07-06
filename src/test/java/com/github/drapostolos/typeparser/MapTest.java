@@ -54,7 +54,6 @@ public class MapTest extends TestBase {
                 new GenericType<IdentityHashMap<String, String>>() {},
                 new GenericType<LinkedHashMap<String, String>>() {},
                 new GenericType<TreeMap<String, String>>() {},
-                new GenericType<HashMap<String, String>>() {},
                 new GenericType<WeakHashMap<String, String>>() {});
 
     }

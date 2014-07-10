@@ -76,6 +76,14 @@ public class ArrayTest extends TestBase {
     }
 
     @Test
+    public void canParseToEmpty() throws Exception {
+        Integer[] intArray = parser.parse("null", Integer[].class);
+        assertThat(intArray)
+                .isInstanceOf(Integer[].class)
+                .isEmpty();
+    }
+
+    @Test
     public void canChangeSplitStrategy() throws Exception {
         // given
         TypeParser parser = TypeParser.newBuilder()

@@ -1,6 +1,5 @@
 package com.github.drapostolos.typeparser;
 
-import static com.github.drapostolos.typeparser.Util.defaultInputPreprocessor;
 import static com.github.drapostolos.typeparser.Util.makeNullArgumentErrorMsg;
 
 import java.lang.reflect.Type;
@@ -14,22 +13,26 @@ import java.lang.reflect.Type;
  */
 public final class InputPreprocessorHelper extends Helper {
 
-    InputPreprocessorHelper(Type targetType) {
+    final private NullStringStrategy nullStringStrategy;
+
+    InputPreprocessorHelper(Type targetType, TypeParser typeParser) {
         super(targetType);
+        this.nullStringStrategy = typeParser.nullStringStrategy;
     }
 
     /**
-     * Prepare the input String by using the default {@link InputPreprocessor} strategy.
+     * Checks if the given <code>input</code> is considered a <code>NullString</code> or not.
+     * Returns true if it is, otherwise returns false.
      * 
-     * @param input String to prepare for parsing
-     * @return pre-processed String to be parsed.
-     * @throws NullPointerException if {@code input} is null.
+     * @param input string to parse.
+     * @return true if <code>input</code> is a <code>NullString</code>, otherwise false.
+     * @throws NullPointerException if given argument is {@code null}.
+     * @see NullStringStrategy
      */
-    public String prepareWithDefaultInputPreprocessor(String input) {
+    public boolean isNullString(String input) {
         if (input == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("input"));
         }
-        return defaultInputPreprocessor().prepare(input, this);
+        return nullStringStrategy.isNullString(input, new NullStringStrategyHelper(targetType));
     }
-
 }

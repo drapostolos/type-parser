@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -33,31 +34,47 @@ import org.junit.Test;
 
 public class CollectionTest extends TestBase {
 
-    @SuppressWarnings("unchecked")
-    @Test
-    public void canParseToCollectionConcreteTypes() throws Exception {
-        canParseToConcreteCollectionTypes(
-                new GenericType<ArrayDeque<String>>() {},
-                new GenericType<ArrayList<String>>() {},
-                new GenericType<ConcurrentLinkedQueue<String>>() {},
-                new GenericType<ConcurrentSkipListSet<String>>() {},
-                new GenericType<CopyOnWriteArrayList<String>>() {},
-                new GenericType<CopyOnWriteArraySet<String>>() {},
-                new GenericType<HashSet<String>>() {},
-                new GenericType<LinkedBlockingDeque<String>>() {},
-                new GenericType<LinkedBlockingQueue<String>>() {},
-                new GenericType<LinkedHashSet<String>>() {},
-                new GenericType<LinkedList<String>>() {},
-                new GenericType<PriorityBlockingQueue<String>>() {},
-                new GenericType<PriorityQueue<String>>() {},
-                new GenericType<Stack<String>>() {},
-                new GenericType<TreeSet<String>>() {},
-                new GenericType<Vector<String>>() {});
-
+    private static final List<GenericType<? extends Collection<String>>> COLLECTION_CLASSES;
+    static {
+        List<GenericType<? extends Collection<String>>> list =
+                new ArrayList<GenericType<? extends Collection<String>>>();
+        list.add(new GenericType<ConcurrentLinkedQueue<String>>() {});
+        list.add(new GenericType<ConcurrentSkipListSet<String>>() {});
+        list.add(new GenericType<CopyOnWriteArrayList<String>>() {});
+        list.add(new GenericType<CopyOnWriteArraySet<String>>() {});
+        list.add(new GenericType<LinkedBlockingDeque<String>>() {});
+        list.add(new GenericType<LinkedBlockingQueue<String>>() {});
+        list.add(new GenericType<PriorityBlockingQueue<String>>() {});
+        list.add(new GenericType<ArrayDeque<String>>() {});
+        list.add(new GenericType<ArrayList<String>>() {});
+        list.add(new GenericType<HashSet<String>>() {});
+        list.add(new GenericType<LinkedHashSet<String>>() {});
+        list.add(new GenericType<LinkedList<String>>() {});
+        list.add(new GenericType<PriorityQueue<String>>() {});
+        list.add(new GenericType<Stack<String>>() {});
+        list.add(new GenericType<TreeSet<String>>() {});
+        list.add(new GenericType<Vector<String>>() {});
+        COLLECTION_CLASSES = Collections.unmodifiableList(list);
     }
 
-    private void canParseToConcreteCollectionTypes(GenericType<? extends Collection<String>>... types) {
-        for (GenericType<? extends Collection<String>> type : types) {
+    private static final List<GenericType<? extends Collection<String>>> COLLECTION_INTERFACES;
+    static {
+        List<GenericType<? extends Collection<String>>> list =
+                new ArrayList<GenericType<? extends Collection<String>>>();
+        list.add(new GenericType<BlockingQueue<String>>() {});
+        list.add(new GenericType<BlockingDeque<String>>() {});
+        list.add(new GenericType<Deque<String>>() {});
+        list.add(new GenericType<List<String>>() {});
+        list.add(new GenericType<NavigableSet<String>>() {});
+        list.add(new GenericType<Queue<String>>() {});
+        list.add(new GenericType<Set<String>>() {});
+        list.add(new GenericType<SortedSet<String>>() {});
+        COLLECTION_INTERFACES = Collections.unmodifiableList(list);
+    }
+
+    @Test
+    public void canParseToCollectionClasses() throws Exception {
+        for (GenericType<? extends Collection<String>> type : COLLECTION_CLASSES) {
             Class<?> rawType = toRawType(type);
             Collection<String> collection = parser.parse(DUMMY_STRING, type);
             assertThat(collection)
@@ -68,23 +85,32 @@ public class CollectionTest extends TestBase {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Test
-    public void canParseToCollectionInterfaces() throws Exception {
-        parseToCollectionInterfaces(
-                new GenericType<BlockingQueue<String>>() {},
-                new GenericType<BlockingDeque<String>>() {},
-                new GenericType<Deque<String>>() {},
-                new GenericType<List<String>>() {},
-                new GenericType<NavigableSet<String>>() {},
-                new GenericType<Queue<String>>() {},
-                new GenericType<Set<String>>() {},
-                new GenericType<SortedSet<String>>() {});
-
+    public void canParseToEmptyCollectionClasses() throws Exception {
+        for (GenericType<? extends Collection<String>> type : COLLECTION_CLASSES) {
+            Class<?> rawType = toRawType(type);
+            Collection<String> collection = parser.parse("null", type);
+            assertThat(collection)
+                    .isInstanceOf(rawType)
+                    .isEmpty();
+            assertThat(collection.getClass()).isEqualTo(rawType);
+        }
     }
 
-    private void parseToCollectionInterfaces(GenericType<? extends Collection<String>>... types) {
-        for (GenericType<? extends Collection<String>> type : types) {
+    @Test
+    public void canParseToCollectionInterfaces() throws Exception {
+        for (GenericType<? extends Collection<String>> type : COLLECTION_INTERFACES) {
+            Class<?> rawType = toRawType(type);
+            Collection<String> collection = parser.parse("null", type);
+            assertThat(collection)
+                    .isInstanceOf(rawType)
+                    .isEmpty();
+        }
+    }
+
+    @Test
+    public void canParseToEmptyCollectionInterfaces() throws Exception {
+        for (GenericType<? extends Collection<String>> type : COLLECTION_INTERFACES) {
             Class<?> rawType = toRawType(type);
             assertThat(parser.parse(DUMMY_STRING, type))
                     .containsExactly(DUMMY_STRING)
@@ -94,12 +120,12 @@ public class CollectionTest extends TestBase {
     }
 
     @Test
-    public void shouldThrowWhenCollectionImplementationHasNoDefaultconstructor() throws Exception {
+    public void MyCollectionWithoutDefaultConstructor() throws Exception {
         shouldThrowTypeParserException()
                 .containingErrorMessage("Cannot instantiate collection of type '")
-                .containingErrorMessage(MyCollection.class.getName())
+                .containingErrorMessage(MyCollectionWithoutDefaultConstructor.class.getName())
                 .whenParsing(DUMMY_STRING)
-                .to(new GenericType<MyCollection<String>>() {});
+                .to(new GenericType<MyCollectionWithoutDefaultConstructor<String>>() {});
     }
 
     enum MyEnum {
@@ -111,6 +137,13 @@ public class CollectionTest extends TestBase {
         assertThat(parser.parse("AAA, CCC", new GenericType<EnumSet<MyEnum>>() {}))
                 .containsExactly(MyEnum.AAA, MyEnum.CCC)
                 .isInstanceOf(EnumSet.class);
+    }
+
+    @Test
+    public void canParseToEmptyEnumSet() throws Exception {
+        assertThat(parser.parse("null", new GenericType<EnumSet<MyEnum>>() {}))
+                .isInstanceOf(EnumSet.class)
+                .isEmpty();
     }
 
     @SuppressWarnings("unchecked")

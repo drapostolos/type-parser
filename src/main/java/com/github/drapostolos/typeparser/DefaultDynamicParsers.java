@@ -62,7 +62,7 @@ class DefaultDynamicParsers {
         if (helper.isTargetTypeParameterized()) {
             return helper.getParameterizedClassArgumentByIndex(0);
         }
-        // Use String.class as the default element type for raw Collections.
+        // Use String as the default element type for raw Collections.
         return String.class;
     }
 
@@ -266,9 +266,6 @@ class DefaultDynamicParsers {
                 if (!methodFound) {
                     return TRY_NEXT;
                 }
-                if (input == null) {
-                    return null;
-                }
                 Object argument;
                 if (argType.equals(String.class)) {
                     // No need to convert String to String
@@ -311,9 +308,6 @@ class DefaultDynamicParsers {
 
                 if (!constructorFound) {
                     return TRY_NEXT;
-                }
-                if (input == null) {
-                    return null;
                 }
                 Object argument;
                 if (argType.equals(String.class) || argType.equals(Object.class)) {

@@ -7,6 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/*
+ * Class holding the various Parsers used by this instance of TypeParser.
+ */
 class Parsers {
 
     private final Map<Type, Parser<?>> staticParsers;
@@ -19,7 +22,7 @@ class Parsers {
     static Parsers copyDefault() {
         return new Parsers(
                 DefaultStaticParsers.copy(),
-                DefaultDynamicParsers.forContainerTypes());
+                new ArrayList<DynamicParser>());
     }
 
     /*

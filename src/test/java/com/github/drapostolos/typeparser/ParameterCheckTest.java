@@ -33,22 +33,37 @@ public class ParameterCheckTest extends TestBase {
     }
 
     @Test
-    public void shouldThrowWhenCallingPrepareWithDefaultInputPreprocessorWithNull() throws Exception {
-        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("input");
-        new InputPreprocessorHelper(SOME_TYPE).prepareWithDefaultInputPreprocessor(null);
-    }
-
-    @Test
     public void shouldThrowWhenDefaultSplitStrategyIsCalledWithNull() throws Exception {
         prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("input");
         new SplitStrategyHelper(SOME_TYPE).splitWithDefaultSplitStrategy(null);
     }
 
     @Test
-    public void shouldThrowWhenDefaultKeyValueSplitStrategyIsCalledWithNull() throws Exception {
+    public void shouldThrowWhenCheckingForNullStringInInputPreprocessorHelperWhenInputIsNull() throws Exception {
+        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("input");
+        TypeParser typeParser = TypeParser.newBuilder().build();
+        new InputPreprocessorHelper(SOME_TYPE, typeParser).isNullString(null);
+    }
+
+    @Test
+    public void shouldThrowWhenKeyValueSplitStrategyIsCalledWithNull() throws Exception {
         prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("keyValue");
         TypeParser typeParser = TypeParser.newBuilder().build();
-        new ParserHelper(typeParser, SOME_TYPE).splitKeyValue(null);
+        new ParserHelper(SOME_TYPE, typeParser).splitKeyValue(null);
+    }
+
+    @Test
+    public void shouldThrowWhenCheckingForNullStringInParserHelperWhenInputIsNull() throws Exception {
+        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("input");
+        TypeParser typeParser = TypeParser.newBuilder().build();
+        new ParserHelper(SOME_TYPE, typeParser).isNullString(null);
+    }
+
+    @Test
+    public void shouldThrowWhenSplitStrategyIsCalledWithNull() throws Exception {
+        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("input");
+        TypeParser typeParser = TypeParser.newBuilder().build();
+        new ParserHelper(SOME_TYPE, typeParser).split(null);
     }
 
     @Test
@@ -57,7 +72,7 @@ public class ParameterCheckTest extends TestBase {
         thrown.expectMessage("Argument named 'index' is illegally "
                 + "set to negative value: -1. Must be positive.");
         TypeParser typeParser = TypeParser.newBuilder().build();
-        new ParserHelper(typeParser, SOME_TYPE).getParameterizedClassArgumentByIndex(-1);
+        new ParserHelper(SOME_TYPE, typeParser).getParameterizedClassArgumentByIndex(-1);
     }
 
     @Test
@@ -67,7 +82,7 @@ public class ParameterCheckTest extends TestBase {
                 + "set to value: 1. List size is: 1.");
         TypeParser typeParser = TypeParser.newBuilder().build();
         Type type = new GenericType<List<Integer>>() {}.getType();
-        new ParserHelper(typeParser, type).getParameterizedClassArgumentByIndex(1);
+        new ParserHelper(type, typeParser).getParameterizedClassArgumentByIndex(1);
     }
 
     @Test
@@ -116,13 +131,19 @@ public class ParameterCheckTest extends TestBase {
     }
 
     @Test
-    public void shouldThrowExceptionWhenSettingNullSplitStrategy() throws Exception {
+    public void shouldThrowExceptionWhenSettingNullStringStrategyWithNull() throws Exception {
+        prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("nullStringStrategy");
+        builder.setNullStringStrategy(null);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenSettingSplitStrategyWithNull() throws Exception {
         prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("splitStrategy");
         builder.setSplitStrategy(null);
     }
 
     @Test
-    public void shouldThrowExceptionWhenSettingNullMakKeyValueSplitStrategy() throws Exception {
+    public void shouldThrowExceptionWhenSettingKeyValueSplitStrategyWithNull() throws Exception {
         prepareExpectedExceptionWhenNullValuePassedInForArgumentNamed("splitStrategy");
         builder.setKeyValueSplitStrategy(null);
     }

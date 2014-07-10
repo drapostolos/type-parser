@@ -2,9 +2,9 @@ package com.github.drapostolos.typeparser;
 
 import java.util.AbstractList;
 
-public class MyCollection<T> extends AbstractList<T> {
+public class MyCollectionWithoutDefaultConstructor<T> extends AbstractList<T> {
 
-    public MyCollection(String str) {}
+    public MyCollectionWithoutDefaultConstructor(String str) {}
 
     @Override
     public T get(int index) {

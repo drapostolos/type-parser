@@ -16,8 +16,8 @@ public abstract class TestBase {
     static final String DUMMY_STRING = "dummy-string";
     static final String ERROR_MSG = "some-error-message";
     static final String NUMBER_FORMAT_ERROR_MSG = "Number format exception For input string: \"%s\".";
-    TypeParserBuilder parserBuilder = TypeParser.newBuilder();
-    TypeParser parser = parserBuilder.build();
+    TypeParserBuilder builder = TypeParser.newBuilder();
+    TypeParser parser = builder.build();
     String stringToParse;
     List<Type> targetTypes = new ArrayList<Type>();
 
@@ -27,27 +27,32 @@ public abstract class TestBase {
     Class<? extends Throwable> expectedThrowable;
 
     final TestBase setInputPreprocessor(InputPreprocessor ip) {
-        parserBuilder.setInputPreprocessor(ip);
+        builder.setInputPreprocessor(ip);
         return this;
     }
 
     final <T> TestBase registerDynamicParser(DynamicParser parser) {
-        parserBuilder.registerDynamicParser(parser);
+        builder.registerDynamicParser(parser);
         return this;
     }
 
     final <T> TestBase registerParser(Class<T> targetType, Parser<T> parser) {
-        parserBuilder.registerParser(targetType, parser);
+        builder.registerParser(targetType, parser);
         return this;
     }
 
     final TestBase setSplitStrategy(SplitStrategy splitStrategy) {
-        parserBuilder.setSplitStrategy(splitStrategy);
+        builder.setSplitStrategy(splitStrategy);
         return this;
     }
 
     final TestBase setKeyValueSplitStrategy(SplitStrategy splitStrategy) {
-        parserBuilder.setKeyValueSplitStrategy(splitStrategy);
+        builder.setKeyValueSplitStrategy(splitStrategy);
+        return this;
+    }
+
+    final TestBase setNullStringStrategy(NullStringStrategy nullStringStrategy) {
+        builder.setNullStringStrategy(nullStringStrategy);
         return this;
     }
 
@@ -107,7 +112,7 @@ public abstract class TestBase {
     }
 
     private void parse() throws Exception {
-        TypeParser parser = parserBuilder.build();
+        TypeParser parser = builder.build();
         Exception throwThis = null;
         for (Type t : targetTypes) {
             try {

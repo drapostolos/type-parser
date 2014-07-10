@@ -29,12 +29,12 @@ abstract class Helper {
             GenericArrayType array = (GenericArrayType) targetType;
             Type componentType = array.getGenericComponentType();
             if (componentType instanceof Class) {
-                return (Class<?>) Array.newInstance((Class<?>) componentType, 0).getClass();
+                return Array.newInstance((Class<?>) componentType, 0).getClass();
             }
             if (componentType instanceof ParameterizedType) {
                 ParameterizedType parameterizedType = (ParameterizedType) componentType;
                 Class<?> rawType = (Class<?>) parameterizedType.getRawType();
-                return (Class<?>) Array.newInstance(rawType, 0).getClass();
+                return Array.newInstance(rawType, 0).getClass();
             }
         }
         return targetType.getClass();
@@ -59,7 +59,7 @@ abstract class Helper {
      * returns a list with the type arguments.
      * <p/>
      * All type arguments must be none parameterized types (i.e. nested parameterized types are not
-     * allowed), with one exception: {@link Class}. <br/>
+     * supported), with one exception: {@link Class}. <br/>
      * 
      * @return List of {@link Class} types.
      * @throws UnsupportedOperationException if the {@code targetType} is not a parameterized type.
@@ -68,8 +68,8 @@ abstract class Helper {
      */
     final public <T> List<Class<T>> getParameterizedClassArguments() {
         if (!(isTargetTypeParameterized())) {
-            String message = "type must be parameterized: \"%s\" {instance of: %s}.";
-            throw new UnsupportedOperationException(String.format(message, targetType, targetType.getClass()));
+            String message = String.format("type must be parameterized: %s", Util.toString(targetType));
+            throw new UnsupportedOperationException(message);
         }
 
         ParameterizedType pt = (ParameterizedType) targetType;

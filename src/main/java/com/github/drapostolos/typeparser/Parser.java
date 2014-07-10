@@ -1,8 +1,8 @@
 package com.github.drapostolos.typeparser;
 
 /**
- * Interface for implementations that parses a given string and then converts it to
- * a specific type. Any implementation of this interface is expected to be immutable.
+ * Callback interface that allows clients to parse a given string and then convert it to
+ * a specific type. Implementations of this interface are expected to be immutable.
  * 
  * @param <T> the type to convert the parsed string to.
  * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
@@ -12,17 +12,19 @@ public interface Parser<T> {
 
     /**
      * Parses the given string and converts it to an instance of type T.
-     * <p>
-     * Type-Parser library will internally call this method with a non-null {@code input} value. If
-     * {@code input} is null (as returned from
-     * {@link InputPreprocessor#prepare(String, InputPreprocessorHelper)}) this method will not be
-     * called, instead a {@code null} value is used.
+     * <p/>
+     * If the input string passed to the {@link TypeParser} is the {@code NullString} (See
+     * {@link NullStringStrategy}), then this method will be skipped and a {@code null} object is
+     * automatically return from {@link TypeParser}.
+     * <p/>
      * 
-     * @param input input string to parse. This will never be null.
+     * @param input pre-processed input string to parse. Will never be {@code null} or a
+     *        {@code NullString}.
      * @param helper Helper class injected automatically by the {@link TypeParser}.
      * @return an instance of type T.
      * @throws RuntimeException Any exception thrown within this method will be wrapped and
      *         re-thrown as a {@link TypeParserException} to the client.
+     * @see NullStringStrategy
      */
     T parse(String input, ParserHelper helper);
 }

@@ -21,13 +21,15 @@ public final class ParserHelper extends Helper {
     private final TypeParser typeParser;
     private final SplitStrategy splitStrategy;
     private final SplitStrategy keyValueSplitStrategy;
+    private final NullStringStrategy nullStringStrategy;
     private final Parsers parsers;
 
-    ParserHelper(TypeParser typeParser, Type targetType) {
+    ParserHelper(Type targetType, TypeParser typeParser) {
         super(targetType);
-        this.parsers = typeParser.parsers;
         this.typeParser = typeParser;
+        this.parsers = typeParser.parsers;
         this.splitStrategy = typeParser.splitStrategy;
+        this.nullStringStrategy = typeParser.nullStringStrategy;
         this.keyValueSplitStrategy = typeParser.keyValueSplitStrategy;
     }
 
@@ -59,46 +61,72 @@ public final class ParserHelper extends Helper {
 
     /**
      * Splits the {@code input} string into a list of sub-strings by using the {@link SplitStrategy}
-     * implementation, as registered with {@link TypeParserBuilder#setSplitStrategy(SplitStrategy)}.
+     * implementation (as registered with {@link TypeParserBuilder#setSplitStrategy(SplitStrategy)}
+     * ).
      * <p/>
-     * If {@code input} is null, an empty list is returned, without calling the registered
-     * {@link SplitStrategy}.
+     * If {@code input} is the <code>NullString</code> (See {@link NullStringStrategy}), an empty
+     * list is returned, without calling the registered {@link SplitStrategy}.
      * <p/>
      * For example the default {@link SplitStrategy} will split this string "1, 2, 3, 4" into ["1",
      * " 2", " 3", " 4"].
      * <p/>
      * 
-     * @param input String to parse. For example "THIS, THAT, OTHER"
-     * @return List of strings.
+     * @param input pre-processed input string to parse. Can be a {@code NullString}.
+     * @return List of strings, or an empty List if the given <code>input</code> is the
+     *         <code>NullString</code> (See {@link NullStringStrategy})
      * @throws NullPointerException if given {@code input} is null.
-     * @throws RuntimeException.
+     * @throws RuntimeException for any other faults that happens within the {@link SplitStrategy}.
+     * @see NullStringStrategy
+     * @see SplitStrategy
+     * @see InputPreprocessor
      */
     public List<String> split(String input) {
         if (input == null) {
+            throw new NullPointerException(makeNullArgumentErrorMsg("input"));
+        }
+        if (nullStringStrategy.isNullString(input, new NullStringStrategyHelper(targetType))) {
             return Collections.emptyList();
         }
         return splitStrategy.split(input, new SplitStrategyHelper(targetType));
     }
 
     /**
-     * Splits the {@code keyValue} string into a list of sub-strings by using the
-     * {@link SplitStrategy} implementation, as registered with
-     * {@link TypeParserBuilder#setKeyValueSplitStrategy(SplitStrategy)}.
+     * Splits the {@code keyValue} string into a list of two string elements by using the
+     * {@link SplitStrategy} implementation (as registered with
+     * {@link TypeParserBuilder#setKeyValueSplitStrategy(SplitStrategy)}). The first element
+     * represent the <code>Key</code> and the second element the <code>Value</code>.
      * <p/>
-     * For example the default behavior splits this string "a=AAA=BBB" into ["a", "AAA=BBB"]. Note!
-     * The the string is only split by the first occurring of "=", any subsequent "=" are ignored by
-     * the {@link SplitStrategy}.
+     * For example the default key-value {@link SplitStrategy} splits this string "a=AAA=BBB" into
+     * ["a", "AAA=BBB"]. Note! The the string is only split by the first occurring of "=", any
+     * subsequent "=" are ignored by the default key-value {@link SplitStrategy}.
      * 
-     * @param keyValue
-     * @return A list of string computed by splitting the {@code keyValue} string using the KeyValue
-     *         SplitStrategy.
+     * @param keyValue Example: "Key=Value"
+     * @return A list of two string elements computed by splitting the {@code keyValue} string using
+     *         the key-value SplitStrategy.
      * @throws NullPointerException if given {@code keyValue} is null.
-     * @throws RuntimeException.
+     * @throws RuntimeException for any other faults that happens within the {@link SplitStrategy}.
+     * @see SplitStrategy
      */
     public List<String> splitKeyValue(String keyValue) {
         if (keyValue == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("keyValue"));
         }
         return keyValueSplitStrategy.split(keyValue, new SplitStrategyHelper(targetType));
+    }
+
+    /**
+     * Checks if the given <code>input</code> is considered a <code>NullString</code> or not.
+     * Returns true if it is, otherwise returns false.
+     * 
+     * @param input string to parse.
+     * @return true if <code>input</code> is a <code>NullString</code>, otherwise false.
+     * @throws NullPointerException if given argument is {@code null}.
+     * @see NullStringStrategy
+     */
+    public boolean isNullString(String input) {
+        if (input == null) {
+            throw new NullPointerException(makeNullArgumentErrorMsg("input"));
+        }
+        return nullStringStrategy.isNullString(input, new NullStringStrategyHelper(targetType));
     }
 }

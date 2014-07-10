@@ -19,6 +19,7 @@ public final class TypeParser {
     final SplitStrategy splitStrategy;
     final SplitStrategy keyValueSplitStrategy;
     final InputPreprocessor inputPreprocessor;
+    final NullStringStrategy nullStringStrategy;
 
     /**
      * Constructs a new instance of {@link TypeParserBuilder}.
@@ -34,6 +35,7 @@ public final class TypeParser {
         this.splitStrategy = builder.splitStrategy;
         this.keyValueSplitStrategy = builder.keyValueSplitStrategy;
         this.inputPreprocessor = builder.inputPreprocessor;
+        this.nullStringStrategy = builder.nullStringStrategy;
     }
 
     /**
@@ -129,8 +131,6 @@ public final class TypeParser {
         String preprocessedInput = null;
         try {
             preprocessedInput = preProcessInputString(input, targetType);
-            throwIfNullAndPrimitive(preprocessedInput, targetType, input);
-
             ParserInvoker invoker = new ParserInvoker(this, targetType, preprocessedInput);
             return invoker.invoke();
         } catch (TypeParserException e) {
@@ -155,22 +155,12 @@ public final class TypeParser {
     }
 
     private String preProcessInputString(String input, Type targetType) {
-        return inputPreprocessor.prepare(input, new InputPreprocessorHelper(targetType));
-    }
-
-    private void throwIfNullAndPrimitive(String preprocessedInput, Type targetType, String input) {
-        if (preprocessedInput == null) {
-            if (isPrimitive(targetType)) {
-                throw new UnsupportedOperationException("Primitive can not be set to null");
-            }
+        String result = inputPreprocessor.prepare(input, new InputPreprocessorHelper(targetType, this));
+        if (result == null) {
+            String message = "InputPreprocessor.prepare(...) method returned a null object "
+                    + "when its contract states an actual String must be returned.";
+            throw new UnsupportedOperationException(message);
         }
-    }
-
-    private boolean isPrimitive(Type targetType) {
-        if (targetType instanceof Class) {
-            Class<?> c = (Class<?>) targetType;
-            return c.isPrimitive();
-        }
-        return false;
+        return result;
     }
 }

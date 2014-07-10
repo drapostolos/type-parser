@@ -11,7 +11,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
 
-public class TypeParserTest extends TestBase {
+public class TypeParserIntegrationTest extends TestBase {
 
     @Test
     public void shouldThrowExceptionWhenParsingPrimitiveToNullValue() throws Exception {
@@ -31,7 +31,6 @@ public class TypeParserTest extends TestBase {
     public void canParseGenericTypeToEmptyList() throws Exception {
         GenericType<List<Long>> type = new GenericType<List<Long>>() {};
         assertThat(parser.parse("null", type)).isEmpty();
-        // What to do with null and Collection? return null or empty collection?
     }
 
     @Test
@@ -83,16 +82,32 @@ public class TypeParserTest extends TestBase {
         assertThat(actual).isEqualTo(new MyClass1("aaa"));
     }
 
+    private static class MyGenericParser<T> implements Parser<MyGenericParser<T>> {
+        private T arg;
+
+        /*
+         * This class servers both as a Parser and an arbitrary Generic class.
+         */
+        MyGenericParser(T arg) {
+            this.arg = arg;
+        }
+
+        @Override
+        public MyGenericParser<T> parse(String input, ParserHelper helper) {
+            return new MyGenericParser<T>(arg);
+        }
+    }
+
     @Test
-    public void canRegisterTypeParserByGenericType() throws Exception {
+    public void canRegisterParserForGenericTypes() throws Exception {
         // given
         TypeParser parser = TypeParser.newBuilder()
-                .registerParser(new GenericType<MyClass1>() {}, new MyClass1())
+                .registerParser(new GenericType<MyGenericParser<String>>() {}, new MyGenericParser<String>("null"))
                 .build();
 
         // then
-        MyClass1 actual = parser.parse("aaa", MyClass1.class);
-        assertThat(actual).isEqualTo(new MyClass1("aaa"));
+        MyGenericParser<String> actual = parser.parse("null", new GenericType<MyGenericParser<String>>() {});
+        assertThat(actual).isNull();
     }
 
     @Test
@@ -100,6 +115,7 @@ public class TypeParserTest extends TestBase {
         // given 
         registerParser(MyClass1.class, new Parser<MyClass1>() {
 
+            @Override
             public MyClass1 parse(String input, ParserHelper helper) {
                 helper.getParameterizedClassArguments();
                 return null;
@@ -120,6 +136,7 @@ public class TypeParserTest extends TestBase {
         parser = TypeParser.newBuilder()
                 .registerParser(MyClass1.class, new Parser<MyClass1>() {
 
+                    @Override
                     public MyClass1 parse(String input, ParserHelper helper) {
                         Class<MyClass1> c = helper.getTargetClass();
                         assertThat(c).isSameAs(MyClass1.class);
@@ -160,6 +177,7 @@ public class TypeParserTest extends TestBase {
         // given
         registerParser(MyClass1.class, new Parser<MyClass1>() {
 
+            @Override
             public MyClass1 parse(String input, ParserHelper helper) {
                 // this call should throw.
                 helper.getComponentClass();
@@ -220,7 +238,7 @@ public class TypeParserTest extends TestBase {
                                 return "MY-DEFAULT";
                             }
                         }
-                        return helper.prepareWithDefaultInputPreprocessor(input);
+                        return input;
                     }
                 })
                 .build();
@@ -236,7 +254,7 @@ public class TypeParserTest extends TestBase {
     @Test
     public void shouldThrowIllegalArgumentExceptionIfInputPreprocessorThrows() throws Exception {
         // given
-        parserBuilder.setInputPreprocessor(new InputPreprocessor() {
+        builder.setInputPreprocessor(new InputPreprocessor() {
 
             @Override
             public String prepare(String input, InputPreprocessorHelper helper) {
@@ -312,6 +330,95 @@ public class TypeParserTest extends TestBase {
     }
 
     @Test
+    public void shouldThrowIfNullStringStrategyThrows() throws Exception {
+        // given
+
+        setNullStringStrategy(new NullStringStrategy() {
+
+            @Override
+            public boolean isNullString(String input, NullStringStrategyHelper helper) {
+                throw new UnsupportedOperationException(ERROR_MSG);
+            }
+        });
+
+        // then
+        shouldThrowTypeParserException()
+                .causedBy(UnsupportedOperationException.class)
+                .containingErrorMessage(ERROR_MSG)
+                .whenParsing("1")
+                .to(Integer.class);
+
+    }
+
+    @Test
+    public void canReturnNullObjectWhenInputIsNullString() throws Exception {
+        // given
+        setNullStringStrategy(new NullStringStrategy() {
+
+            @Override
+            public boolean isNullString(String input, NullStringStrategyHelper helper) {
+                return input.equals("");
+            }
+        });
+        parser = builder.build();
+
+        // then
+        assertThat(parser.parse("", Integer.class)).isNull();
+    }
+
+    @Test
+    public void canReturnEmptyListWhenInputIsNullString() throws Exception {
+        // given
+        setNullStringStrategy(new NullStringStrategy() {
+
+            @Override
+            public boolean isNullString(String input, NullStringStrategyHelper helper) {
+                return input.equals("");
+            }
+        });
+        parser = builder.build();
+
+        // then
+        assertThat(parser.parse("", new GenericType<List<Integer>>() {})).isEmpty();
+    }
+
+    @Test
+    public void canDecideIfNullStringWithinInputPreprocessor() throws Exception {
+        // given
+        builder.setInputPreprocessor(new InputPreprocessor() {
+
+            @Override
+            public String prepare(String input, InputPreprocessorHelper helper) {
+                assertThat(helper.isNullString(input)).isTrue();
+                assertThat(helper.isNullString(DUMMY_STRING)).isFalse();
+                return input;
+            }
+        });
+        parser = builder.build();
+
+        // then
+        assertThat(parser.parse("null", Long.class)).isNull();
+    }
+
+    @Test
+    public void canDecideIfNullStringWithinParser() throws Exception {
+        // given
+        builder.registerDynamicParser(new DynamicParser() {
+
+            @Override
+            public Object parse(String input, ParserHelper helper) {
+                assertThat(helper.isNullString(input)).isTrue();
+                assertThat(helper.isNullString(DUMMY_STRING)).isFalse();
+                return null;
+            }
+        });
+        parser = builder.build();
+
+        // then
+        assertThat(parser.parse("null", Long.class)).isNull();
+    }
+
+    @Test
     public void shouldReturnEmptyListAndSkipCustomSplitStrategyWhenInputStringIsNull() throws Exception {
         // given
         final CountDownLatch counter = new CountDownLatch(1);
@@ -332,5 +439,26 @@ public class TypeParserTest extends TestBase {
         // This calls the above registered Parser
         assertThat(counter.getCount()).isEqualTo(1);
         assertThat(parser.parse("null", new GenericType<List<String>>() {})).isEmpty();
+    }
+
+    @Test
+    public void shouldThrowWhenInputPreprocessorReturnsNull() throws Exception {
+        // given
+        builder.setInputPreprocessor(new InputPreprocessor() {
+
+            @Override
+            public String prepare(String input, InputPreprocessorHelper helper) {
+                return null;
+            }
+        });
+        parser = builder.build();
+
+        // then
+        shouldThrowTypeParserException()
+                .causedBy(UnsupportedOperationException.class)
+                .containingErrorMessage("InputPreprocessor.prepare(...) method returned a null object")
+                .containingErrorMessage("when its contract states an actual String must be returned.")
+                .whenParsing(DUMMY_STRING)
+                .to(String.class);
     }
 }

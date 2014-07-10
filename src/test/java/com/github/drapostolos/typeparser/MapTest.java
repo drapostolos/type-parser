@@ -50,11 +50,12 @@ public class MapTest extends TestBase {
                 new GenericType<ConcurrentHashMap<String, String>>() {},
                 new GenericType<ConcurrentSkipListMap<String, String>>() {},
                 new GenericType<HashMap<String, String>>() {},
-                new GenericType<Hashtable<String, String>>() {},
-                new GenericType<IdentityHashMap<String, String>>() {},
                 new GenericType<LinkedHashMap<String, String>>() {},
-                new GenericType<TreeMap<String, String>>() {},
-                new GenericType<WeakHashMap<String, String>>() {});
+                new GenericType<WeakHashMap<String, String>>() {},
+                new GenericType<IdentityHashMap<String, String>>() {},
+                new GenericType<Hashtable<String, String>>() {},
+                new GenericType<TreeMap<String, String>>() {}
+                );
 
     }
 
@@ -71,9 +72,11 @@ public class MapTest extends TestBase {
     }
 
     @Test
-    public void canParseStringToEmptyMap() throws Exception {
+    public void canParseToEmptyMap() throws Exception {
         GenericType<Map<String, String>> type = new GenericType<Map<String, String>>() {};
-        assertThat(parser.parse("null", type)).isEmpty();
+        assertThat(parser.parse("null", type))
+                .isInstanceOf(Map.class)
+                .isEmpty();
     }
 
     @Test

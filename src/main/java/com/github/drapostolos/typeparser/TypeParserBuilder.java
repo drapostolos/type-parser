@@ -3,9 +3,7 @@ package com.github.drapostolos.typeparser;
 import static com.github.drapostolos.typeparser.Util.makeNullArgumentErrorMsg;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Builder class for constructing and configuring instances of {@link TypeParser}.
@@ -19,6 +17,7 @@ public final class TypeParserBuilder {
     SplitStrategy splitStrategy = Util.defaultSplitStrategy();
     SplitStrategy keyValueSplitStrategy = Util.defaultKeyValueSplitStrategy();
     InputPreprocessor inputPreprocessor = Util.defaultInputPreprocessor();
+    NullStringStrategy nullStringStrategy = Util.defaultNullStringStrategy();
 
     TypeParserBuilder() {
         // Initialize with the default Parsers/DynamicParsers
@@ -108,10 +107,10 @@ public final class TypeParserBuilder {
 
     /**
      * Set a custom made {@link SplitStrategy} implementation to be used by
-     * the {@link TypeParser} (as built by this instance).
+     * the {@link TypeParser}.
      * <p/>
-     * The default behavior, when parsing a string to a generic type (example: {@link Collection} /
-     * {@link List} / {@link Set} etc.), Array or {@link Map} type, is to split by comma (',').
+     * The default behavior, when parsing a string to either a {@link Collection}, {@link Map} or
+     * Array type is to split the <code>input</code> string by comma (',').
      * <p/>
      * Use this method to register your own {@link SplitStrategy} implementation to override the
      * default behavior.
@@ -130,17 +129,14 @@ public final class TypeParserBuilder {
 
     /**
      * Set a custom made {@link SplitStrategy} implementation to separate the {@code key} and
-     * {@code value} pair in a Map entry, to be used by
-     * the {@link TypeParser} (as built by this instance).
+     * {@code value} pair in a Map entry.
      * <p/>
      * The default behavior, when parsing a string to a {@link Map} instance, is to split each map
-     * entry by a "=" sign.
-     * <p/>
-     * For example this input string: <br/>
-     * <code>"key1=valueA,key2=valueB"</code> will first be split using the {@link SplitStrategy}
-     * strategy as set with {@link #setSplitStrategy(SplitStrategy)} to get a list of map entries
-     * (key/value pairs). Then each map entry is split by "=" where first element is the {@code key}
-     * and the second element is the {@code value}.
+     * entry by a "=" sign. For example this input string: <code>"key1=valueA,key2=valueB"</code><br/>
+     * will first be split using the {@link SplitStrategy} strategy as set with
+     * {@link #setSplitStrategy(SplitStrategy)} to get a list of map entries (key/value pairs.
+     * Example: ["key1=valueA", "key2=valueB"]). Then each map entry is split by "=" where first
+     * element is the {@code key} and the second element is the {@code value}.
      * <p/>
      * Use this method to register your own key/value {@link SplitStrategy} implementation to
      * override the default behavior. I.e replace using the "=" sign with some other character.
@@ -159,15 +155,10 @@ public final class TypeParserBuilder {
 
     /**
      * Set a custom made {@link InputPreprocessor} implementation to be used by
-     * the {@link TypeParser} (as built by this instance).
+     * the {@link TypeParser}.
      * <p/>
-     * The default behavior, when pre-processing an input String, is:
-     * <ul>
-     * <li>if input string equals the string "null" (case ignored and trimmed) then a {@code null}
-     * object is returned by the {@link TypeParser}</li>
-     * </ul>
-     * Use this method to set your own {@link InputPreprocessor} implementation to override the
-     * default behavior.
+     * By default, the pre-processing is doing nothing. Use this method to set your own
+     * {@link InputPreprocessor} implementation to override the default behavior.
      * 
      * @param inputPreprocessor {@link InputPreprocessor} implementation.
      * @return {@link TypeParserBuilder}
@@ -178,6 +169,38 @@ public final class TypeParserBuilder {
             throw new NullPointerException(makeNullArgumentErrorMsg("inputPreprocessor"));
         }
         this.inputPreprocessor = inputPreprocessor;
+        return this;
+    }
+
+    /**
+     * Set a custom made {@link NullStringStrategy} implementation to be used by the
+     * {@link TypeParser}.
+     * <p>
+     * The {@link NullStringStrategy} defines the string that will cause the {@link TypeParser} to
+     * return either an empty type (applicable for {@link Collection}, {@link Map} and Array types)
+     * or a null object. This String is known as the <code>NullString</code>.
+     * <p/>
+     * By default the <code>NullString</code> is set to the (trimmed and case insensitive) string
+     * "null". Examples follow: <br />
+     * <code>
+     * TypeParser parser = TypeParser.newBuilder().build();<br/>
+     * parser.parse("null", Integer.class); // returns a null object<br/>
+     * parser.parse("NULL", new {@code GenericType<List<Integer>>}() {}); // returns an empty List<br/>
+     * parser.parse(" null ", Integer[].class); // returns an empty Integer array<br/>
+     * </code>
+     * Use this method to set your own {@link InputPreprocessor} implementation to override the
+     * default behavior.
+     * 
+     * @param nullStringStrategy {@link NullStringStrategy} implementation.
+     * @return {@link TypeParserBuilder}
+     * @throws NullPointerException if any given argument is null.
+     * @see NullStringStrategy
+     */
+    public TypeParserBuilder setNullStringStrategy(NullStringStrategy nullStringStrategy) {
+        if (nullStringStrategy == null) {
+            throw new NullPointerException(makeNullArgumentErrorMsg("nullStringStrategy"));
+        }
+        this.nullStringStrategy = nullStringStrategy;
         return this;
     }
 

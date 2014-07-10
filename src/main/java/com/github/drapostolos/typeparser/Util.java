@@ -1,12 +1,43 @@
 package com.github.drapostolos.typeparser;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
 
 final class Util {
 
-    private static final SplitStrategy DEFAULT_SPLIT_STRATEGY = new DefaultSplitStrategy();
-    private static final SplitStrategy DEFAULT_KEY_VALUE_SPLIT_STRATEGY = new DefaultKeyValueSplitStrategy();
-    private static final InputPreprocessor DEFAULT_INPUT_PREPROCESSOR = new NullInputPreprocessor();
+    private static final SplitStrategy DEFAULT_SPLIT_STRATEGY =
+            new SplitStrategy() {
+
+                @Override
+                public List<String> split(String input, SplitStrategyHelper helper) {
+                    return Arrays.asList(input.split(","));
+                }
+            };
+    private static final SplitStrategy DEFAULT_KEY_VALUE_SPLIT_STRATEGY =
+            new SplitStrategy() {
+
+                @Override
+                public List<String> split(String input, SplitStrategyHelper helper) {
+                    return Arrays.asList(input.split("=", 2));
+                }
+            };
+    private static final InputPreprocessor DEFAULT_INPUT_PREPROCESSOR =
+            new InputPreprocessor() {
+
+                @Override
+                public String prepare(String input, InputPreprocessorHelper helper) {
+                    return input;
+                }
+            };
+    private static final NullStringStrategy DEFAULT_NULL_STRING_STRATEGY =
+            new NullStringStrategy() {
+
+                @Override
+                public boolean isNullString(String input, NullStringStrategyHelper helper) {
+                    return input.trim().equalsIgnoreCase("null");
+                }
+            };
 
     private Util() {
         throw new AssertionError("Not meant for instantiation");
@@ -24,12 +55,16 @@ final class Util {
         return DEFAULT_KEY_VALUE_SPLIT_STRATEGY;
     }
 
+    static NullStringStrategy defaultNullStringStrategy() {
+        return DEFAULT_NULL_STRING_STRATEGY;
+    }
+
     static String makeNullArgumentErrorMsg(String argName) {
         return String.format("Argument named '%s' is illegally set to null!", argName);
     }
 
     static String toString(Object o) {
-        return String.format("%s {%s}", o, o.getClass());
+        return String.format("%s {instance of: %s}", o, o.getClass());
     }
 
     static String formatErrorMessage(String input, String preprocessed, Type targetType, String message) {

@@ -72,4 +72,10 @@ public class ClassTest extends AbstractTypeTester<Class<?>> {
         String str = String.format("%s=%s,java.lang.Long=java.lang.Short", cls.getName(), cls.getName());
         canParse(str).toLinkedHashMap(new GenericType<Map<Class<?>, Class<?>>>() {});
     }
+
+    @Test
+    public void canParseToNull() throws Exception {
+        canParse("null").toNull(new GenericType<Class<?>>() {});
+    }
+
 }

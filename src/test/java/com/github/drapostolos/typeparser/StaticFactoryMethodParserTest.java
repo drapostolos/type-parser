@@ -6,6 +6,14 @@ import org.junit.Test;
 
 public class StaticFactoryMethodParserTest extends TestBase {
 
+    public static class WithStaticFactoryMethodLong {
+
+        static WithStaticFactoryMethodLong valueOf(Long l) {
+            return new WithStaticFactoryMethodLong();
+        }
+
+    }
+
     @Test
     public void canParseWhenArgumentIsAnySupportedType() throws Exception {
         Object o = parser.parse("123", WithStaticFactoryMethodLong.class);

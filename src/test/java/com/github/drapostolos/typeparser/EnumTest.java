@@ -52,13 +52,18 @@ public class EnumTest extends AbstractTypeTester<MyEnum> {
     }
 
     @Test
-    public void canParseToMyEnumSet() throws Exception {
+    public void canParseToMyEnumHashSet() throws Exception {
         canParse("AAA, BBB, AAA").toLinkedHashSet(new GenericType<Set<MyEnum>>() {});
     }
 
     @Test
     public void canParseToMyEnumMap() throws Exception {
         canParse("AAA=BBB, BBB=CCC").toLinkedHashMap(new GenericType<Map<MyEnum, MyEnum>>() {});
+    }
+
+    @Test
+    public void canParseToNull() throws Exception {
+        canParse("null").toNull(MyEnum.class);
     }
 
 }

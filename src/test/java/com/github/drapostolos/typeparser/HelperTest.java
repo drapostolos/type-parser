@@ -39,18 +39,18 @@ public class HelperTest extends TestBase {
         // given
         final GenericType<?> genType = new GenericType<String>() {};
 
-        parser = TypeParser.newBuilder()
-                .setInputPreprocessor(new InputPreprocessor() {
+        setInputPreprocessor(new InputPreprocessor() {
 
-                    @Override
-                    public String prepare(String input, InputPreprocessorHelper helper) {
-                        helper.toString().equals(genType.toString());
-                        return null;
-                    }
-                })
-                .build();
+            @Override
+            public String prepare(String input, InputPreprocessorHelper helper) {
+                assertThat(helper.toString()).contains(genType.toString());
+                return input;
+            }
+        });
+        parser = builder.build();
 
-        parser.parse(DUMMY_STRING, genType);
+        // when
+        assertThat(parser.parse("null", genType)).isNull();
     }
 
     @Test

@@ -95,4 +95,12 @@ public abstract class AbstractTypeTester<T> extends TestBase {
         String str = element(i).split("=")[1];
         return make(str);
     }
+
+    public void toNull(Class<T> type) {
+        assertThat(parser.parse(stringToParse, type)).isNull();
+    }
+
+    public void toNull(GenericType<Class<?>> genericType) {
+        assertThat(parser.parse(stringToParse, genericType)).isNull();
+    }
 }

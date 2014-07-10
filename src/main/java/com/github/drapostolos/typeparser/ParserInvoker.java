@@ -9,30 +9,34 @@ final class ParserInvoker {
     private final Parsers parsers;
     private final ParserHelper helper;
     private final Type targetType;
+    private final NullStringStrategy nullStringStrategy;
 
     ParserInvoker(TypeParser typeParser, Type targetType, String preprocessedInput) {
         this.targetType = targetType;
         this.preprocessedInput = preprocessedInput;
         this.parsers = typeParser.parsers;
-        this.helper = new ParserHelper(typeParser, targetType);
+        this.nullStringStrategy = typeParser.nullStringStrategy;
+        this.helper = new ParserHelper(targetType, typeParser);
     }
 
     Object invoke() {
         Object result;
 
-        result = invokeDynamicParsers(parsers.dynamicParsers());
+        result = invokeDynamicParsersForContainerTypes();
+        if (result != DynamicParser.TRY_NEXT) {
+            return result;
+        }
+
+        result = invokeDynamicParsersRegisteredByClient();
         if (result != DynamicParser.TRY_NEXT) {
             return result;
         }
 
         if (parsers.containsStaticParser(targetType)) {
-            if (preprocessedInput == null) {
-                return null;
-            }
             return invokeStaticParser();
         }
 
-        result = invokeDynamicParsers(DefaultDynamicParsers.forRegularTypes());
+        result = invokeDynamicParsersForRegularTypes();
         if (result != DynamicParser.TRY_NEXT) {
             return result;
         }
@@ -40,9 +44,24 @@ final class ParserInvoker {
         throw new NoSuchRegisteredParserException("There is no registered 'Parser' for that type.");
     }
 
+    private Object invokeDynamicParsersForContainerTypes() {
+        return invokeDynamicParsers(DefaultDynamicParsers.forContainerTypes());
+    }
+
+    private Object invokeDynamicParsersRegisteredByClient() {
+        return invokeDynamicParsers(parsers.dynamicParsers());
+    }
+
+    private Object invokeDynamicParsersForRegularTypes() {
+        if (isNullString()) {
+            return null;
+        }
+        return invokeDynamicParsers(DefaultDynamicParsers.forRegularTypes());
+    }
+
     private Object invokeDynamicParsers(Collection<? extends DynamicParser> dynamicParsers) {
         for (DynamicParser dynamicParser : dynamicParsers) {
-            Object result = invokeDynamicParser(dynamicParser);
+            Object result = dynamicParser.parse(preprocessedInput, helper);
             if (result != DynamicParser.TRY_NEXT) {
                 return result;
             }
@@ -50,12 +69,27 @@ final class ParserInvoker {
         return DynamicParser.TRY_NEXT;
     }
 
-    private Object invokeDynamicParser(DynamicParser dynamicParser) {
-        return dynamicParser.parse(preprocessedInput, helper);
-    }
-
     private Object invokeStaticParser() {
+        if (isNullString()) {
+            if (isPrimitive(targetType)) {
+                throw new UnsupportedOperationException("Primitive can not be set to null");
+            }
+            return null;
+        }
         Parser<?> parser = parsers.getStaticParser(targetType);
         return parser.parse(preprocessedInput, helper);
+    }
+
+    private boolean isNullString() {
+        NullStringStrategyHelper helper = new NullStringStrategyHelper(targetType);
+        return nullStringStrategy.isNullString(preprocessedInput, helper);
+    }
+
+    private boolean isPrimitive(Type targetType) {
+        if (targetType instanceof Class) {
+            Class<?> c = (Class<?>) targetType;
+            return c.isPrimitive();
+        }
+        return false;
     }
 }

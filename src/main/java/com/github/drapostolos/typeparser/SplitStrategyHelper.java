@@ -32,8 +32,7 @@ public final class SplitStrategyHelper extends Helper {
      */
     public List<String> splitWithDefaultSplitStrategy(String input) {
         if (input == null) {
-            String message = makeNullArgumentErrorMsg("input");
-            throw new NullPointerException(message);
+            throw new NullPointerException(makeNullArgumentErrorMsg("input"));
         }
         return defaultSplitStrategy().split(input, IGNORED);
     }

@@ -8,7 +8,7 @@ import java.lang.reflect.Type;
  * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
  *      target="_blank">User-Guide</a>
  */
-public class NullStringStrategyHelper extends Helper {
+public final class NullStringStrategyHelper extends Helper {
 
     NullStringStrategyHelper(Type targetType) {
         super(targetType);

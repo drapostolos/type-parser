@@ -26,6 +26,8 @@ import java.util.Map;
 public interface NullStringStrategy {
 
     /**
+     * Checks if the given <code>input</code> is a <code>NullString</code> or not.
+     * 
      * @param input pre-processed input string to parse. Will never be {@code null}.
      * @param helper Helper class injected automatically by the {@link TypeParser}.
      * @return true if the given input String is the {@code NullString} otherwise false.

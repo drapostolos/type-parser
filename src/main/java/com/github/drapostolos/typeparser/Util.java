@@ -63,18 +63,22 @@ final class Util {
         return String.format("Argument named '%s' is illegally set to null!", argName);
     }
 
-    static String toString(Object o) {
+    /**
+     * @param o
+     * @return %s {instance of: %s}
+     */
+    static String objectToString(Object o) {
         return String.format("%s {instance of: %s}", o, o.getClass());
     }
 
-    static String formatErrorMessage(String input, String preprocessed, Type targetType, String message) {
+    static String formatErrorMessage(String input, String preprocessed, TargetType targetType, String message) {
         String messageTemplate = "\n\t"
                 + "Can not parse \"%s\" {preprocessed: %s} "
                 + "to type \"%s\" {instance of: %s} \n\t"
                 + "due to: %s";
         String preprocessedInput = formatPreprocessedInput(preprocessed);
-        String targetTypeName = getTargetTypeName(targetType);
-        String className = targetType.getClass().getName();
+        String targetTypeName = getTargetTypeName(targetType.targetType());
+        String className = targetType.targetType().getClass().getName();
         return String.format(messageTemplate,
                 input, preprocessedInput, targetTypeName, className, message);
     }

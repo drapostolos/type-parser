@@ -3,7 +3,6 @@ package com.github.drapostolos.typeparser;
 import static com.github.drapostolos.typeparser.Util.defaultSplitStrategy;
 import static com.github.drapostolos.typeparser.Util.makeNullArgumentErrorMsg;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -17,7 +16,7 @@ public final class SplitStrategyHelper extends Helper {
 
     private static final SplitStrategyHelper IGNORED = null;
 
-    SplitStrategyHelper(Type targetType) {
+    SplitStrategyHelper(TargetType targetType) {
         super(targetType);
     }
 

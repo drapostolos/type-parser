@@ -18,7 +18,7 @@ public class HelperTest extends TestBase {
     public void canDecideIfRawTargetClassIsWithinAListOfRawTargetClassesWhenItIs() throws Exception {
         // given
         Class<?> type = Integer.class;
-        Helper helper = new Helper(type) {};
+        Helper helper = new Helper(new TargetType(type)) {};
 
         // when
         assertThat(helper.isRawTargetClassAnyOf(Integer.class, String.class)).isTrue();
@@ -28,7 +28,7 @@ public class HelperTest extends TestBase {
     public void canDecideIfRawTargetClassIsWithinAListOfRawTargetClassesWhenItIsNot() throws Exception {
         // given
         Class<?> type = Integer.class;
-        Helper helper = new Helper(type) {};
+        Helper helper = new Helper(new TargetType(type)) {};
 
         // when
         assertThat(helper.isRawTargetClassAnyOf(File.class, String.class)).isFalse();
@@ -57,7 +57,7 @@ public class HelperTest extends TestBase {
     public void canDecideTargetTypeIsInstanceOfMapWhenTargetTypeIsMap() throws Exception {
         // given
         Type type = new GenericType<Map<String, URL>>() {}.getType();
-        Helper helper = new Helper(type) {};
+        Helper helper = new Helper(new TargetType(type)) {};
 
         // when
         assertThat(helper.isTargetTypeAssignableTo(Map.class)).isTrue();
@@ -67,7 +67,7 @@ public class HelperTest extends TestBase {
     public void canDecideTargetTypeIsNotAssignableToMapWhenTargetTypeIsList() throws Exception {
         // given
         Type type = new GenericType<List<String>>() {}.getType();
-        Helper helper = new Helper(type) {};
+        Helper helper = new Helper(new TargetType(type)) {};
 
         // when
         assertThat(helper.isTargetTypeAssignableTo(Map.class)).isFalse();
@@ -77,7 +77,7 @@ public class HelperTest extends TestBase {
     public void canDecideTargetTypeIsAssignableToSuperClassWhenTargetTypeIsSubclass() throws Exception {
         // given
         Type type = new GenericType<Integer>() {}.getType();
-        Helper helper = new Helper(type) {};
+        Helper helper = new Helper(new TargetType(type)) {};
 
         // when
 
@@ -88,7 +88,7 @@ public class HelperTest extends TestBase {
     public void canDecideTargetTypeIsEqualToStringWhenTargetTypeIsString() throws Exception {
         // given
         Type type = new GenericType<String>() {}.getType();
-        Helper helper = new Helper(type) {};
+        Helper helper = new Helper(new TargetType(type)) {};
 
         // when
         assertThat(helper.isTargetTypeEqualTo(String.class)).isTrue();
@@ -98,7 +98,7 @@ public class HelperTest extends TestBase {
     public void canDecideTargetTypeIsNotEqualToStringWhenTargetTypeIsInteger() throws Exception {
         // given
         Type type = new GenericType<Integer>() {}.getType();
-        Helper helper = new Helper(type) {};
+        Helper helper = new Helper(new TargetType(type)) {};
 
         // when
         assertThat(helper.isTargetTypeEqualTo(String.class)).isFalse();
@@ -108,7 +108,7 @@ public class HelperTest extends TestBase {
     public void canDecideTargetTypeIsEqualToListOfStringWhenTargetTypeIsListOfString() throws Exception {
         // given
         Type type = new GenericType<List<String>>() {}.getType();
-        Helper helper = new Helper(type) {};
+        Helper helper = new Helper(new TargetType(type)) {};
 
         // when
 
@@ -119,7 +119,7 @@ public class HelperTest extends TestBase {
     public void canDecideTargetTypeIsNotEqualToListOfStringWhenTargetTypeIsListOfInteger() throws Exception {
         // given
         Type type = new GenericType<List<String>>() {}.getType();
-        Helper helper = new Helper(type) {};
+        Helper helper = new Helper(new TargetType(type)) {};
 
         // when
         GenericType<List<Integer>> listOfInteger = new GenericType<List<Integer>>() {};
@@ -130,7 +130,7 @@ public class HelperTest extends TestBase {
     public void canGetRawClassWhenTargetTypeIsClass() throws Exception {
         // given
         Type type = new GenericType<Integer>() {}.getType();
-        Helper helper = new Helper(type) {};
+        Helper helper = new Helper(new TargetType(type)) {};
 
         // when
         assertThat(helper.getRawTargetClass()).isSameAs(Integer.class);
@@ -141,7 +141,7 @@ public class HelperTest extends TestBase {
         // given
 
         Type type = new GenericType<Set<Integer>>() {}.getType();
-        Helper helper = new Helper(type) {};
+        Helper helper = new Helper(new TargetType(type)) {};
 
         // when
         assertThat(helper.getRawTargetClass()).isSameAs(Set.class);
@@ -152,7 +152,7 @@ public class HelperTest extends TestBase {
 
         // given
         Type type = new GenericType<String[]>() {}.getType();
-        Helper helper = new Helper(type) {};
+        Helper helper = new Helper(new TargetType(type)) {};
 
         // then
         assertThat(helper.getRawTargetClass()).isSameAs(String[].class);
@@ -163,7 +163,7 @@ public class HelperTest extends TestBase {
 
         // given
         Type type = new GenericType<Class<?>[]>() {}.getType();
-        Helper helper = new Helper(type) {};
+        Helper helper = new Helper(new TargetType(type)) {};
         Method m = getClass().getDeclaredMethod("m2");
 
         // then

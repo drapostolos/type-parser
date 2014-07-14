@@ -65,7 +65,7 @@ public final class TypeParser {
         }
 
         @SuppressWarnings("unchecked")
-        T temp = (T) parseType2(input, targetType);
+        T temp = (T) parseType2(input, new TargetType(targetType));
         return temp;
 
     }
@@ -98,7 +98,7 @@ public final class TypeParser {
         }
 
         @SuppressWarnings("unchecked")
-        T temp = (T) parseType2(input, genericType.getType());
+        T temp = (T) parseType2(input, new TargetType(genericType.getType()));
         return temp;
     }
 
@@ -123,11 +123,11 @@ public final class TypeParser {
             throw new NullPointerException(makeNullArgumentErrorMsg("targetType"));
         }
 
-        return parseType2(input, targetType);
+        return parseType2(input, new TargetType(targetType));
 
     }
 
-    private Object parseType2(final String input, final Type targetType) {
+    private Object parseType2(final String input, final TargetType targetType) {
         String preprocessedInput = null;
         try {
             preprocessedInput = preProcessInputString(input, targetType);
@@ -154,7 +154,7 @@ public final class TypeParser {
         }
     }
 
-    private String preProcessInputString(String input, Type targetType) {
+    private String preProcessInputString(String input, TargetType targetType) {
         String result = inputPreprocessor.prepare(input, new InputPreprocessorHelper(targetType, this));
         if (result == null) {
             String message = "InputPreprocessor.prepare(...) method returned a null object "

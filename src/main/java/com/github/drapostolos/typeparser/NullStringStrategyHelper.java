@@ -1,6 +1,5 @@
 package com.github.drapostolos.typeparser;
 
-import java.lang.reflect.Type;
 
 /**
  * Helper class providing helper methods to implementations of {@link NullStringStrategy}.
@@ -10,7 +9,7 @@ import java.lang.reflect.Type;
  */
 public final class NullStringStrategyHelper extends Helper {
 
-    NullStringStrategyHelper(Type targetType) {
+    NullStringStrategyHelper(TargetType targetType) {
         super(targetType);
     }
 

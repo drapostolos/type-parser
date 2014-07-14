@@ -7,7 +7,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.EnumSet;
@@ -39,15 +38,15 @@ class DefaultDynamicParsers {
     /*
      * Container types are types that holds other types. Example Collections, Maps Arrays etc.
      */
-    static List<DynamicParser> forContainerTypes() {
-        return new ArrayList<DynamicParser>(Arrays.asList(ContainerType.values()));
+    static DynamicParser[] forContainerTypes() {
+        return ContainerType.values();
     }
 
     /*
      * Regular types are non-container types.
      */
-    static List<DynamicParser> forRegularTypes() {
-        return new ArrayList<DynamicParser>(Arrays.asList(RegularTypes.values()));
+    static DynamicParser[] forRegularTypes() {
+        return RegularTypes.values();
     }
 
     static private Collection<Object> populateCollection(

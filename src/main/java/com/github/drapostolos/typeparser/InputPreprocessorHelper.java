@@ -2,8 +2,6 @@ package com.github.drapostolos.typeparser;
 
 import static com.github.drapostolos.typeparser.Util.makeNullArgumentErrorMsg;
 
-import java.lang.reflect.Type;
-
 /**
  * Helper class providing helper methods to implementations of {@link InputPreprocessor} when
  * preparing an input string for parsing.
@@ -14,9 +12,11 @@ import java.lang.reflect.Type;
 public final class InputPreprocessorHelper extends Helper {
 
     final private NullStringStrategy nullStringStrategy;
+    final private TargetType targetType;
 
-    InputPreprocessorHelper(Type targetType, TypeParser typeParser) {
+    InputPreprocessorHelper(TargetType targetType, TypeParser typeParser) {
         super(targetType);
+        this.targetType = targetType;
         this.nullStringStrategy = typeParser.nullStringStrategy;
     }
 

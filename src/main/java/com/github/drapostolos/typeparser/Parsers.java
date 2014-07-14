@@ -14,6 +14,7 @@ class Parsers {
 
     private final Map<Type, Parser<?>> staticParsers;
     private final List<DynamicParser> dynamicParsers;
+    private final DynamicParser[] dynamicParserArray;
 
     /*
      * Return a copy of the default parsers, which allows modifications
@@ -46,6 +47,10 @@ class Parsers {
     private Parsers(Map<Type, Parser<?>> staticParsers, List<DynamicParser> dynamicParsers) {
         this.staticParsers = staticParsers;
         this.dynamicParsers = dynamicParsers;
+        /*
+         * This is used for optimization
+         */
+        this.dynamicParserArray = dynamicParsers.toArray(new DynamicParser[0]);
     }
 
     boolean containsStaticParser(Type targetType) {
@@ -68,7 +73,7 @@ class Parsers {
         dynamicParsers.add(parser);
     }
 
-    List<DynamicParser> dynamicParsers() {
-        return dynamicParsers;
+    DynamicParser[] dynamicParsers() {
+        return dynamicParserArray;
     }
 }

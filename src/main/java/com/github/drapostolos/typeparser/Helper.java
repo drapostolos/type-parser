@@ -1,52 +1,19 @@
 package com.github.drapostolos.typeparser;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
 abstract class Helper {
 
-    final Type targetType;
-    final Class<?> rawTargetType;
+    private final TargetType tt;
 
-    Helper(Type targetType) {
-        this.targetType = targetType;
-        this.rawTargetType = extractRawTargetType();
-    }
-
-    private Class<?> extractRawTargetType() {
-        if (targetType instanceof Class) {
-            return (Class<?>) targetType;
-        }
-        if (isTargetTypeParameterized()) {
-            ParameterizedType type = (ParameterizedType) targetType;
-            return (Class<?>) type.getRawType();
-        }
-        if (targetType instanceof GenericArrayType) {
-            GenericArrayType array = (GenericArrayType) targetType;
-            Type componentType = array.getGenericComponentType();
-            if (componentType instanceof Class) {
-                /*
-                 * This is a special case that only happens in Java version 1.6
-                 * (example: java version "1.6.0_30")
-                 */
-                return Array.newInstance((Class<?>) componentType, 0).getClass();
-            }
-            if (componentType instanceof ParameterizedType) {
-                ParameterizedType parameterizedType = (ParameterizedType) componentType;
-                Class<?> rawType = (Class<?>) parameterizedType.getRawType();
-                return Array.newInstance(rawType, 0).getClass();
-            }
-        }
-        return targetType.getClass();
+    Helper(TargetType targetType) {
+        tt = targetType;
     }
 
     @Override
     public String toString() {
-        return Util.toString(targetType);
+        return Util.objectToString(tt.targetType());
     }
 
     /**
@@ -55,7 +22,7 @@ abstract class Helper {
      * @return the {@link Type} to parse to.
      */
     final public Type getTargetType() {
-        return targetType;
+        return tt.targetType();
     }
 
     /**
@@ -70,42 +37,8 @@ abstract class Helper {
      * @throws UnsupportedOperationException if any of the parameterized type arguments is of a
      *         parameterized type (with exception of {@link Class}).
      */
-    final public <T> List<Class<T>> getParameterizedClassArguments() {
-        if (!(isTargetTypeParameterized())) {
-            String message = String.format("type must be parameterized: %s", Util.toString(targetType));
-            throw new UnsupportedOperationException(message);
-        }
-
-        ParameterizedType pt = (ParameterizedType) targetType;
-        List<Class<T>> result = new ArrayList<Class<T>>();
-        for (Type typeArgument : pt.getActualTypeArguments()) {
-            if (typeArgument instanceof Class) {
-                /*
-                 * This cast is correct since we check typeArgument is instance of Class
-                 */
-                @SuppressWarnings("unchecked")
-                Class<T> cls = (Class<T>) typeArgument;
-                result.add(cls);
-                continue;
-            }
-            if (typeArgument instanceof ParameterizedType) {
-                Type rawType = ((ParameterizedType) typeArgument).getRawType();
-                if (rawType instanceof Class) {
-                    /*
-                     * Special case to handle Class<?>
-                     * This cast is correct since we check rawType is instance of Class
-                     */
-                    @SuppressWarnings("unchecked")
-                    Class<T> cls = (Class<T>) rawType;
-                    result.add(cls);
-                    continue;
-                }
-            }
-            String message = "That type contains illegal type argument: '%s' [%s]";
-            message = String.format(message, typeArgument, typeArgument.getClass());
-            throw new UnsupportedOperationException(message);
-        }
-        return result;
+    final public List<Class<?>> getParameterizedClassArguments() {
+        return tt.getParameterizedClassArguments();
     }
 
     /**
@@ -121,37 +54,34 @@ abstract class Helper {
      *         (with exception of {@link Class}).
      */
     Class<?> getComponentClass() {
-        if (rawTargetType.isArray()) {
-            return rawTargetType.getComponentType();
+        if (tt.rawTargetType().isArray()) {
+            return tt.rawTargetType().getComponentType();
         }
         throw new UnsupportedOperationException("type is not an array.");
     }
 
     /**
-     * Convenient method for retrieving elements by index position in the list as returned from
-     * method {@link ParserHelper#getParameterizedClassArguments()}
-     * 
-     * @param index in list of type arguments.
-     * @return Type argument.
-     * @throws IllegalArgumentException when {@code index} is negative or larger
-     *         tan number of elements in list.
+     * Convenient method that returns the specified element in the list (as returned from method
+     * {@link ParserHelper#getParameterizedClassArguments()}).
+     *
+     * @param index index of the element to return
+     * @return the element at the specified position in the list (as returned from method
+     *         {@link ParserHelper#getParameterizedClassArguments()}).
+     * @throws IndexOutOfBoundsException if the index is out of range
+     *         (<tt>index &lt; 0 || index &gt;= size()</tt>)
      * @throws UnsupportedOperationException if the {@code targetType} is not a parameterized type.
      * @throws UnsupportedOperationException if any of the parameterized type arguments is of a
      *         parameterized type (with exception of {@link Class}).
      */
     final public <T> Class<T> getParameterizedClassArgumentByIndex(int index) {
-        if (index < 0) {
-            String message = "Argument named 'index' is illegally "
-                    + "set to negative value: %s. Must be positive.";
-            throw new IllegalArgumentException(String.format(message, index));
+        List<Class<?>> list = getParameterizedClassArguments();
+        if (index > list.size() - 1 || index < 0) {
+            String message = "index %s is out of bounds. Should be within [0, %s]";
+            throw new IndexOutOfBoundsException(String.format(message, index, list.size() - 1));
         }
-        List<Class<T>> list = getParameterizedClassArguments();
-        if (index >= list.size()) {
-            String message = "Argument named 'index' is illegally "
-                    + "set to value: %s. List size is: %s.";
-            throw new IllegalArgumentException(String.format(message, index, list.size()));
-        }
-        return list.get(index);
+        @SuppressWarnings("unchecked")
+        Class<T> temp = (Class<T>) list.get(index);
+        return temp;
     }
 
     /**
@@ -163,13 +93,13 @@ abstract class Helper {
      * @throws UnsupportedOperationException if targetType is not an instance of {@link Class}.
      */
     final public <T> Class<T> getTargetClass() {
-        if (targetType instanceof Class) {
+        if (tt.targetType() instanceof Class) {
             @SuppressWarnings("unchecked")
-            Class<T> temp = (Class<T>) targetType;
+            Class<T> temp = (Class<T>) tt.targetType();
             return temp;
         }
-        String message = "%s [%s] cannot be casted to java.lang.Class";
-        message = String.format(message, targetType, targetType.getClass());
+        String message = "%s cannot be casted to java.lang.Class";
+        message = String.format(message, Util.objectToString(tt.targetType()));
         throw new UnsupportedOperationException(message);
     }
 
@@ -184,10 +114,7 @@ abstract class Helper {
      * @return true if {@code targetType} is of Parameterized type, otherwise false.
      */
     final public boolean isTargetTypeParameterized() {
-        if (targetType instanceof ParameterizedType) {
-            return true;
-        }
-        return false;
+        return tt.isTargetTypeParameterized();
     }
 
     /**
@@ -202,7 +129,7 @@ abstract class Helper {
      * @return true if {@code targetType} is assignable to the given {@code type}, otherwise false.
      */
     final public boolean isTargetTypeAssignableTo(Class<?> type) {
-        return type.isAssignableFrom(rawTargetType);
+        return type.isAssignableFrom(tt.rawTargetType());
     }
 
     /**
@@ -212,7 +139,7 @@ abstract class Helper {
      * @return true if {@code targetType} is equal to the given {@code type}.
      */
     final public boolean isTargetTypeEqualTo(Class<?> type) {
-        return targetType.equals(type);
+        return tt.targetType().equals(type);
     }
 
     /**
@@ -224,7 +151,7 @@ abstract class Helper {
      *         {@code genericType}.
      */
     final public boolean isTargetTypeEqualTo(GenericType<?> genericType) {
-        return targetType.equals(genericType.getType());
+        return tt.targetType().equals(genericType.getType());
     }
 
     /**
@@ -237,7 +164,7 @@ abstract class Helper {
      */
     final public boolean isRawTargetClassAnyOf(Class<?>... types) {
         for (Class<?> type : types) {
-            if (type.equals(rawTargetType)) {
+            if (type.equals(tt.rawTargetType())) {
                 return true;
             }
         }
@@ -257,6 +184,6 @@ abstract class Helper {
      */
     @SuppressWarnings("unchecked")
     final public <T> Class<T> getRawTargetClass() {
-        return (Class<T>) rawTargetType;
+        return (Class<T>) tt.rawTargetType();
     }
 }

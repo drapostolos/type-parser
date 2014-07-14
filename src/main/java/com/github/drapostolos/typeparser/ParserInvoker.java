@@ -1,17 +1,16 @@
 package com.github.drapostolos.typeparser;
 
 import java.lang.reflect.Type;
-import java.util.Collection;
 
 final class ParserInvoker {
 
     private final String preprocessedInput;
     private final Parsers parsers;
     private final ParserHelper helper;
-    private final Type targetType;
+    private final TargetType targetType;
     private final NullStringStrategy nullStringStrategy;
 
-    ParserInvoker(TypeParser typeParser, Type targetType, String preprocessedInput) {
+    ParserInvoker(TypeParser typeParser, TargetType targetType, String preprocessedInput) {
         this.targetType = targetType;
         this.preprocessedInput = preprocessedInput;
         this.parsers = typeParser.parsers;
@@ -22,18 +21,18 @@ final class ParserInvoker {
     Object invoke() {
         Object result;
 
-        result = invokeDynamicParsersForContainerTypes();
-        if (result != DynamicParser.TRY_NEXT) {
-            return result;
-        }
-
         result = invokeDynamicParsersRegisteredByClient();
         if (result != DynamicParser.TRY_NEXT) {
             return result;
         }
 
-        if (parsers.containsStaticParser(targetType)) {
+        if (parsers.containsStaticParser(targetType.targetType())) {
             return invokeStaticParser();
+        }
+
+        result = invokeDynamicParsersForContainerTypes();
+        if (result != DynamicParser.TRY_NEXT) {
+            return result;
         }
 
         result = invokeDynamicParsersForRegularTypes();
@@ -59,7 +58,7 @@ final class ParserInvoker {
         return invokeDynamicParsers(DefaultDynamicParsers.forRegularTypes());
     }
 
-    private Object invokeDynamicParsers(Collection<? extends DynamicParser> dynamicParsers) {
+    private Object invokeDynamicParsers(DynamicParser[] dynamicParsers) {
         for (DynamicParser dynamicParser : dynamicParsers) {
             Object result = dynamicParser.parse(preprocessedInput, helper);
             if (result != DynamicParser.TRY_NEXT) {
@@ -71,12 +70,12 @@ final class ParserInvoker {
 
     private Object invokeStaticParser() {
         if (isNullString()) {
-            if (isPrimitive(targetType)) {
+            if (isPrimitive(targetType.targetType())) {
                 throw new UnsupportedOperationException("Primitive can not be set to null");
             }
             return null;
         }
-        Parser<?> parser = parsers.getStaticParser(targetType);
+        Parser<?> parser = parsers.getStaticParser(targetType.targetType());
         return parser.parse(preprocessedInput, helper);
     }
 

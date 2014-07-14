@@ -1,7 +1,9 @@
 package com.github.drapostolos.typeparser;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Rule;
@@ -10,7 +12,7 @@ import org.junit.rules.ExpectedException;
 
 public class ParameterCheckTest extends TestBase {
 
-    private static final Type SOME_TYPE = TestBase.class;
+    private static final TargetType SOME_TYPE = new TargetType(TestBase.class);
     private TypeParserBuilder builder = TypeParser.newBuilder();
 
     @Rule
@@ -68,21 +70,22 @@ public class ParameterCheckTest extends TestBase {
 
     @Test
     public void shouldThrowWhenRetrievingParameterizedClassArgumentsByNegativeIndex() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Argument named 'index' is illegally "
-                + "set to negative value: -1. Must be positive.");
+        thrown.expect(IndexOutOfBoundsException.class);
+        thrown.expectMessage("index -1 is out of bounds.");
+        thrown.expectMessage("Should be within [0, 1]");
         TypeParser typeParser = TypeParser.newBuilder().build();
-        new ParserHelper(SOME_TYPE, typeParser).getParameterizedClassArgumentByIndex(-1);
+        Type type = new GenericType<Map<Integer, File>>() {}.getType();
+        new ParserHelper(new TargetType(type), typeParser).getParameterizedClassArgumentByIndex(-1);
     }
 
     @Test
     public void shouldThrowWhenRetrievingParameterizedClassArgumentsByTooHighIndex() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Argument named 'index' is illegally "
-                + "set to value: 1. List size is: 1.");
+        thrown.expect(IndexOutOfBoundsException.class);
+        thrown.expectMessage("index 1 is out of bounds.");
+        thrown.expectMessage("Should be within [0, 0]");
         TypeParser typeParser = TypeParser.newBuilder().build();
         Type type = new GenericType<List<Integer>>() {}.getType();
-        new ParserHelper(type, typeParser).getParameterizedClassArgumentByIndex(1);
+        new ParserHelper(new TargetType(type), typeParser).getParameterizedClassArgumentByIndex(1);
     }
 
     @Test

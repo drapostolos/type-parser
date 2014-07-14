@@ -18,14 +18,16 @@ import java.util.List;
  */
 public final class ParserHelper extends Helper {
 
+    private final TargetType targetType;
     private final TypeParser typeParser;
     private final SplitStrategy splitStrategy;
     private final SplitStrategy keyValueSplitStrategy;
     private final NullStringStrategy nullStringStrategy;
     private final Parsers parsers;
 
-    ParserHelper(Type targetType, TypeParser typeParser) {
+    ParserHelper(TargetType targetType, TypeParser typeParser) {
         super(targetType);
+        this.targetType = targetType;
         this.typeParser = typeParser;
         this.parsers = typeParser.parsers;
         this.splitStrategy = typeParser.splitStrategy;

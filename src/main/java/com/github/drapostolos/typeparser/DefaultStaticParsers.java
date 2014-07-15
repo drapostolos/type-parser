@@ -161,6 +161,13 @@ final class DefaultStaticParsers {
                 return input;
             }
         });
+        addStaticParser(map, Object.class, new Parser<Object>() {
+
+            @Override
+            public Object parse(String input, ParserHelper helper) {
+                return input;
+            }
+        });
         DEFAULT_STATIC_PARSERS = Collections.unmodifiableMap(map);
     }
 

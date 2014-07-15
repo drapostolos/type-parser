@@ -246,31 +246,36 @@ class DefaultDynamicParsers {
                 Method method = null;
                 Type argType = null;
                 Class<?> targetType = helper.getRawTargetClass();
+                Object argument = null;
 
+                // try find a matching method.
                 for (Method m : targetType.getDeclaredMethods()) {
                     if (m.getName().equals("valueOf")) {
                         if (m.getGenericParameterTypes().length == 1) {
                             if (Modifier.isStatic(m.getModifiers())) {
                                 argType = m.getGenericParameterTypes()[0];
-                                if (helper.containsStaticParser(argType)) {
+                                try {
+                                    argument = helper.parseType(input, argType);
                                     method = m;
                                     methodFound = true;
                                     break;
+                                } catch (NoSuchRegisteredParserException e) {
+                                    continue;
+                                } catch (TypeParserException e) {
+                                    if (e.getCause() instanceof StackOverflowError) {
+                                        String message = "StackOverflowError: Cyclic argument type "
+                                                + "for method '%s' on this type.";
+                                        throw new StackOverflowError(String.format(message, m));
+                                    } else {
+                                        throw e;
+                                    }
                                 }
                             }
                         }
                     }
                 }
-
                 if (!methodFound) {
                     return TRY_NEXT;
-                }
-                Object argument;
-                if (argType.equals(String.class)) {
-                    // No need to convert String to String
-                    argument = input;
-                } else {
-                    argument = helper.parseType(input, argType);
                 }
 
                 try {
@@ -293,27 +298,32 @@ class DefaultDynamicParsers {
                 boolean constructorFound = false;
                 Constructor<?> constructor = null;
                 Type argType = null;
+                Object argument = null;
 
+                // try find a matching constructor.
                 for (Constructor<?> c : targetType.getDeclaredConstructors()) {
                     if (c.getGenericParameterTypes().length == 1) {
                         argType = c.getGenericParameterTypes()[0];
-                        if (helper.containsStaticParser(argType) || argType.equals(Object.class)) {
+                        try {
+                            argument = helper.parseType(input, argType);
                             constructor = c;
                             constructorFound = true;
                             break;
+                        } catch (NoSuchRegisteredParserException e) {
+                            continue;
+                        } catch (TypeParserException e) {
+                            if (e.getCause() instanceof StackOverflowError) {
+                                String message = "StackOverflowError: Cyclic argument type "
+                                        + "for constructor '%s' on this type.";
+                                throw new StackOverflowError(String.format(message, c));
+                            } else {
+                                throw e;
+                            }
                         }
                     }
                 }
-
                 if (!constructorFound) {
                     return TRY_NEXT;
-                }
-                Object argument;
-                if (argType.equals(String.class) || argType.equals(Object.class)) {
-                    // No need to convert String to String
-                    argument = input;
-                } else {
-                    argument = helper.parseType(input, argType);
                 }
 
                 constructor.setAccessible(true);

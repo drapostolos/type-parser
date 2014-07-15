@@ -9,16 +9,61 @@ import org.junit.Test;
 public class SingleArgumentConstructorParserTest extends TestBase {
 
     @Test
-    public void canParseWhenArgumentIsAnySupportedType() throws Exception {
-        Object o = parser.parse("/some/path", FileConstructor.class);
-        assertThat(o).isInstanceOf(FileConstructor.class);
+    public void canParseTypeWhithConstructorThatTakesEnumArgument() throws Exception {
+        Object o = parser.parse("A", WithEnumConstructor.class);
+        assertThat(o).isInstanceOf(WithEnumConstructor.class);
     }
 
-    private static class FileConstructor {
+    private static class WithEnumConstructor {
+
+        enum MyEnum {
+            A, B, C
+        }
 
         @SuppressWarnings("unused")
-        FileConstructor(File f) {}
+        WithEnumConstructor(MyEnum e) {}
+    }
 
+    @Test
+    public void canParseTypeWhithConstructorThatTakesFileArgument() throws Exception {
+        Object o = parser.parse("/some/path", WithFileConstructor.class);
+        assertThat(o).isInstanceOf(WithFileConstructor.class);
+    }
+
+    private static class WithFileConstructor {
+
+        @SuppressWarnings("unused")
+        WithFileConstructor(File f) {}
+    }
+
+    @Test
+    public void canParseTypeWhithConstructorThatTakesClassArgument() throws Exception {
+        Object o = parser.parse("java.lang.Long", WithClassConstructor.class);
+        assertThat(o).isInstanceOf(WithClassConstructor.class);
+    }
+
+    private static class WithClassConstructor {
+
+        @SuppressWarnings("unused")
+        WithClassConstructor(Class<?> f) {}
+    }
+
+    @Test
+    public void canParseTypeWhithConstructorThatTakesClassWithValueOfMethod() throws Exception {
+        Object o = parser.parse(DUMMY_STRING, WithValueOfConstructor.class);
+        assertThat(o).isInstanceOf(WithValueOfConstructor.class);
+    }
+
+    static class WithValueOfConstructor {
+
+        WithValueOfConstructor(WithValueOfMethod v) {}
+    }
+
+    static class WithValueOfMethod {
+
+        static WithValueOfMethod valueOf(String s) {
+            return new WithValueOfMethod();
+        }
     }
 
     @Test
@@ -34,11 +79,25 @@ public class SingleArgumentConstructorParserTest extends TestBase {
         ThrowingConstructor(String s) {
             throw new RuntimeException(ERROR_MSG);
         }
-
     }
 
     @Test
-    public void canParseTypeWithStringConstructor() throws Exception {
+    public void shouldThrowExceptionWhenCyclicConstructor() throws Exception {
+        shouldThrowTypeParserException()
+                .causedBy(StackOverflowError.class)
+                .containingErrorMessage("Cyclic argument type for constructor")
+                .containingErrorMessage("WithCyclicConstructor")
+                .whenParsing(DUMMY_STRING)
+                .to(WithCyclicConstructor.class);
+    }
+
+    public static class WithCyclicConstructor {
+
+        WithCyclicConstructor(WithCyclicConstructor s) {}
+    }
+
+    @Test
+    public void canParseTypeWithConstructorThatTakesStringArgument() throws Exception {
         Object actual = parser.parse(DUMMY_STRING, StringConstructor.class);
         assertThat(actual).isInstanceOf(StringConstructor.class);
     }
@@ -50,7 +109,7 @@ public class SingleArgumentConstructorParserTest extends TestBase {
     }
 
     @Test
-    public void canParseTypeWithObjectConstructor() throws Exception {
+    public void canParseTypeWithConstructorThatTakesObjectArgument() throws Exception {
         Object actual = parser.parse(DUMMY_STRING, ObjectConstructor.class);
         assertThat(actual).isInstanceOf(ObjectConstructor.class);
     }

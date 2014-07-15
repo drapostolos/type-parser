@@ -68,7 +68,7 @@ public abstract class TestBase {
         return this;
     }
 
-    final <T extends Exception> TestBase causedBy(final Class<T> cause) {
+    final <T extends Throwable> TestBase causedBy(final Class<T> cause) {
         thrown.expectCause(new BaseMatcher<T>() {
 
             @Override

@@ -97,4 +97,9 @@ final class TargetType {
         return result;
     }
 
+    @Override
+    public String toString() {
+        return targetType.toString();
+    }
+
 }

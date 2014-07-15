@@ -25,34 +25,34 @@ public class UrlTest extends AbstractTypeTester<URL> {
     }
 
     @Test
-    public void canParseStringToUri() throws Exception {
+    public void canParseStringToUrl() throws Exception {
         canParse("http://host.com/").toType(URL.class);
     }
 
     @Test
-    public void canParseToGenericUriArray() throws Exception {
+    public void canParseToGenericUrlArray() throws Exception {
         canParse(STRING).toGenericArray(new GenericType<URL[]>() {});
 
     }
 
     @Test
-    public void canParseToUriArray() throws Exception {
+    public void canParseToUrlArray() throws Exception {
         canParse(STRING).toArray(URL[].class);
     }
 
     @Test
-    public void canParseToUriList() throws Exception {
+    public void canParseToUrlList() throws Exception {
         canParse(STRING).toArrayList(new GenericType<List<URL>>() {});
     }
 
     @Test
-    public void canParseToUriSet() throws Exception {
+    public void canParseToUrlSet() throws Exception {
         canParse("http://host1.com/, http://host2.com/, http://host1.com/");
         toLinkedHashSet(new GenericType<Set<URL>>() {});
     }
 
     @Test
-    public void canParseToUriMap() throws Exception {
+    public void canParseToUrlMap() throws Exception {
         canParse("http://host1.com/=http://host11.com/, http://host2.com/=http://host22.com/");
         toLinkedHashMap(new GenericType<Map<URL, URL>>() {});
     }

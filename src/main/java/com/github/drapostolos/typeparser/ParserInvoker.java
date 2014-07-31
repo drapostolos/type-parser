@@ -1,6 +1,7 @@
 package com.github.drapostolos.typeparser;
 
 import java.lang.reflect.Type;
+import java.util.List;
 
 final class ParserInvoker {
 
@@ -58,7 +59,7 @@ final class ParserInvoker {
         return invokeDynamicParsers(DefaultDynamicParsers.forRegularTypes());
     }
 
-    private Object invokeDynamicParsers(DynamicParser[] dynamicParsers) {
+    private Object invokeDynamicParsers(List<DynamicParser> dynamicParsers) {
         for (DynamicParser dynamicParser : dynamicParsers) {
             Object result = dynamicParser.parse(preprocessedInput, helper);
             if (result != DynamicParser.TRY_NEXT) {

@@ -34,19 +34,39 @@ class DefaultDynamicParsers {
     private DefaultDynamicParsers() {
         throw new AssertionError("Not meant for instantiation");
     }
+    
+    private static final List<DynamicParser> regularTypes;
+    private static final List<DynamicParser> containerTypes;
+    
+    static {
+        regularTypes = asList(RegularType.values());
+        containerTypes = asList(ContainerType.values());
+    }
+
+    static List<DynamicParser> asList(DynamicParser[] parsers) {
+        /*
+         * Not possible to use Arrays.asList(). Can't cast Enum type to
+         * DynamicParser interface (for some reason???).
+         */
+        List<DynamicParser> result = new ArrayList<DynamicParser>();
+        for (DynamicParser dynamicParser : parsers) {
+            result.add(dynamicParser);
+        }
+        return result;
+    }
 
     /*
      * Container types are types that holds other types. Example Collections, Maps Arrays etc.
      */
-    static DynamicParser[] forContainerTypes() {
-        return ContainerType.values();
+    static List<DynamicParser> forContainerTypes() {
+        return containerTypes;
     }
 
     /*
      * Regular types are non-container types.
      */
-    static DynamicParser[] forRegularTypes() {
-        return RegularTypes.values();
+    static List<DynamicParser> forRegularTypes() {
+        return regularTypes;
     }
 
     static private Collection<Object> populateCollection(
@@ -206,7 +226,7 @@ class DefaultDynamicParsers {
     /*
      * This enum represents types that can be contained in a container type.
      */
-    private enum RegularTypes implements DynamicParser {
+    private enum RegularType implements DynamicParser {
         ENUM {
 
             @Override

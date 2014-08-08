@@ -8,15 +8,26 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 final class DefaultStaticParsers {
 
     private static final Map<Type, Parser<?>> DEFAULT_STATIC_PARSERS;
+    private static final ThreadLocal<NumberFormat> NUMBER_FORMAT = new ThreadLocal<NumberFormat>() {
+
+        @Override
+        protected NumberFormat initialValue() {
+            return NumberFormat.getInstance(Locale.US);
+        }
+    };
+
 
     private DefaultStaticParsers() {
         throw new AssertionError("Not meant for instantiation");
@@ -166,6 +177,17 @@ final class DefaultStaticParsers {
             @Override
             public Object parse(String input, ParserHelper helper) {
                 return input;
+            }
+        });
+        addStaticParser(map, Number.class, new Parser<Number>() {
+
+            @Override
+            public Number parse(String input, ParserHelper helper) {
+                try {
+                    return NUMBER_FORMAT.get().parse(input.trim());
+                } catch (ParseException e) {
+                    throw new IllegalArgumentException(e.getMessage(), e);
+                }
             }
         });
         DEFAULT_STATIC_PARSERS = Collections.unmodifiableMap(map);

@@ -36,12 +36,10 @@ public abstract class AbstractTypeTester<T> extends TestBase {
     }
 
     final T[] expectedElements(int... indexes) throws Exception {
-        T element = make(element(0));
-        Class<?> type = element.getClass();
+        Class<?> type = getClass().getDeclaredMethod("make", String.class).getReturnType();
         @SuppressWarnings("unchecked")
         T[] array = (T[]) Array.newInstance(type, indexes.length);
-        array[0] = element;
-        for (int i = 1; i < indexes.length; i++) {
+        for (int i = 0; i < indexes.length; i++) {
             array[i] = make(element(i));
         }
         return array;

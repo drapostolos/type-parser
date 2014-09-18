@@ -21,6 +21,14 @@ public final class TypeParser {
     final InputPreprocessor inputPreprocessor;
     final NullStringStrategy nullStringStrategy;
 
+    TypeParser(TypeParserBuilder builder) {
+        this.parsers = Parsers.unmodifiableCopy(builder.parsers);
+        this.splitStrategy = builder.splitStrategy;
+        this.keyValueSplitStrategy = builder.keyValueSplitStrategy;
+        this.inputPreprocessor = builder.inputPreprocessor;
+        this.nullStringStrategy = builder.nullStringStrategy;
+    }
+
     /**
      * Constructs a new instance of {@link TypeParserBuilder}.
      * 
@@ -28,14 +36,6 @@ public final class TypeParser {
      */
     public static TypeParserBuilder newBuilder() {
         return new TypeParserBuilder();
-    }
-
-    TypeParser(TypeParserBuilder builder) {
-        this.parsers = Parsers.unmodifiableCopy(builder.parsers);
-        this.splitStrategy = builder.splitStrategy;
-        this.keyValueSplitStrategy = builder.keyValueSplitStrategy;
-        this.inputPreprocessor = builder.inputPreprocessor;
-        this.nullStringStrategy = builder.nullStringStrategy;
     }
 
     /**

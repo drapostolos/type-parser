@@ -35,7 +35,7 @@ final class Util {
 
                 @Override
                 public boolean isNullString(String input, NullStringStrategyHelper helper) {
-                    return input.trim().equalsIgnoreCase("null");
+                    return "null".equalsIgnoreCase(input.trim());
                 }
             };
 

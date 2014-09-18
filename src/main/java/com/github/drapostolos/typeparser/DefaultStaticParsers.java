@@ -89,9 +89,9 @@ final class DefaultStaticParsers {
                     @Override
                     public Boolean parse(final String input, ParserHelper helper) {
                         String value = input.trim().toLowerCase();
-                        if (value.equals("true")) {
+                        if ("true".equals(value)) {
                             return Boolean.TRUE;
-                        } else if (value.equals("false")) {
+                        } else if ("false".equals(value)) {
                             return Boolean.FALSE;
                         }
                         String message = "\"%s\" is not parsable to a Boolean.";

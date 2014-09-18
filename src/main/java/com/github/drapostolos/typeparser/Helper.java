@@ -21,7 +21,7 @@ abstract class Helper {
      * 
      * @return the {@link Type} to parse to.
      */
-    final public Type getTargetType() {
+    public final Type getTargetType() {
         return tt.targetType();
     }
 
@@ -37,7 +37,7 @@ abstract class Helper {
      * @throws UnsupportedOperationException if any of the parameterized type arguments is of a
      *         parameterized type (with exception of {@link Class}).
      */
-    final public List<Class<?>> getParameterizedClassArguments() {
+    public final List<Class<?>> getParameterizedClassArguments() {
         return tt.getParameterizedClassArguments();
     }
 
@@ -73,7 +73,7 @@ abstract class Helper {
      * @throws UnsupportedOperationException if any of the parameterized type arguments is of a
      *         parameterized type (with exception of {@link Class}).
      */
-    final public <T> Class<T> getParameterizedClassArgumentByIndex(int index) {
+    public final <T> Class<T> getParameterizedClassArgumentByIndex(int index) {
         List<Class<?>> list = getParameterizedClassArguments();
         if (index > list.size() - 1 || index < 0) {
             String message = "index %s is out of bounds. Should be within [0, %s]";
@@ -92,7 +92,7 @@ abstract class Helper {
      * @return {@link Class} object of the targetType.
      * @throws UnsupportedOperationException if targetType is not an instance of {@link Class}.
      */
-    final public <T> Class<T> getTargetClass() {
+    public final <T> Class<T> getTargetClass() {
         if (tt.targetType() instanceof Class) {
             @SuppressWarnings("unchecked")
             Class<T> temp = (Class<T>) tt.targetType();
@@ -113,7 +113,7 @@ abstract class Helper {
      * 
      * @return true if {@code targetType} is of Parameterized type, otherwise false.
      */
-    final public boolean isTargetTypeParameterized() {
+    public final boolean isTargetTypeParameterized() {
         return tt.isTargetTypeParameterized();
     }
 
@@ -128,7 +128,7 @@ abstract class Helper {
      * @param type check if {@code targetType} is assignable to this type.
      * @return true if {@code targetType} is assignable to the given {@code type}, otherwise false.
      */
-    final public boolean isTargetTypeAssignableTo(Class<?> type) {
+    public final boolean isTargetTypeAssignableTo(Class<?> type) {
         return type.isAssignableFrom(tt.rawTargetType());
     }
 
@@ -138,7 +138,7 @@ abstract class Helper {
      * @param type to compare with {@code targetType}.
      * @return true if {@code targetType} is equal to the given {@code type}.
      */
-    final public boolean isTargetTypeEqualTo(Class<?> type) {
+    public final boolean isTargetTypeEqualTo(Class<?> type) {
         return tt.targetType().equals(type);
     }
 
@@ -150,7 +150,7 @@ abstract class Helper {
      * @return true if {@code targetType} is equal to the generic type represented by the given
      *         {@code genericType}.
      */
-    final public boolean isTargetTypeEqualTo(GenericType<?> genericType) {
+    public final boolean isTargetTypeEqualTo(GenericType<?> genericType) {
         return tt.targetType().equals(genericType.getType());
     }
 
@@ -162,7 +162,7 @@ abstract class Helper {
      * @return true if at least one of the given {@code types} is equal to the raw
      *         {@code targetType}.
      */
-    final public boolean isRawTargetClassAnyOf(Class<?>... types) {
+    public final boolean isRawTargetClassAnyOf(Class<?>... types) {
         for (Class<?> type : types) {
             if (type.equals(tt.rawTargetType())) {
                 return true;
@@ -183,7 +183,7 @@ abstract class Helper {
      * @return the raw format of {@code targetType}
      */
     @SuppressWarnings("unchecked")
-    final public <T> Class<T> getRawTargetClass() {
+    public final <T> Class<T> getRawTargetClass() {
         return (Class<T>) tt.rawTargetType();
     }
 }

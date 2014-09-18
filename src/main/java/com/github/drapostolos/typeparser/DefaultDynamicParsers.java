@@ -30,17 +30,16 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.LinkedBlockingDeque;
 
 class DefaultDynamicParsers {
+    private static final List<DynamicParser> REGULAR_TYPES;
+    private static final List<DynamicParser> CONTAINER_TYPES;
 
     private DefaultDynamicParsers() {
         throw new AssertionError("Not meant for instantiation");
     }
     
-    private static final List<DynamicParser> regularTypes;
-    private static final List<DynamicParser> containerTypes;
-    
     static {
-        regularTypes = asList(RegularType.values());
-        containerTypes = asList(ContainerType.values());
+        REGULAR_TYPES = asList(RegularType.values());
+        CONTAINER_TYPES = asList(ContainerType.values());
     }
 
     static List<DynamicParser> asList(DynamicParser[] parsers) {
@@ -59,14 +58,14 @@ class DefaultDynamicParsers {
      * Container types are types that holds other types. Example Collections, Maps Arrays etc.
      */
     static List<DynamicParser> forContainerTypes() {
-        return containerTypes;
+        return CONTAINER_TYPES;
     }
 
     /*
      * Regular types are non-container types.
      */
     static List<DynamicParser> forRegularTypes() {
-        return regularTypes;
+        return REGULAR_TYPES;
     }
 
     static private Collection<Object> populateCollection(
@@ -122,8 +121,9 @@ class DefaultDynamicParsers {
             }
 
             private <T> Collection<T> instantiateCollection(Class<? extends T> collectionType) {
-                if (collectionType.isInterface())
+                if (collectionType.isInterface()) {
                     return instantiateCollectionFromInterface(collectionType);
+                }
                 return instantiateCollectionFromClass(collectionType);
             }
 
@@ -139,20 +139,21 @@ class DefaultDynamicParsers {
             }
 
             private <T> Collection<T> instantiateCollectionFromInterface(Class<? extends T> collectionType) {
-                if (List.class.isAssignableFrom(collectionType))
+                if (List.class.isAssignableFrom(collectionType)) {
                     return new ArrayList<T>();
-                else if (SortedSet.class.isAssignableFrom(collectionType))
+                } else if (SortedSet.class.isAssignableFrom(collectionType)) {
                     return new TreeSet<T>();
-                else if (Set.class.isAssignableFrom(collectionType))
+                } else if (Set.class.isAssignableFrom(collectionType)) {
                     return new LinkedHashSet<T>();
-                else if (BlockingDeque.class.isAssignableFrom(collectionType))
+                } else if (BlockingDeque.class.isAssignableFrom(collectionType)) {
                     return new LinkedBlockingDeque<T>();
-                else if (Deque.class.isAssignableFrom(collectionType))
+                } else if (Deque.class.isAssignableFrom(collectionType)) {
                     return new ArrayDeque<T>();
-                else if (BlockingQueue.class.isAssignableFrom(collectionType))
+                } else if (BlockingQueue.class.isAssignableFrom(collectionType)) {
                     return new LinkedBlockingDeque<T>();
-                else if (Queue.class.isAssignableFrom(collectionType))
+                } else if (Queue.class.isAssignableFrom(collectionType)) {
                     return new LinkedList<T>();
+                }
                 return new ArrayList<T>();
             }
         },
@@ -177,18 +178,22 @@ class DefaultDynamicParsers {
             }
 
             private <K, V> Map<K, V> instantiateMap(Class<?> rawType) {
-                if (rawType.isInterface())
+                if (rawType.isInterface()) {
                     return instantiateMapFromInterface(rawType);
+                }
                 return instantiateMapFromClass(rawType);
             }
 
             private <K, V> Map<K, V> instantiateMapFromInterface(Class<?> targetType) {
-                if (NavigableMap.class.isAssignableFrom(targetType))
+                if (NavigableMap.class.isAssignableFrom(targetType)) {
                     return new ConcurrentSkipListMap<K, V>();
-                if (ConcurrentMap.class.isAssignableFrom(targetType))
+                }
+                if (ConcurrentMap.class.isAssignableFrom(targetType)) {
                     return new ConcurrentHashMap<K, V>();
-                else if (SortedMap.class.isAssignableFrom(targetType))
+                }
+                if (SortedMap.class.isAssignableFrom(targetType)) {
                     return new TreeMap<K, V>();
+                }
                 return new LinkedHashMap<K, V>();
             }
 
@@ -257,9 +262,6 @@ class DefaultDynamicParsers {
             }
         },
         CLASS_DECLARING_STATIC_VALUE_OF_METHOD {
-
-            private final Object STATIC_METHOD = null;
-
             @Override
             public Object parse(final String input, ParserHelper helper) {
                 boolean methodFound = false;
@@ -270,7 +272,7 @@ class DefaultDynamicParsers {
 
                 // try find a matching method.
                 for (Method m : targetType.getDeclaredMethods()) {
-                    if (m.getName().equals("valueOf")) {
+                    if ("valueOf".equals(m.getName())) {
                         if (m.getGenericParameterTypes().length == 1) {
                             if (Modifier.isStatic(m.getModifiers())) {
                                 argType = m.getGenericParameterTypes()[0];
@@ -298,9 +300,10 @@ class DefaultDynamicParsers {
                     return TRY_NEXT;
                 }
 
+                final Object staticMethod = null;
                 try {
                     method.setAccessible(true);
-                    return method.invoke(STATIC_METHOD, argument);
+                    return method.invoke(staticMethod, argument);
                 } catch (Exception e) {
                     String message = "Failed when calling static factory method %s, "
                             + "with error message: %s";

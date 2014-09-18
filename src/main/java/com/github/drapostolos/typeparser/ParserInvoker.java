@@ -81,8 +81,7 @@ final class ParserInvoker {
     }
 
     private boolean isNullString() {
-        NullStringStrategyHelper helper = new NullStringStrategyHelper(targetType);
-        return nullStringStrategy.isNullString(preprocessedInput, helper);
+        return nullStringStrategy.isNullString(preprocessedInput, new NullStringStrategyHelper(targetType));
     }
 
     private boolean isPrimitive(Type targetType) {

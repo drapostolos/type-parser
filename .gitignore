@@ -1,4 +1,10 @@
 .classpath
 .project
 .settings/
+.gradle/
+.idea/
 target/
+bin/
+build/
+test-output/
+test-report/

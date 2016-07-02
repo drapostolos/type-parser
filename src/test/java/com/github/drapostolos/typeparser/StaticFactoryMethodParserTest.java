@@ -8,6 +8,19 @@ import org.junit.Test;
 public class StaticFactoryMethodParserTest extends TestBase {
 
     @Test
+    public void canParseTypeWhitStaticFactoryMethodThatTakesNumberArgument() throws Exception {
+        Object o = parser.parse("123", WithStaticFactoryMethodTakingANumber.class);
+        assertThat(o).isInstanceOf(WithStaticFactoryMethodTakingANumber.class);
+    }
+
+    static class WithStaticFactoryMethodTakingANumber {
+
+        static WithStaticFactoryMethodTakingANumber staticFactoryMethod(Number e) {
+            return new WithStaticFactoryMethodTakingANumber();
+        }
+    }
+
+    @Test
     public void canParseTypeWhitValueOfMethodThatTakesLongArgument() throws Exception {
         Object o = parser.parse("123", WithValueOfMethodTakingLongArgument.class);
         assertThat(o).isInstanceOf(WithValueOfMethodTakingLongArgument.class);

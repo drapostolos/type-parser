@@ -4,6 +4,7 @@ jdk:
   - oraclejdk7
   - openjdk7
   - openjdk6
+install: gradle build
 #install: mvn install -Dgpg.skip=true -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 #script: mvn test -B
 

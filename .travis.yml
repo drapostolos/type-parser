@@ -4,8 +4,8 @@ jdk:
   - oraclejdk7
   - openjdk7
   - openjdk6
-install: mvn install -Dgpg.skip=true -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-script: mvn test -B
+#install: mvn install -Dgpg.skip=true -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+#script: mvn test -B
 
-after_success:
-  - mvn clean cobertura:cobertura coveralls:cobertura
+#after_success:
+#  - mvn clean cobertura:cobertura coveralls:cobertura

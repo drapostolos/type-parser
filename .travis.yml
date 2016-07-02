@@ -4,7 +4,7 @@ jdk:
   - oraclejdk7
   - openjdk7
   - openjdk6
-  before_install:
+before_install:
  - chmod +x gradlew
  - chmod +x gradle/wrapper/gradle-wrapper.jar
 #install: ls -la;  ls -la gradle/wrapper/gradle-wrapper.*; ./gradlew build

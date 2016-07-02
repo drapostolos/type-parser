@@ -1,9 +1,10 @@
 package com.github.drapostolos.typeparser;
 
+import static java.lang.reflect.Modifier.isStatic;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -261,37 +262,31 @@ class DefaultDynamicParsers {
                 }
             }
         },
-        CLASS_DECLARING_STATIC_VALUE_OF_METHOD {
+        CLASS_DECLARING_STATIC_FACTORY_METHOD {
             @Override
             public Object parse(final String input, ParserHelper helper) {
                 boolean methodFound = false;
                 Method method = null;
-                Type argType = null;
-                Class<?> targetType = helper.getRawTargetClass();
                 Object argument = null;
 
                 // try find a matching method.
-                for (Method m : targetType.getDeclaredMethods()) {
-                    if ("valueOf".equals(m.getName())) {
-                        if (m.getGenericParameterTypes().length == 1) {
-                            if (Modifier.isStatic(m.getModifiers())) {
-                                argType = m.getGenericParameterTypes()[0];
-                                try {
-                                    argument = helper.parseType(input, argType);
-                                    method = m;
-                                    methodFound = true;
-                                    break;
-                                } catch (NoSuchRegisteredParserException e) {
-                                    continue;
-                                } catch (TypeParserException e) {
-                                    if (e.getCause() instanceof StackOverflowError) {
-                                        String message = "StackOverflowError: Cyclic argument type "
-                                                + "for method '%s' on this type.";
-                                        throw new StackOverflowError(String.format(message, m));
-                                    } else {
-                                        throw e;
-                                    }
-                                }
+                for (Method m : helper.getRawTargetClass().getDeclaredMethods()) {
+                    if (isStaticFactoryMethod(m)) {
+                        Type argType = m.getGenericParameterTypes()[0];
+                        try {
+                            argument = helper.parseType(input, argType);
+                            method = m;
+                            methodFound = true;
+                            break;
+                        } catch (NoSuchRegisteredParserException e) {
+                            continue;
+                        } catch (TypeParserException e) {
+                            if (e.getCause() instanceof StackOverflowError) {
+                                String message = "StackOverflowError: Cyclic argument type "
+                                        + "for method '%s' on this type.";
+                                throw new StackOverflowError(String.format(message, m));
+                            } else {
+                                throw e;
                             }
                         }
                     }
@@ -310,6 +305,12 @@ class DefaultDynamicParsers {
                     message = String.format(message, method, e.getMessage());
                     throw new UnsupportedOperationException(message, e);
                 }
+            }
+
+            private boolean isStaticFactoryMethod(Method m) {
+                return isStatic(m.getModifiers()) &&
+                        m.getParameterTypes().length == 1 &&
+                        m.getDeclaringClass().isAssignableFrom(m.getReturnType());
             }
         },
         CLASS_DECLARING_SINGLE_ARGUMENT_CONSTRUCTOR {

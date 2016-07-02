@@ -4,7 +4,10 @@ jdk:
   - oraclejdk7
   - openjdk7
   - openjdk6
-install: ls -la;  ls -la gradle/wrapper/gradle-wrapper.*; ./gradlew build
+  before_install:
+ - chmod +x gradlew
+ - chmod +x gradle/wrapper/gradle-wrapper.jar
+#install: ls -la;  ls -la gradle/wrapper/gradle-wrapper.*; ./gradlew build
 #install: mvn install -Dgpg.skip=true -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 #script: mvn test -B
 

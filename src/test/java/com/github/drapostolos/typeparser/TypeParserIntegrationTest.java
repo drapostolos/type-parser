@@ -28,22 +28,6 @@ public class TypeParserIntegrationTest extends TestBase {
     }
 
     @Test
-    public void canOverrideStaticParserWithDynamicParser() throws Exception {
-        // given
-        builder.registerDynamicParser(new DynamicParser() {
-
-            @Override
-            public Object parse(String input, ParserHelper helper) {
-                return 42;
-            }
-        });
-        parser = builder.build();
-
-        // then
-        assertThat(parser.parse(DUMMY_STRING, int.class)).isEqualTo(42);
-    }
-
-    @Test
     public void canParseGenericTypeToEmptyList() throws Exception {
         GenericType<List<Long>> type = new GenericType<List<Long>>() {};
         assertThat(parser.parse("null", type)).isEmpty();
@@ -122,8 +106,8 @@ public class TypeParserIntegrationTest extends TestBase {
                 .build();
 
         // then
-        MyGenericParser<String> actual = parser.parse("null", new GenericType<MyGenericParser<String>>() {});
-        assertThat(actual).isNull();
+        MyGenericParser<String> actual = parser.parse("", new GenericType<MyGenericParser<String>>() {});
+        assertThat(actual).isNotNull();
     }
 
     @Test

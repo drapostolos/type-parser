@@ -79,7 +79,7 @@ public class TypeParserExceptionTest extends TestBase {
         shouldThrowTypeParserException()
                 .containingErrorMessage(ERROR_MSG)
                 .whenParsing(DUMMY_STRING)
-                .to(String.class);
+                .to(DynamicParser.class);
     }
 
     @Test

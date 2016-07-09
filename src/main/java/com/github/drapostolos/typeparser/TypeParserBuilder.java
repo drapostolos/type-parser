@@ -1,9 +1,19 @@
 package com.github.drapostolos.typeparser;
 
+import static com.github.drapostolos.typeparser.DynamicParsers.NoneContainerType.PROPERTY_EDITOR;
+import static com.github.drapostolos.typeparser.Util.decorateParser;
+import static com.github.drapostolos.typeparser.Util.defaultInputPreprocessor;
+import static com.github.drapostolos.typeparser.Util.defaultKeyValueSplitStrategy;
+import static com.github.drapostolos.typeparser.Util.defaultNullStringStrategy;
+import static com.github.drapostolos.typeparser.Util.defaultSplitStrategy;
 import static com.github.drapostolos.typeparser.Util.makeNullArgumentErrorMsg;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Builder class for constructing and configuring instances of {@link TypeParser}.
@@ -13,15 +23,15 @@ import java.util.Map;
  */
 public final class TypeParserBuilder {
 
-    Parsers parsers;
-    SplitStrategy splitStrategy = Util.defaultSplitStrategy();
-    SplitStrategy keyValueSplitStrategy = Util.defaultKeyValueSplitStrategy();
-    InputPreprocessor inputPreprocessor = Util.defaultInputPreprocessor();
-    NullStringStrategy nullStringStrategy = Util.defaultNullStringStrategy();
+    final Map<Type, Parser<?>> parsers = Parsers.copyDefault();
+    final Set<DynamicParser> defaultDynamicParsers = DynamicParsers.copyDefault();
+    final List<DynamicParser> clientProvidedDynamicParsers = new ArrayList<DynamicParser>();
+    SplitStrategy splitStrategy = defaultSplitStrategy();
+    SplitStrategy keyValueSplitStrategy = defaultKeyValueSplitStrategy();
+    InputPreprocessor inputPreprocessor = defaultInputPreprocessor();
+    NullStringStrategy nullStringStrategy = defaultNullStringStrategy();
 
     TypeParserBuilder() {
-        // Initialize with the default Parsers/DynamicParsers
-        parsers = Parsers.copyDefault();
     }
 
     /**
@@ -36,7 +46,7 @@ public final class TypeParserBuilder {
         if (targetType == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("targetType"));
         }
-        parsers.removeStaticParser(targetType);
+        parsers.remove(targetType);
         return this;
     }
 
@@ -63,7 +73,7 @@ public final class TypeParserBuilder {
             Class<?> componentType = targetType.getComponentType();
             throw new IllegalArgumentException(String.format(message, componentType.getName()));
         }
-        parsers.addStaticParser(targetType, parser);
+        parsers.put(targetType, decorateParser(targetType, parser));
         return this;
     }
 
@@ -83,7 +93,7 @@ public final class TypeParserBuilder {
         if (targetType == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("targetType"));
         }
-        parsers.addStaticParser(targetType.getType(), parser);
+        parsers.put(targetType.getType(), decorateParser(targetType.getType(), parser));
         return this;
     }
 
@@ -101,7 +111,7 @@ public final class TypeParserBuilder {
         if (parser == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("parser"));
         }
-        parsers.addDynamicParser(parser);
+        clientProvidedDynamicParsers.add(parser);
         return this;
     }
 
@@ -201,6 +211,11 @@ public final class TypeParserBuilder {
             throw new NullPointerException(makeNullArgumentErrorMsg("nullStringStrategy"));
         }
         this.nullStringStrategy = nullStringStrategy;
+        return this;
+    }
+
+    public TypeParserBuilder enablePropertyEditor() {
+        defaultDynamicParsers.add(PROPERTY_EDITOR);
         return this;
     }
 

@@ -1,8 +1,14 @@
 package com.github.drapostolos.typeparser;
 
+import static com.github.drapostolos.typeparser.DynamicParser.TRY_NEXT;
+import static com.github.drapostolos.typeparser.Util.formatErrorMessage;
 import static com.github.drapostolos.typeparser.Util.makeNullArgumentErrorMsg;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The purpose of this class is to parse a simple string (read from a properties file
@@ -15,18 +21,21 @@ import java.lang.reflect.Type;
  */
 public final class TypeParser {
 
-    final Parsers parsers;
+    final Map<Type, Parser<?>> parsers;
+    final List<DynamicParser> dynamicParsers;
     final SplitStrategy splitStrategy;
     final SplitStrategy keyValueSplitStrategy;
     final InputPreprocessor inputPreprocessor;
     final NullStringStrategy nullStringStrategy;
 
     TypeParser(TypeParserBuilder builder) {
-        this.parsers = Parsers.unmodifiableCopy(builder.parsers);
-        this.splitStrategy = builder.splitStrategy;
-        this.keyValueSplitStrategy = builder.keyValueSplitStrategy;
-        this.inputPreprocessor = builder.inputPreprocessor;
-        this.nullStringStrategy = builder.nullStringStrategy;
+        parsers = new HashMap<Type, Parser<?>>(builder.parsers);
+        dynamicParsers = new ArrayList<DynamicParser>(builder.clientProvidedDynamicParsers);
+        dynamicParsers.addAll(builder.defaultDynamicParsers);
+        splitStrategy = builder.splitStrategy;
+        keyValueSplitStrategy = builder.keyValueSplitStrategy;
+        inputPreprocessor = builder.inputPreprocessor;
+        nullStringStrategy = builder.nullStringStrategy;
     }
 
     /**
@@ -131,25 +140,24 @@ public final class TypeParser {
         String preprocessedInput = null;
         try {
             preprocessedInput = preProcessInputString(input, targetType);
-            ParserInvoker invoker = new ParserInvoker(this, targetType, preprocessedInput);
-            return invoker.invoke();
+            return invokeParser(targetType, preprocessedInput);
         } catch (TypeParserException e) {
             // Re-throw as is (already contains context message)
             throw e;
         } catch (NoSuchRegisteredParserException e) {
             // prepend original error message with context (i.e. input and targetType)
-            String message = Util.formatErrorMessage(input, preprocessedInput, targetType, e.getMessage());
+            String message = formatErrorMessage(input, preprocessedInput, targetType, e.getMessage());
             throw new NoSuchRegisteredParserException(message);
         } catch (NumberFormatException e) {
             // Improve NumberFormatException error message and wrap it in a TypeParserException.
             // Also provide context (i.e. input and targetType)
             String message = "NumberFormatException " + e.getMessage();
-            message = Util.formatErrorMessage(input, preprocessedInput, targetType, message);
+            message = formatErrorMessage(input, preprocessedInput, targetType, message);
             throw new TypeParserException(message, e);
         } catch (Throwable t) {
             // Something unexpected happen. Wrap it in a TypeParserException
             // and provide context (i.e. input and targetType)
-            String message = Util.formatErrorMessage(input, preprocessedInput, targetType, t.getMessage());
+            String message = formatErrorMessage(input, preprocessedInput, targetType, t.getMessage());
             throw new TypeParserException(message, t);
         }
     }
@@ -162,5 +170,23 @@ public final class TypeParser {
             throw new UnsupportedOperationException(message);
         }
         return result;
+    }
+
+    private Object invokeParser(TargetType targetType, String preprocessedInput) {
+        ParserHelper helper = new ParserHelper(targetType, this);
+
+        if (parsers.containsKey(targetType.targetType())) {
+            Parser<?> parser = parsers.get(targetType.targetType());
+            return parser.parse(preprocessedInput, helper);
+        }
+
+        for (DynamicParser dynamicParser : dynamicParsers) {
+            Object result = dynamicParser.parse(preprocessedInput, helper);
+            if (result != TRY_NEXT) {
+                return result;
+            }
+        }
+
+        throw new NoSuchRegisteredParserException("There is no registered 'Parser' for that type.");
     }
 }

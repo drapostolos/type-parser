@@ -6,38 +6,34 @@ import java.util.List;
 
 final class Util {
 
-    private static final SplitStrategy DEFAULT_SPLIT_STRATEGY =
-            new SplitStrategy() {
+    private static final SplitStrategy DEFAULT_SPLIT_STRATEGY = new SplitStrategy() {
 
-                @Override
-                public List<String> split(String input, SplitStrategyHelper helper) {
-                    return Arrays.asList(input.split(","));
-                }
-            };
-    private static final SplitStrategy DEFAULT_KEY_VALUE_SPLIT_STRATEGY =
-            new SplitStrategy() {
+        @Override
+        public List<String> split(String input, SplitStrategyHelper helper) {
+            return Arrays.asList(input.split(","));
+        }
+    };
+    private static final SplitStrategy DEFAULT_KEY_VALUE_SPLIT_STRATEGY = new SplitStrategy() {
 
-                @Override
-                public List<String> split(String input, SplitStrategyHelper helper) {
-                    return Arrays.asList(input.split("=", 2));
-                }
-            };
-    private static final InputPreprocessor DEFAULT_INPUT_PREPROCESSOR =
-            new InputPreprocessor() {
+        @Override
+        public List<String> split(String input, SplitStrategyHelper helper) {
+            return Arrays.asList(input.split("=", 2));
+        }
+    };
+    private static final InputPreprocessor DEFAULT_INPUT_PREPROCESSOR = new InputPreprocessor() {
 
-                @Override
-                public String prepare(String input, InputPreprocessorHelper helper) {
-                    return input;
-                }
-            };
-    private static final NullStringStrategy DEFAULT_NULL_STRING_STRATEGY =
-            new NullStringStrategy() {
+        @Override
+        public String prepare(String input, InputPreprocessorHelper helper) {
+            return input;
+        }
+    };
+    private static final NullStringStrategy DEFAULT_NULL_STRING_STRATEGY = new NullStringStrategy() {
 
-                @Override
-                public boolean isNullString(String input, NullStringStrategyHelper helper) {
-                    return "null".equalsIgnoreCase(input.trim());
-                }
-            };
+        @Override
+        public boolean isNullString(String input, NullStringStrategyHelper helper) {
+            return "null".equalsIgnoreCase(input.trim());
+        }
+    };
 
     private Util() {
         throw new AssertionError("Not meant for instantiation");
@@ -61,6 +57,34 @@ final class Util {
 
     static String makeNullArgumentErrorMsg(String argName) {
         return String.format("Argument named '%s' is illegally set to null!", argName);
+    }
+
+    static <T> Parser<T> decorateParser(Type targetType, final Parser<T> parser) {
+        if (targetType instanceof Class) {
+            Class<?> c = (Class<?>) targetType;
+            if (c.isPrimitive()) {
+                return new Parser<T>() {
+
+                    @Override
+                    public T parse(String input, ParserHelper helper) {
+                        if (helper.isNullString(input)) {
+                            throw new UnsupportedOperationException("Primitive can not be set to null");
+                        }
+                        return parser.parse(input, helper);
+                    }
+                };
+            }
+        }
+
+        return new Parser<T>() {
+            @Override
+            public T parse(String input, ParserHelper helper) {
+                if (helper.isNullString(input)) {
+                    return null;
+                }
+                return parser.parse(input, helper);
+            }
+        };
     }
 
     /**

@@ -1,18 +1,14 @@
 plugins {
-  id 'net.researchgate.release' version '2.4.0'
+  id 'net.researchgate.release' version '2.8.0'
   id 'java'
   id 'maven'
   id 'signing'
 }
 
-sourceCompatibility = 1.6
+sourceCompatibility = 1.8
 group = 'com.github.drapostolos'
 archivesBaseName = 'type-parser'
 afterReleaseBuild.dependsOn uploadArchives
-
-task wrapper(type: Wrapper) {
-   gradleVersion = '2.14' //version required
-}
 
 repositories {
     mavenCentral()

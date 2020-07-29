@@ -34,7 +34,7 @@ public class MapTest extends TestBase {
 
     }
 
-    private void parseToMapInterfaces(GenericType<? extends Map<String, String>>... types) {
+	private void parseToMapInterfaces(@SuppressWarnings("unchecked") GenericType<? extends Map<String, String>>... types) {
         for (GenericType<? extends Map<String, String>> type : types) {
             Class<?> rawType = toRawType(type);
             assertThat(parser.parse("a=A", type))
@@ -59,7 +59,7 @@ public class MapTest extends TestBase {
 
     }
 
-    private void parseToConcreteMapTypes(GenericType<? extends Map<String, String>>... types) {
+    private void parseToConcreteMapTypes(@SuppressWarnings("unchecked") GenericType<? extends Map<String, String>>... types) {
         for (GenericType<? extends Map<String, String>> type : types) {
             Class<?> rawType = toRawType(type);
             Map<String, String> map = parser.parse("a=A", type);

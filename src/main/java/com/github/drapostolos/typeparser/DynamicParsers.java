@@ -242,7 +242,6 @@ final class DynamicParsers {
                     return TRY_NEXT;
                 }
                 Class<Enum<?>> enumType = helper.getRawTargetClass();
-                @SuppressWarnings({ "unchecked" })
                 Enum<?> temp = Enum.valueOf(enumType.asSubclass(Enum.class), input.trim());
                 return temp;
             }

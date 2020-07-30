@@ -47,13 +47,6 @@ final class TargetType {
         if (targetType instanceof GenericArrayType) {
             GenericArrayType array = (GenericArrayType) targetType;
             Type componentType = array.getGenericComponentType();
-            if (componentType instanceof Class) {
-                /*
-                 * This is a special case that only happens in Java version 1.6
-                 * (example: java version "1.6.0_30")
-                 */
-                return Array.newInstance((Class<?>) componentType, 0).getClass();
-            }
             if (componentType instanceof ParameterizedType) {
                 ParameterizedType parameterizedType = (ParameterizedType) componentType;
                 Class<?> rawType = (Class<?>) parameterizedType.getRawType();

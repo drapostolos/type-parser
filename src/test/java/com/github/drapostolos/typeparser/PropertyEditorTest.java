@@ -81,7 +81,6 @@ public class PropertyEditorTest extends TestBase {
         @Override
         public void setAsText(String text) throws IllegalArgumentException {
             this.text = text;
-            System.out.println("setAsTest: " + text);
         }
 
         @Override

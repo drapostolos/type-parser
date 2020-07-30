@@ -10,6 +10,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.LinkedHashMap;
@@ -170,7 +172,15 @@ enum Parsers implements Parser<Object> {
                 throw new IllegalArgumentException(e.getMessage(), e);
             }
         }
-    };
+    },
+    PATH(Path.class) {
+
+        @Override
+        public Path parse(String input, ParserHelper helper) {
+            return Paths.get(input.trim());
+        }
+    },
+;
 
     private static final Map<Type, Parser<?>> DEFAULT_PARSERS;
     private Type[] types;

@@ -8,6 +8,7 @@ package com.github.drapostolos.typeparser;
  * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
  *      target="_blank">User-Guide</a>
  */
+@FunctionalInterface
 public interface Parser<T> {
 
     /**

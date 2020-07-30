@@ -23,6 +23,7 @@ import java.util.Map;
  *      target="_blank">User-Guide</a>
  * @see TypeParserBuilder#setNullStringStrategy(NullStringStrategy)
  */
+@FunctionalInterface
 public interface NullStringStrategy {
 
     /**

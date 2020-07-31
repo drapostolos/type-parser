@@ -2,11 +2,9 @@ package com.github.drapostolos.typeparser;
 
 import static com.github.drapostolos.typeparser.DynamicParsers.NoneContainerType.PROPERTY_EDITOR;
 import static com.github.drapostolos.typeparser.Util.decorateParser;
-import static com.github.drapostolos.typeparser.Util.defaultInputPreprocessor;
-import static com.github.drapostolos.typeparser.Util.defaultKeyValueSplitStrategy;
-import static com.github.drapostolos.typeparser.Util.defaultNullStringStrategy;
 import static com.github.drapostolos.typeparser.Util.defaultSplitStrategy;
 import static com.github.drapostolos.typeparser.Util.makeNullArgumentErrorMsg;
+import static java.util.Arrays.asList;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -27,9 +25,9 @@ public final class TypeParserBuilder {
     final Set<DynamicParser> defaultDynamicParsers = DynamicParsers.copyDefault();
     final List<DynamicParser> clientProvidedDynamicParsers = new ArrayList<DynamicParser>();
     SplitStrategy splitStrategy = defaultSplitStrategy();
-    SplitStrategy keyValueSplitStrategy = defaultKeyValueSplitStrategy();
-    InputPreprocessor inputPreprocessor = defaultInputPreprocessor();
-    NullStringStrategy nullStringStrategy = defaultNullStringStrategy();
+    SplitStrategy keyValueSplitStrategy = (input, helper) -> asList(input.split("=", 2));
+    InputPreprocessor inputPreprocessor = (input, helper) -> input;
+    NullStringStrategy nullStringStrategy = (input, helper) -> "null".equalsIgnoreCase(input.trim());
 
     TypeParserBuilder() {
     }

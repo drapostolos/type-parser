@@ -18,27 +18,6 @@ final class Util {
         return String.format("Argument named '%s' is illegally set to null!", argName);
     }
 
-    // TODO move this logic to TypeParser?
-    static <T> Parser<T> decorateParser(Type targetType, final Parser<T> parser) {
-        if (targetType instanceof Class) {
-            Class<?> c = (Class<?>) targetType;
-            if (c.isPrimitive()) {
-				return (input, helper) -> {
-					if (helper.isNullString(input)) {
-						throw new UnsupportedOperationException("Primitive can not be set to null");
-					}
-					return parser.parse(input, helper);
-				};
-            }
-        }
-        return (input, helper) -> {
-                if (helper.isNullString(input)) {
-                    return null;
-                }
-                return parser.parse(input, helper);
-        };
-    }
-
     /**
      * @param o
      * @return %s {instance of: %s}

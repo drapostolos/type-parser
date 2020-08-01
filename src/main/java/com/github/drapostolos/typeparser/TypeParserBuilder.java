@@ -1,7 +1,6 @@
 package com.github.drapostolos.typeparser;
 
 import static com.github.drapostolos.typeparser.DynamicParsers.NoneContainerType.PROPERTY_EDITOR;
-import static com.github.drapostolos.typeparser.Util.decorateParser;
 import static com.github.drapostolos.typeparser.Util.defaultSplitStrategy;
 import static com.github.drapostolos.typeparser.Util.makeNullArgumentErrorMsg;
 import static java.util.Arrays.asList;
@@ -71,7 +70,7 @@ public final class TypeParserBuilder {
             Class<?> componentType = targetType.getComponentType();
             throw new IllegalArgumentException(String.format(message, componentType.getName()));
         }
-        parsers.put(targetType, decorateParser(targetType, parser));
+        parsers.put(targetType, parser);
         return this;
     }
 
@@ -91,7 +90,7 @@ public final class TypeParserBuilder {
         if (targetType == null) {
             throw new NullPointerException(makeNullArgumentErrorMsg("targetType"));
         }
-        parsers.put(targetType.getType(), decorateParser(targetType.getType(), parser));
+        parsers.put(targetType.getType(), parser);
         return this;
     }
 

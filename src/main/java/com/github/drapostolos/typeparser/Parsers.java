@@ -1,7 +1,5 @@
 package com.github.drapostolos.typeparser;
 
-import static com.github.drapostolos.typeparser.Util.decorateParser;
-
 import java.io.File;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -44,30 +42,30 @@ enum Parsers implements Parser<Object> {
         throw new IllegalArgumentException(String.format(message, input));}),
     BIG_INTEGER(BigInteger.class, (input, helper) -> new BigInteger(input.trim())),
     BIG_DECIMAL(BigDecimal.class, (input, helper) -> {
-            try {
-                return new BigDecimal(input.trim());
-            } catch (NumberFormatException e) {
-                /*
-                 * The NumberFormatException thrown by BigDecimal contains
-                 * an empty error message. The below is done to address that.
-                 */
-                String message = "NumberFormatException For input string: \"" + input + "\"";
-                NumberFormatException e2 = new NumberFormatException(message);
-                e2.setStackTrace(e.getStackTrace());
-                throw e2;
-            }}),
+        try {
+            return new BigDecimal(input.trim());
+        } catch (NumberFormatException e) {
+            /*
+             * The NumberFormatException thrown by BigDecimal contains
+             * an empty error message. The below is done to address that.
+             */
+            String message = "NumberFormatException For input string: \"" + input + "\"";
+            NumberFormatException e2 = new NumberFormatException(message);
+            e2.setStackTrace(e.getStackTrace());
+            throw e2;
+        }}),
     URL(URL.class, (input, helper) -> {
-            try {
-                return new URL(input.trim());
-            } catch (MalformedURLException e) {
-                throw new IllegalArgumentException("MalformedURLException: " + e.getMessage(), e);
-            }}),
+        try {
+            return new URL(input.trim());
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("MalformedURLException: " + e.getMessage(), e);
+        }}),
     URI(URI.class, (input, helper) -> {
-            try {
-                return new URI(input.trim());
-            } catch (URISyntaxException e) {
-                throw new IllegalArgumentException(e.getMessage(), e);
-            }}),
+        try {
+            return new URI(input.trim());
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        }}),
 	FILE(File.class, (input, helper) -> new File(input.trim())),
     STRING(String.class, (input, helper) -> input),
     OBJECT(Object.class, (input, helper) -> input),
@@ -87,8 +85,7 @@ enum Parsers implements Parser<Object> {
 			return NUMBER_FORMAT.get().parse(input.trim());
 		} catch (ParseException e) {
 			throw new IllegalArgumentException(e.getMessage(), e);
-		}
-	}),
+		}}),
     PATH(Path.class, (input,helper) -> Paths.get(input.trim()));
 
 	private static final Map<Type, Parser<?>> DEFAULT_PARSERS;
@@ -115,7 +112,7 @@ enum Parsers implements Parser<Object> {
 		DEFAULT_PARSERS = new LinkedHashMap<Type, Parser<?>>();
 		for (Parsers parser : values()) {
 			for (Type type : parser.types) {
-				DEFAULT_PARSERS.put(type, decorateParser(type, parser));
+				DEFAULT_PARSERS.put(type, parser);
 			}
 		}
 	}

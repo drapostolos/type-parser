@@ -95,4 +95,8 @@ final class TargetType {
         return targetType.toString();
     }
 
+	public boolean isPrimitive() {
+		return targetType instanceof Class && ((Class<?>) targetType).isPrimitive();
+	}
+
 }

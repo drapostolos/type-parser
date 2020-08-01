@@ -3,6 +3,7 @@ package com.github.drapostolos.typeparser;
 import static java.beans.PropertyEditorManager.findEditor;
 import static java.lang.reflect.Modifier.isStatic;
 import static java.util.EnumSet.allOf;
+import static java.util.stream.Collectors.toList;
 
 import java.beans.PropertyEditor;
 import java.lang.reflect.Array;
@@ -42,14 +43,10 @@ final class DynamicParsers {
         DEFAULT_DYNAMIC_PARSERS.addAll(mandatory(allOf(NoneContainerType.class)));
     }
 
-    private static List<DynamicParser> mandatory(Collection<? extends Optional> parsers) {
-        List<DynamicParser> result = new ArrayList<DynamicParser>();
-        for (Optional o : parsers) {
-            if (!o.isOptional()) {
-                result.add((DynamicParser) o);
-            }
-        }
-        return result;
+    private static List<DynamicParser> mandatory(Collection<? extends MandatoryOrOptionalDynamicParser> parsers) {
+    	return parsers.stream()
+    	.filter(MandatoryOrOptionalDynamicParser::isMandatory)
+    	.collect(toList());
     }
 
     static Set<DynamicParser> copyDefault() {
@@ -60,16 +57,17 @@ final class DynamicParsers {
         throw new AssertionError("Not meant for instantiation");
     }
 
-    private static interface Optional {
-
-        boolean isOptional();
+    private static interface MandatoryOrOptionalDynamicParser extends DynamicParser{
+        default boolean isMandatory() {
+        	return true;
+        }
     }
 
     /*
      * This enum represents container types (i.e. types containing other types)
      * such as Collections, arrays, Maps etc.
      */
-    enum ContainerType implements DynamicParser, Optional {
+    enum ContainerType implements MandatoryOrOptionalDynamicParser {
         /**
          * ENUMSET Must be called before COLLECTION enum constant.
          */
@@ -208,11 +206,6 @@ final class DynamicParsers {
             }
         };
 
-        @Override
-        public boolean isOptional() {
-            return false;
-        }
-
         static private Collection<Object> populateCollection(Collection<Object> collection,
                 Class<?> elementType, String input, ParserHelper helper) {
             for (String value : helper.split(input)) {
@@ -233,7 +226,7 @@ final class DynamicParsers {
     /*
      * This enum represents types that can be contained in a container type.
      */
-    enum NoneContainerType implements DynamicParser, Optional {
+    enum NoneContainerType implements MandatoryOrOptionalDynamicParser {
         ENUM {
 
             @Override
@@ -360,8 +353,8 @@ final class DynamicParsers {
         },
         PROPERTY_EDITOR {
             @Override
-            public boolean isOptional() {
-                return true;
+            public boolean isMandatory() {
+                return false;
             }
 
             @Override
@@ -383,13 +376,7 @@ final class DynamicParsers {
             if (helper.isNullString(input)) {
                 return null;
             }
-
             return parseImp(input, helper);
-        }
-
-        @Override
-        public boolean isOptional() {
-            return false;
         }
     }
 

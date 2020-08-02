@@ -69,7 +69,7 @@ abstract class Helper {
      * @return the element at the specified position in the list (as returned from method
      *         {@link ParserHelper#getParameterizedClassArguments()}).
      * @throws IndexOutOfBoundsException if the index is out of range
-     *         (<tt>index &lt; 0 || index &gt;= size()</tt>)
+     *         (<code>index &lt; 0 || index &gt;= size()</code>)
      * @throws UnsupportedOperationException if the {@code targetType} is not a parameterized type.
      * @throws UnsupportedOperationException if any of the parameterized type arguments is of a
      *         parameterized type (with exception of {@link Class}).

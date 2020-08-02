@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Helper class providing helper methods to implementations of {@link Parser} when parsing a
  * string to a type.
- * <p/>
+ * <p>
  * The {@link TypeParser} will automatically inject an instance of this class into the
  * {@link Parser} implementation.
  * 
@@ -36,6 +36,7 @@ public final class ParserHelper extends Helper {
     /**
      * This method gives access to {@link TypeParser#parse(String, Class)}.
      * 
+     * @param <T> the expected type to convert {@code input} to.
      * @param input String to parse.
      * @param targetType to parse it to.
      * @return an instance of type.
@@ -59,13 +60,13 @@ public final class ParserHelper extends Helper {
      * Splits the {@code input} string into a list of sub-strings by using the {@link SplitStrategy}
      * implementation (as registered with {@link TypeParserBuilder#setSplitStrategy(SplitStrategy)}
      * ).
-     * <p/>
+     * <p>
      * If {@code input} is the <code>NullString</code> (See {@link NullStringStrategy}), an empty
      * list is returned, without calling the registered {@link SplitStrategy}.
-     * <p/>
+     * <p>
      * For example the default {@link SplitStrategy} will split this string "1, 2, 3, 4" into ["1",
      * " 2", " 3", " 4"].
-     * <p/>
+     * <p>
      * 
      * @param input pre-processed input string to parse. Can be a {@code NullString}.
      * @return List of strings, or an empty List if the given <code>input</code> is the
@@ -91,7 +92,7 @@ public final class ParserHelper extends Helper {
      * {@link SplitStrategy} implementation (as registered with
      * {@link TypeParserBuilder#setKeyValueSplitStrategy(SplitStrategy)}). The first element
      * represent the <code>Key</code> and the second element the <code>Value</code>.
-     * <p/>
+     * <p>
      * For example the default key-value {@link SplitStrategy} splits this string "a=AAA=BBB" into
      * ["a", "AAA=BBB"]. Note! The the string is only split by the first occurring of "=", any
      * subsequent "=" are ignored by the default key-value {@link SplitStrategy}.

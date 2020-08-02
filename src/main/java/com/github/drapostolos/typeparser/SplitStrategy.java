@@ -8,7 +8,7 @@ import java.util.Map;
  * Callback interface that allows clients to define their own split strategy. The
  * {@link SplitStrategy} is used when splitting the input string to either {@link Collection},
  * {@link Map} or Array types.
- * <p/>
+ * <p>
  * Implementations of this interface are expected to be immutable.
  * 
  * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
@@ -25,7 +25,6 @@ public interface SplitStrategy {
      * @param helper Helper class injected automatically by the {@link TypeParser}.
      * @return A list of strings computed by splitting the {@code input} string using this
      *         {@link SplitStrategy}.
-     * @throws RuntimeException
      * @see ParserHelper#split(String)
      * @see ParserHelper#splitKeyValue(String)
      * @see InputPreprocessor

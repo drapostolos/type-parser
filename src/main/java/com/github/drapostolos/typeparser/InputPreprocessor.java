@@ -12,7 +12,7 @@ public interface InputPreprocessor {
 
     /**
      * Prepares the input string to be parsed. Must return a {@link String} object.
-     * <p/>
+     * <p>
      * Returning a <code>null</code> object is not supported. If a null object is return, an
      * {@link UnsupportedOperationException} will be thrown.
      * 

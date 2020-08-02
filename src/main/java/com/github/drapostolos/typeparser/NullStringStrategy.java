@@ -6,17 +6,17 @@ import java.util.Map;
 /**
  * Callback interface that allows clients define their own {@code NullString}. Implementations of
  * this interface are expected to be immutable.
- * <p/>
+ * <p>
  * A {@code NullString} is string which will cause the {@link TypeParser} to return either an empty
  * type (applicable for {@link Collection}, {@link Map} and Array types) or a null object.
- * <p/>
+ * <p>
  * By default the <code>NullString</code> is set to the (trimmed and case insensitive) string
- * "null". Examples follow: <br />
+ * "null". Examples follow: <br>
  * <code>
- * TypeParser parser = TypeParser.newBuilder().build();<br/>
- * parser.parse("null", Integer.class); // returns a null object<br/>
- * parser.parse("NULL", new {@code GenericType<List<Integer>>}() {}); // returns an empty List<br/>
- * parser.parse(" null ", Integer[].class); // returns an empty Integer array<br/>
+ * TypeParser parser = TypeParser.newBuilder().build();<br>
+ * parser.parse("null", Integer.class); // returns a null object<br>
+ * parser.parse("NULL", new GenericType&lt;List&lt;Integer&gt;&gt;() {}); // returns an empty List<br>
+ * parser.parse(" null ", Integer[].class); // returns an empty Integer array<br>
  * </code>
  * 
  * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"

@@ -49,13 +49,14 @@ public final class TypeParser {
 
     /**
      * Parses the given {@code input} string to the given {@code targetType}.
-     * <p/>
-     * Example: <br/>
+     * <p>
+     * Example: <br>
      * <code>
-     * TypeParser parser = TypeParser.newBuilder().build();<br/>
+     * TypeParser parser = TypeParser.newBuilder().build();<br>
      * Integer i = parser.parse("1", Integer.class);
      * </code>
      * 
+     * @param <T> the expected type to convert {@code input} to.
      * @param input - string value to parse
      * @param targetType - the expected type to convert {@code input} to.
      * @return an instance of {@code targetType} corresponding to the given {@code input}.
@@ -81,14 +82,15 @@ public final class TypeParser {
 
     /**
      * Parses the given {@code input} string to the given {@code genericType}.
-     * <p/>
-     * Example: <br/>
+     * <p>
+     * Example: <br>
      * <code>
-     * TypeParser parser = TypeParser.newBuilder().build();<br/>
-     * {@code List<Integer>} list = parser.parse("1, 2", new {@code GenericType<List<Integer>>}() {});
-     * </code><br/>
+     * TypeParser parser = TypeParser.newBuilder().build();<br>
+     * List&lt;Integer&gt; list = parser.parse("1, 2", new GenericType&lt;List&lt;Integer&gt;&gt;() {});
+     * </code><br>
      * Note the ending "{}".
      * 
+     * @param <T> the expected generic type to convert {@code input} to.
      * @param input - string value to parse.
      * @param genericType - the expected generic type to convert {@code input} to.
      * @return an instance of {@code genericType} corresponding to the given {@code input}.
@@ -113,7 +115,7 @@ public final class TypeParser {
 
     /**
      * Parses the given {@code input} string to the given {@code targetType}.
-     * <p/>
+     * <p>
      * 
      * @param input - string value to parse.
      * @param targetType - the expected type to convert {@code input} to.

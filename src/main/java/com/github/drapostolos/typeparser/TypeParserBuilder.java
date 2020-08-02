@@ -51,6 +51,7 @@ public final class TypeParserBuilder {
      * Register a custom made {@link Parser} implementation, associated with
      * the given {@code targetType}.
      * 
+     * @param <T> the type associated with given {@code parser}.
      * @param targetType associated with given {@code parser}.
      * @param parser custom made {@link Parser} implementation.
      * @return {@link TypeParserBuilder}
@@ -78,6 +79,7 @@ public final class TypeParserBuilder {
      * Register a custom made {@link Parser} implementation, associated with
      * the given generic {@code targetType}.
      * 
+     * @param <T> the generic type associated with given {@code parser}.
      * @param targetType generic type associated with given {@code parser}.
      * @param parser custom made {@link Parser} implementation.
      * @return {@link TypeParserBuilder}
@@ -115,10 +117,10 @@ public final class TypeParserBuilder {
     /**
      * Set a custom made {@link SplitStrategy} implementation to be used by
      * the {@link TypeParser}.
-     * <p/>
+     * <p>
      * The default behavior, when parsing a string to either a {@link Collection}, {@link Map} or
      * Array type is to split the <code>input</code> string by comma (',').
-     * <p/>
+     * <p>
      * Use this method to register your own {@link SplitStrategy} implementation to override the
      * default behavior.
      * 
@@ -137,14 +139,14 @@ public final class TypeParserBuilder {
     /**
      * Set a custom made {@link SplitStrategy} implementation to separate the {@code key} and
      * {@code value} pair in a Map entry.
-     * <p/>
+     * <p>
      * The default behavior, when parsing a string to a {@link Map} instance, is to split each map
-     * entry by a "=" sign. For example this input string: <code>"key1=valueA,key2=valueB"</code><br/>
+     * entry by a "=" sign. For example this input string: <code>"key1=valueA,key2=valueB"</code><br>
      * will first be split using the {@link SplitStrategy} strategy as set with
      * {@link #setSplitStrategy(SplitStrategy)} to get a list of map entries (key/value pairs.
      * Example: ["key1=valueA", "key2=valueB"]). Then each map entry is split by "=" where first
      * element is the {@code key} and the second element is the {@code value}.
-     * <p/>
+     * <p>
      * Use this method to register your own key/value {@link SplitStrategy} implementation to
      * override the default behavior. I.e replace using the "=" sign with some other character.
      * 
@@ -163,7 +165,7 @@ public final class TypeParserBuilder {
     /**
      * Set a custom made {@link InputPreprocessor} implementation to be used by
      * the {@link TypeParser}.
-     * <p/>
+     * <p>
      * By default, the pre-processing is doing nothing. Use this method to set your own
      * {@link InputPreprocessor} implementation to override the default behavior.
      * 
@@ -186,14 +188,14 @@ public final class TypeParserBuilder {
      * The {@link NullStringStrategy} defines the string that will cause the {@link TypeParser} to
      * return either an empty type (applicable for {@link Collection}, {@link Map} and Array types)
      * or a null object. This String is known as the <code>NullString</code>.
-     * <p/>
+     * </p>
      * By default the <code>NullString</code> is set to the (trimmed and case insensitive) string
-     * "null". Examples follow: <br />
+     * "null". Examples follow: <br>
      * <code>
-     * TypeParser parser = TypeParser.newBuilder().build();<br/>
-     * parser.parse("null", Integer.class); // returns a null object<br/>
-     * parser.parse("NULL", new {@code GenericType<List<Integer>>}() {}); // returns an empty List<br/>
-     * parser.parse(" null ", Integer[].class); // returns an empty Integer array<br/>
+     * TypeParser parser = TypeParser.newBuilder().build();<br>
+     * parser.parse("null", Integer.class); // returns a null object<br>
+     * parser.parse("NULL", new GenericType&lt;List&lt;Integer&gt;&gt;() {}); // returns an empty List<br>
+     * parser.parse(" null ", Integer[].class); // returns an empty Integer array<br>
      * </code>
      * Use this method to set your own {@link InputPreprocessor} implementation to override the
      * default behavior.

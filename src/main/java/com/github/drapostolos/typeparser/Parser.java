@@ -13,11 +13,11 @@ public interface Parser<T> {
 
     /**
      * Parses the given string and converts it to an instance of type T.
-     * <p/>
+     * <p>
      * If the input string passed to the {@link TypeParser} is the {@code NullString} (See
      * {@link NullStringStrategy}), then this method will be skipped and a {@code null} object is
      * automatically return from {@link TypeParser}.
-     * <p/>
+     * <p>
      * 
      * @param input pre-processed input string to parse. Will never be {@code null} or a
      *        {@code NullString}.

@@ -3,15 +3,15 @@ package com.github.drapostolos.typeparser;
 /**
  * Callback interface that allows clients to define a {@link Parser} that decides during
  * runtime if it can parse the {@code input} string for a given {@code targetType}.
- * <p/>
+ * <p>
  * If a DynamicParser can not parse, then the {@link DynamicParser#parse(String, ParserHelper)}
  * method is expected to return the {@link DynamicParser#TRY_NEXT} constant.
- * <p/>
+ * <p>
  * The {@link TypeParser} will internally call all registered {@link DynamicParser} until the first
  * one found that does NOT return a {@link DynamicParser#TRY_NEXT} object.
- * <p/>
+ * <p>
  * Implementations of this interface are expected to be immutable.
- * <p/>
+ * <p>
  * Register {@link DynamicParser}s with this method
  * {@link TypeParserBuilder#registerDynamicParser(DynamicParser)}.
  * 

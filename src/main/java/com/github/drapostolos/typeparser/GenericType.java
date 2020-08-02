@@ -4,16 +4,16 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 /**
- * Define a generic type (known in compile time) by sub-classing this class. <br/>
- * Below example defines a {@code List<String>}: <br/>
+ * Define a generic type (known in compile time) by sub-classing this class. <br>
+ * Below example defines a {@code List<String>}: <br>
  * <code>
- *  new {@code GenericType<List<Integer>>} () {};
- * </code><br/>
+ *  new GenericType&lt;List&lt;Integer&gt;&gt; () {};
+ * </code><br>
  * Note the ending "{}".
- * <p/>
+ * <p>
  * Use a subclass of this class as an argument to {@link TypeParser#parse(String, GenericType)} when
  * you want to convert a string to a generic type known at compile time.
- * <p/>
+ * <p>
  * Additionally, use a subclass of this class when you want to register a {@link Parser} for a
  * generic type, by using this method: {@link TypeParserBuilder#registerParser(GenericType, Parser)}.
  * 

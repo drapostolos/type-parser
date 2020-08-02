@@ -28,9 +28,9 @@ abstract class Helper {
     /**
      * When the {@code targetType} is a parameterized type this method
      * returns a list with the type arguments.
-     * <p/>
+     * <p>
      * All type arguments must be none parameterized types (i.e. nested parameterized types are not
-     * supported), with one exception: {@link Class}. <br/>
+     * supported), with one exception: {@link Class}. <br>
      * 
      * @return List of {@link Class} types.
      * @throws UnsupportedOperationException if the {@code targetType} is not a parameterized type.
@@ -64,6 +64,7 @@ abstract class Helper {
      * Convenient method that returns the specified element in the list (as returned from method
      * {@link ParserHelper#getParameterizedClassArguments()}).
      *
+     * @param <T> the expected return type.
      * @param index index of the element to return
      * @return the element at the specified position in the list (as returned from method
      *         {@link ParserHelper#getParameterizedClassArguments()}).
@@ -89,6 +90,7 @@ abstract class Helper {
      * Assuming targeType is an instance of {@link Class},
      * otherwise throws an {@link UnsupportedOperationException}.
      * 
+     * @param <T> the expected return type.
      * @return {@link Class} object of the targetType.
      * @throws UnsupportedOperationException if targetType is not an instance of {@link Class}.
      */
@@ -107,7 +109,7 @@ abstract class Helper {
      * Checks if {@code targetType} is of Parameterized type, return true if it is,
      * otherwise false.
      * <p>
-     * Note!<br/>
+     * Note!<br>
      * If {@code targetType} is of a raw collection type (e.g. java.lang.List.class), then false is
      * returned.
      * 
@@ -119,11 +121,11 @@ abstract class Helper {
 
     /**
      * Checks if the raw format of {@code targetType} is assignable to the given {@code type}.
-     * <p/>
-     * Examples: <br \>
-     * <code>isTargetTypeAssignableTo(Number.class); // true</code> if targetType is Integer.class<br \>
+     * <p>
+     * Examples: <br>
+     * <code>isTargetTypeAssignableTo(Number.class); // true</code> if targetType is Integer.class<br>
      * <code>isTargetTypeAssignableTo(List.class); // true</code> if targetType is
-     * {@code List<Long>} <br \>
+     * {@code List<Long>} <br>
      * 
      * @param type check if {@code targetType} is assignable to this type.
      * @return true if {@code targetType} is assignable to the given {@code type}, otherwise false.
@@ -173,13 +175,14 @@ abstract class Helper {
 
     /**
      * Returns the raw format of {@code targetType}.
-     * <p \>
-     * Example <br \>
-     * String => String.class<br \>
-     * {@code List<Integer>} => List.class<br \>
-     * {@code String[]} => String[].class<br \>
-     * {@code Class<?>[]} => Class[].class<br \>
+     * <p>
+     * Example <br>
+     * String =&gt; String.class<br>
+     * {@code List<Integer>} =&gt; List.class<br>
+     * {@code String[]} =&gt; String[].class<br>
+     * {@code Class<?>[]} =&gt; Class[].class<br>
      * 
+     * @param <T> the expected return type.
      * @return the raw format of {@code targetType}
      */
     @SuppressWarnings("unchecked")

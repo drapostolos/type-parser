@@ -81,7 +81,7 @@ final class DynamicParsers {
 
                 Class<?> elementType = extractElementType(helper);
                 @SuppressWarnings("unchecked")
-                Collection<Object> collection = EnumSet.noneOf(elementType.asSubclass(Enum.class));
+                Collection<Object> collection = (Collection<Object>) EnumSet.noneOf(elementType.asSubclass(Enum.class));
                 return populateCollection(collection, elementType, input, helper);
             }
 

@@ -6,5 +6,5 @@ jdk:
 before_install:
  - chmod +x gradlew
  - chmod +x gradle/wrapper/gradle-wrapper.jar
- after_success:
-  - bash <(curl -s https://codecov.io/bash)
+after_success:
+ - bash <(curl -s https://codecov.io/bash)

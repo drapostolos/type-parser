@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/drapostolos/type-parser.svg?branch=master)](https://travis-ci.org/drapostolos/type-parser)
+[![Build Status](https://travis-ci.com/drapostolos/type-parser.svg?branch=master)](https://travis-ci.com/drapostolos/type-parser)
 [![Coverage Status](https://coveralls.io/repos/drapostolos/type-parser/badge.png)](https://coveralls.io/r/drapostolos/type-parser)
 type-parser
 ================

@@ -1,91 +1,91 @@
 plugins {
-  id 'net.researchgate.release' version '2.8.0'
-  id 'java'
-  id 'maven'
-  id 'signing'
+    id "maven-publish"
+    id "signing"
+    id "java-library"
+    id 'net.researchgate.release' version '3.0.2'
 }
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 sourceCompatibility = 1.8
 group = 'com.github.drapostolos'
 archivesBaseName = 'type-parser'
-afterReleaseBuild.dependsOn uploadArchives
 
 repositories {
     mavenCentral()
 }
 
 dependencies { 
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.assertj:assertj-core:1.7.1'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.assertj:assertj-core:1.7.1'
 }
 
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
+publishing {
+    repositories {
+        maven {
+            def releaseRepo = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotRepo = "https://oss.sonatype.org/content/repositories/snapshots/"
+            
+            name = "OSSRH"
+            url = isReleaseVersion ? releaseRepo : snapshotRepo
+            
+            credentials {
+                username = findProperty("ossrhUsername") ?: System.getenv("OSSRH_USERNAME")
+                password = findProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
+            }
+        }
+    }
 
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            
+            pom {
+                groupId = 'com.github.drapostolos'
+                name = 'type-parser'
+                description = 'This is a lightweigth library that does nothing but parse a string to a given type. Supports most of the java classes, such as Integer, File, Enum, Float and also generic types as well, such as List&lt;Integer&gt;, Set&lt;File&gt; etc. Also possible to register your own parsers.'
+                url = 'https://github.com/drapostolos/type-parser'
+                packaging = 'jar'
 
-artifacts {
-    archives javadocJar, sourcesJar
+                licenses {
+                    license {
+                        name = 'The MIT License (MIT'
+                        url = 'http://opensource.org/licenses/MIT'
+                    }
+                }
+
+                scm {
+                    url = 'https://github.com/drapostolos/type-parser'
+                    connection = 'scm:git://github.com:drapostolos/type-parser.git'
+                    developerConnection = 'scm:git://github.com:drapostolos/type-parser.git'
+                }
+
+                developers {
+                    developer {
+                        id = 'drapostolos'
+                        name = 'Alexander Poulikakos'
+                        email = 'github@labelscans.com'
+                    }
+                }
+            }
+        }
+    }
+    
 }
 
 signing {
-    required { gradle.taskGraph.hasTask("uploadArchives") }
-    sign configurations.archives
+    sign publishing.publications.mavenJava
 }
 
-uploadArchives {
-  repositories {
-    mavenDeployer {
-      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
-      }
-
-      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
-      }
-
-      pom.project {
-        name 'type-parser'
-        packaging 'jar'
-        description 'This is a lightweigth library that does nothing but parse a string to a given type. Supports most of the java classes, such as Integer, File, Enum, Float and also generic types as well, such as List&lt;Integer&gt;, Set&lt;File&gt; etc. Also possible to register your own parsers.'
-        url 'https://github.com/drapostolos/type-parser.git'
-
-        scm {
-          connection 'scm:git:https://github.com/drapostolos/type-parser.git'
-          developerConnection 'scm:git:https://github.com/drapostolos/type-parser.git'
-          url 'https://github.com/drapostolos/type-parser.git'
-        }
-
-        licenses {
-          license {
-            name 'The MIT License (MIT)'
-            url 'http://opensource.org/licenses/MIT'
-          }
-        }
-
-        developers {
-          developer {
-            id 'drapostolos'
-            name 'Alexander Poulikakos'
-            email 'github@labelscans.com'
-          }
-        }
-      }
-    }
-  }
+tasks.withType(Sign) {
+    onlyIf { isReleaseVersion }
 }
 
 release {
-    preTagCommitMessage = '[Gradle Release Plugin] - release '
-    tagCommitMessage = '[Gradle Release Plugin] - creating tag '
-    newVersionCommitMessage = '[Gradle Release Plugin] - prepare for next development iteration '
     tagTemplate = '$name-$version'
-    buildTasks = ['build']
 }

@@ -17,17 +17,17 @@ shared: &shared
 jobs:
   jdk8:
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: cimg/openjdk:8.0
     <<: *shared
     
   jdk11:
     docker:
-      - image: circleci/openjdk:11-jdk
+      - image: cimg/openjdk:11.0
     <<: *shared
 
   jdk17:
     docker:
-      - image: circleci/openjdk:17-jdk
+      - image: cimg/openjdk:17.0
     <<: *shared
 
 workflows:

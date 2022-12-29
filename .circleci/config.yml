@@ -15,12 +15,12 @@ shared: &shared
           path: build/reports/jacoco
           destination: test_coverage
 jobs:
-  java-11:
+  jdk11:
     docker:
       - image: circleci/openjdk:11-jdk
     <<: *shared
     
-  java-8:
+  jdk8:
     docker:
       - image: circleci/openjdk:8-jdk
     <<: *shared

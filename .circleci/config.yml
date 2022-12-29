@@ -14,17 +14,16 @@ shared: &shared
       - store_artifacts:
           path: build/reports/jacoco
           destination: test_coverage
+          
 jobs:
   jdk8:
     docker:
       - image: cimg/openjdk:8.0
     <<: *shared
-    
   jdk11:
     docker:
       - image: cimg/openjdk:11.0
     <<: *shared
-
   jdk17:
     docker:
       - image: cimg/openjdk:17.0

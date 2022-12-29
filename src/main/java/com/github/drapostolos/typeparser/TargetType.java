@@ -5,6 +5,7 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 final class TargetType {
@@ -56,7 +57,7 @@ final class TargetType {
         return targetType.getClass();
     }
 
-    final public List<Class<?>> getParameterizedClassArguments() {
+    List<Class<?>> getParameterizedClassArguments() {
         if (parameterizedClassArguments == null) {
             parameterizedClassArguments = extractParameterizedClassArguments();
         }
@@ -95,8 +96,17 @@ final class TargetType {
         return targetType.toString();
     }
 
-	public boolean isPrimitive() {
+	boolean isPrimitive() {
 		return targetType instanceof Class && ((Class<?>) targetType).isPrimitive();
+	}
+
+	List<Type> getParameterizedTypeArguments() {
+        if (!(isTargetTypeParameterized())) {
+            String message = String.format("type must be parameterized: %s", Util.objectToString(targetType));
+            throw new UnsupportedOperationException(message);
+        }
+        ParameterizedType pt = (ParameterizedType) targetType;
+        return Arrays.asList(pt.getActualTypeArguments());
 	}
 
 }

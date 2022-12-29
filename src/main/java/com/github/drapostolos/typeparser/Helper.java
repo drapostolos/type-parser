@@ -40,6 +40,19 @@ abstract class Helper {
     public final List<Class<?>> getParameterizedClassArguments() {
         return tt.getParameterizedClassArguments();
     }
+    
+    /**
+     * When the {@code targetType} is a parameterized type this method
+     * returns a list with the type arguments.
+     * <p>
+     * 
+     * @return List of {@link Type} types.
+     * @throws UnsupportedOperationException if the {@code targetType} is not a parameterized type.
+     */
+	public List<Type> getParameterizedTypeArguments() {
+		return tt.getParameterizedTypeArguments();
+	}
+
 
     /**
      * When the {@code targetType} is an array, this method

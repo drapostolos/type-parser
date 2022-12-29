@@ -3,6 +3,9 @@ plugins {
     id "signing"
     id "java-library"
     id 'net.researchgate.release' version '3.0.2'
+    id 'jacoco'
+    id 'pmd'
+    id 'checkstyle'
 }
 
 java {
@@ -24,6 +27,48 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.assertj:assertj-core:1.7.1'
 }
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        html.required = true
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.8
+            }
+        }
+    }
+}
+
+pmd {
+    consoleOutput = true
+    toolVersion = "6.21.0"
+    rulesMinimumPriority = 5
+}
+
+checkstyle {
+    toolVersion '8.40'
+    ignoreFailures true
+}
+
+tasks.withType(Checkstyle) {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+check.dependsOn jacocoTestCoverageVerification
 
 publishing {
     repositories {

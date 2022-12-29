@@ -15,14 +15,19 @@ shared: &shared
           path: build/reports/jacoco
           destination: test_coverage
 jobs:
+  jdk8:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    <<: *shared
+    
   jdk11:
     docker:
       - image: circleci/openjdk:11-jdk
     <<: *shared
-    
-  jdk8:
+
+  jdk17:
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: circleci/openjdk:17-jdk
     <<: *shared
 
 workflows:
@@ -31,3 +36,4 @@ workflows:
     jobs:
       - jdk8
       - jdk11
+      - jdk17

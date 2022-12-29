@@ -1,4 +1,4 @@
-[![drapostolos](https://circleci.com/gh/drapostolos/type-parser.svg?style=shield )](<LINK>)
+[![drapostolos](https://circleci.com/gh/drapostolos/type-parser.svg?style=shield )](https://app.circleci.com/pipelines/github/drapostolos/type-parser)
 
 type-parser
 ================

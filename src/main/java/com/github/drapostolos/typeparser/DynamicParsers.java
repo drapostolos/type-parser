@@ -146,10 +146,10 @@ final class DynamicParsers {
                 if (!helper.isTargetTypeAssignableTo(Map.class)) {
                     return TRY_NEXT;
                 }
-                Class<?> keyType = helper.getParameterizedClassArgumentByIndex(KEY);
-                Class<?> valueType = helper.getParameterizedClassArgumentByIndex(VALUE);
                 Map<Object, Object> map = instantiateMap(helper.getRawTargetClass());
                 for (String entryString : helper.split(input)) {
+                    Class<?> keyType = helper.getParameterizedClassArgumentByIndex(KEY);
+                    Class<?> valueType = helper.getParameterizedClassArgumentByIndex(VALUE);
                     List<String> entry = helper.splitKeyValue(entryString);
                     map.put(helper.parse(entry.get(KEY), keyType), helper.parse(entry.get(VALUE), valueType));
                 }
@@ -259,19 +259,13 @@ final class DynamicParsers {
 
             @Override
             public Object parseImp(final String input, ParserHelper helper) {
-                boolean methodFound = false;
-                Method method = null;
-                Object argument = null;
-
                 // try find a matching method.
                 for (Method m : helper.getRawTargetClass().getDeclaredMethods()) {
                     if (isStaticFactoryMethod(m)) {
                         Type argType = m.getGenericParameterTypes()[0];
                         try {
-                            argument = helper.parseType(input, argType);
-                            method = m;
-                            methodFound = true;
-                            break;
+                        	Object argument = helper.parseType(input, argType);
+                            return setMethodAccessibleAndInvoke(m, argument);
                         } catch (NoSuchRegisteredParserException e) {
                             continue;
                         } catch (TypeParserException e) {
@@ -285,10 +279,10 @@ final class DynamicParsers {
                         }
                     }
                 }
-                if (!methodFound) {
-                    return TRY_NEXT;
-                }
+                return TRY_NEXT;
+            }
 
+            private Object setMethodAccessibleAndInvoke(Method method, Object argument) {
                 final Object staticMethod = null;
                 try {
                     method.setAccessible(true);
@@ -299,9 +293,9 @@ final class DynamicParsers {
                     message = String.format(message, method, e.getMessage());
                     throw new UnsupportedOperationException(message, e);
                 }
-            }
+			}
 
-            private boolean isStaticFactoryMethod(Method m) {
+			private boolean isStaticFactoryMethod(Method m) {
                 return isStatic(m.getModifiers()) &&
                         m.getParameterTypes().length == 1 &&
                         m.getDeclaringClass().isAssignableFrom(m.getReturnType());
@@ -311,36 +305,31 @@ final class DynamicParsers {
 
             @Override
             public Object parseImp(final String input, ParserHelper helper) {
-                boolean constructorFound = false;
-                Constructor<?> constructor = null;
-                Object argument = null;
-
                 // try find a matching constructor.
-                for (Constructor<?> c : helper.getRawTargetClass().getDeclaredConstructors()) {
-                    if (c.getGenericParameterTypes().length == 1) {
-                        Type argType = c.getGenericParameterTypes()[0];
+                for (Constructor<?> constructor : helper.getRawTargetClass().getDeclaredConstructors()) {
+                	int lengthOf1Element = 1;
+                    if (constructor.getGenericParameterTypes().length == lengthOf1Element) {
+                        Type argType = constructor.getGenericParameterTypes()[0];
                         try {
-                            argument = helper.parseType(input, argType);
-                            constructor = c;
-                            constructorFound = true;
-                            break;
+                        	Object argument = helper.parseType(input, argType);
+                            return setConstructorAccessibleAndInstantiateIt(constructor, argument);
                         } catch (NoSuchRegisteredParserException e) {
                             continue;
                         } catch (TypeParserException e) {
                             if (e.getCause() instanceof StackOverflowError) {
                                 String message = "StackOverflowError: Cyclic argument type "
                                         + "for constructor '%s' on this type.";
-                                throw new StackOverflowError(String.format(message, c));
+                                throw new StackOverflowError(String.format(message, constructor));
                             } else {
                                 throw e;
                             }
                         }
                     }
                 }
-                if (!constructorFound) {
-                    return TRY_NEXT;
-                }
+                return TRY_NEXT;
+            }
 
+			Object setConstructorAccessibleAndInstantiateIt(Constructor<?> constructor, Object argument) {
                 constructor.setAccessible(true);
                 try {
                     return constructor.newInstance(argument);
@@ -349,7 +338,7 @@ final class DynamicParsers {
                     message = String.format(message, constructor, e.getMessage());
                     throw new UnsupportedOperationException(message, e);
                 }
-            }
+			}
         },
         PROPERTY_EDITOR {
             @Override

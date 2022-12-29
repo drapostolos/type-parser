@@ -175,18 +175,19 @@ public final class TypeParser {
     }
 
     private Object invokeParser(TargetType targetType, String preprocessedInput) {
-        ParserHelper helper = new ParserHelper(targetType, this);
         if (parsers.containsKey(targetType.targetType())) {
-            Parser<?> parser = parsers.get(targetType.targetType());
+            ParserHelper helper = new ParserHelper(targetType, this);
             if(targetType.isPrimitive() && helper.isNullString(preprocessedInput)) {
 				throw new UnsupportedOperationException("Primitive can not be set to null");
             }
             if (helper.isNullString(preprocessedInput)) {
                 return null;
             }
+            Parser<?> parser = parsers.get(targetType.targetType());
             return parser.parse(preprocessedInput, helper);
         }
         for (DynamicParser dynamicParser : dynamicParsers) {
+            ParserHelper helper = new ParserHelper(targetType, this);
             Object result = dynamicParser.parse(preprocessedInput, helper);
             if (result != TRY_NEXT) {
                 return result;

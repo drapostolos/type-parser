@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  build:
+  build1:
     docker:
       - image: cimg/openjdk:8.0
 
@@ -23,7 +23,7 @@ jobs:
           path: build/reports/jacoco
           destination: test_coverage
 
-  build:
+  build2:
     docker:
       - image: cimg/openjdk:11.0
 

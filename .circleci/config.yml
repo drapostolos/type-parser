@@ -1,20 +1,16 @@
-version: 2.1
+version: 2
 shared: &shared
   working_directory: ~/repo
   environment:
     JVM_OPTS: -Xmx1g
  steps:
       - checkout
-
       - run: ./gradlew clean build
-
       - store_test_results:
           path: build/test-results
-
       - store_artifacts:
           path: build/reports/tests/test
           destination: test_result
-
       - store_artifacts:
           path: build/reports/jacoco
           destination: test_coverage

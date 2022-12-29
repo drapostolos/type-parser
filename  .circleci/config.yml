@@ -22,11 +22,3 @@ jobs:
       - store_artifacts:
           path: build/reports/jacoco
           destination: test_coverage
-
-      - store_artifacts:
-          path: build/reports/pmd
-          destination: pmd
-
-      - store_artifacts:
-          path: build/reports/checkstyle
-          destination: checkstyle

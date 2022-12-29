@@ -18,6 +18,7 @@ shared: &shared
       - store_artifacts:
           path: build/reports/jacoco
           destination: test_coverage
+          
 jobs:
   java-11:
     docker:

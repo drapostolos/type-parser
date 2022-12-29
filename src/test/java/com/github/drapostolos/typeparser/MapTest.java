@@ -56,15 +56,20 @@ public class MapTest extends TestBase {
                 new GenericType<Hashtable<String, String>>() {},
                 new GenericType<TreeMap<String, String>>() {}
                 );
-
     }
 
     private void parseToConcreteMapTypes(@SuppressWarnings("unchecked") GenericType<? extends Map<String, String>>... types) {
         for (GenericType<? extends Map<String, String>> type : types) {
             Class<?> rawType = toRawType(type);
             Map<String, String> map = parser.parse("a=A", type);
+            /*
+             * Workaround for testing IdentityHashMap with assertJ (version: 3.23.1)
+             */
+            map.forEach((k, v) -> assertThat(k).describedAs("key: %s", k).isEqualTo("a"));
+            map.forEach((k, v) -> assertThat(v).describedAs("value: %s", v).isEqualTo("A"));
+            
             assertThat(map)
-                    .containsOnly(MapEntry.entry("a", "A"))
+                    .describedAs("type: %s", type)
                     .isInstanceOf(rawType);
             assertThat(map.getClass())
                     .isEqualTo(rawType);

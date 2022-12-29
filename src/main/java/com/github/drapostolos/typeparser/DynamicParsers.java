@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.SortedMap;
@@ -204,7 +205,20 @@ final class DynamicParsers {
                 }
                 return result;
             }
-        };
+        },
+    	OPTIONAL {
+
+			@Override
+			public Object parse(String input, ParserHelper helper) {
+                if (!helper.isTargetTypeAssignableTo(Optional.class)) {
+                    return TRY_NEXT;
+                }
+                Object value = helper.parseType(input, helper.getParameterizedTypeArguments().get(0));
+                return Optional.ofNullable(value);
+			}
+    		
+    	},
+;
 
         static private Collection<Object> populateCollection(Collection<Object> collection,
                 Class<?> elementType, String input, ParserHelper helper) {

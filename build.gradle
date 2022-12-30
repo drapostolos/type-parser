@@ -1,3 +1,5 @@
+// https://medium.com/viascom/complete-guide-publish-with-gradle-to-maven-central-native-7b128addbb6
+// https://github.com/researchgate/gradle-release
 plugins {
     id "maven-publish"
     id "signing"
@@ -79,7 +81,7 @@ publishing {
 
                 licenses {
                     license {
-                        name = 'The MIT License (MIT'
+                        name = 'The MIT License (MIT)'
                         url = 'http://opensource.org/licenses/MIT'
                     }
                 }
@@ -100,7 +102,6 @@ publishing {
             }
         }
     }
-    
 }
 
 signing {
@@ -118,3 +119,5 @@ release {
         requireBranch.set('master')
     }
 }
+afterReleaseBuild.dependsOn publish
+

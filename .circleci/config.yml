@@ -1,4 +1,7 @@
 version: 2.1
+orbs:
+  codecov: codecov/codecov@3.2.4
+
 shared: &shared
   working_directory: ~/repo
   environment:
@@ -6,6 +9,7 @@ shared: &shared
   steps:
       - checkout
       - run: ./gradlew clean build
+      - codecov/upload:
       - store_test_results:
           path: build/test-results
       - store_artifacts:

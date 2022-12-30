@@ -1,4 +1,5 @@
 [![drapostolos](https://circleci.com/gh/drapostolos/type-parser.svg?style=shield )](https://app.circleci.com/pipelines/github/drapostolos/type-parser)
+[![codecov](https://codecov.io/github/drapostolos/type-parser/branch/master/graph/badge.svg?token=ZakwLLdB1g)](https://codecov.io/github/drapostolos/type-parser)
 
 type-parser
 ================

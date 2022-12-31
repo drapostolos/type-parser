@@ -16,7 +16,7 @@ import java.util.Map;
  * For example converting "1" to an {@code Integer} type, or "1,2,3" to a {@code List<Integer>}
  * type.
  * 
- * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki"
  *      target="_blank">User-Guide</a>
  */
 public final class TypeParser {

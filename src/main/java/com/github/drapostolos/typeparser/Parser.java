@@ -5,7 +5,7 @@ package com.github.drapostolos.typeparser;
  * a specific type. Implementations of this interface are expected to be immutable.
  * 
  * @param <T> the type to convert the parsed string to.
- * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki"
  *      target="_blank">User-Guide</a>
  */
 @FunctionalInterface

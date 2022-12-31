@@ -19,7 +19,7 @@ import java.util.Map;
  * parser.parse(" null ", Integer[].class); // returns an empty Integer array<br>
  * </code>
  * 
- * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki"
  *      target="_blank">User-Guide</a>
  * @see TypeParserBuilder#setNullStringStrategy(NullStringStrategy)
  */

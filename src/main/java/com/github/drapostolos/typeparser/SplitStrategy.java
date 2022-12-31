@@ -11,7 +11,7 @@ import java.util.Map;
  * <p>
  * Implementations of this interface are expected to be immutable.
  * 
- * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki"
  *      target="_blank">User-Guide</a>
  */
 @FunctionalInterface

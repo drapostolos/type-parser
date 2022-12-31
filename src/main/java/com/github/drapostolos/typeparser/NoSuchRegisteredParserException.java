@@ -4,7 +4,7 @@ package com.github.drapostolos.typeparser;
  * A {@link NoSuchRegisteredParserException} is thrown when there is NO registered {@link Parser}
  * for a given {@code targetType}.
  * 
- * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki"
  *      target="_blank">User-Guide</a>
  */
 public final class NoSuchRegisteredParserException extends RuntimeException {

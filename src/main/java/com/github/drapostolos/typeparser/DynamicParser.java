@@ -15,7 +15,7 @@ package com.github.drapostolos.typeparser;
  * Register {@link DynamicParser}s with this method
  * {@link TypeParserBuilder#registerDynamicParser(DynamicParser)}.
  * 
- * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki"
  *      target="_blank">User-Guide</a>
  */
 @FunctionalInterface

@@ -4,7 +4,7 @@ package com.github.drapostolos.typeparser;
  * This wraps any unexpected {@link RuntimeException} thrown in parsing process
  * and propagates up to the client.
  * 
- * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki"
  *      target="_blank">User-Guide</a>
  */
 public class TypeParserException extends RuntimeException {

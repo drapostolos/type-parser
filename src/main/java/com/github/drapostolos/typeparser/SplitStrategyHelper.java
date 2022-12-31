@@ -9,7 +9,7 @@ import java.util.List;
  * Helper class providing helper methods to implementations of {@link SplitStrategy} when splitting
  * a string into sub-strings.
  * 
- * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki"
  *      target="_blank">User-Guide</a>
  */
 public final class SplitStrategyHelper extends Helper {

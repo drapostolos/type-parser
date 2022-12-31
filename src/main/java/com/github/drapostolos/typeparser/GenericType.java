@@ -18,7 +18,7 @@ import java.lang.reflect.Type;
  * generic type, by using this method: {@link TypeParserBuilder#registerParser(GenericType, Parser)}.
  * 
  * @param <T> a generic type, example: {@code List<String>}
- * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki"
  *      target="_blank">User-Guide</a>
  */
 public abstract class GenericType<T> {

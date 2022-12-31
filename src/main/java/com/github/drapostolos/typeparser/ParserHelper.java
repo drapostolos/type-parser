@@ -13,7 +13,7 @@ import java.util.List;
  * The {@link TypeParser} will automatically inject an instance of this class into the
  * {@link Parser} implementation.
  * 
- * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki"
  *      target="_blank">User-Guide</a>
  */
 public final class ParserHelper extends Helper {

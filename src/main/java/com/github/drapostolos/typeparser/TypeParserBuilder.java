@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * Builder class for constructing and configuring instances of {@link TypeParser}.
  * 
- * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki"
  *      target="_blank">User-Guide</a>
  */
 public final class TypeParserBuilder {

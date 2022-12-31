@@ -6,7 +6,7 @@ import static com.github.drapostolos.typeparser.Util.makeNullArgumentErrorMsg;
  * Helper class providing helper methods to implementations of {@link InputPreprocessor} when
  * preparing an input string for parsing.
  * 
- * @see <a href="https://github.com/drapostolos/type-parser/wiki/User-Guide"
+ * @see <a href="https://github.com/drapostolos/type-parser/wiki"
  *      target="_blank">User-Guide</a>
  */
 public final class InputPreprocessorHelper extends Helper {

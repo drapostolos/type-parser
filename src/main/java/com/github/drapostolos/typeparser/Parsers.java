@@ -12,6 +12,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -86,7 +89,10 @@ enum Parsers implements Parser<Object> {
 		} catch (ParseException e) {
 			throw new IllegalArgumentException(e.getMessage(), e);
 		}}),
-    PATH(Path.class, (input,helper) -> Paths.get(input.trim()));
+    PATH(Path.class, (input,helper) -> Paths.get(input.trim())),
+	LOCAL_DATE(LocalDate.class, (input, helper) -> LocalDate.parse(input.trim())),
+	LOCAL_TIME(LocalTime.class, (input, helper) -> LocalTime.parse(input.trim())),
+	LOCA_DATE_TIME(LocalDateTime.class, (input, helper) -> LocalDateTime.parse(input.trim()));
 
 	private static final Map<Type, Parser<?>> DEFAULT_PARSERS;
 	private List<Type> types = new ArrayList<>();
